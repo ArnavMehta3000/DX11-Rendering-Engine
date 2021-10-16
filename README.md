@@ -1,2 +1,2 @@
 # DirectX 11 Framework
- A
+A framework that renders basic stuff on screen
