@@ -150,17 +150,18 @@ HRESULT Application::InitVertexBuffer()
 {
 	HRESULT hr;
 
-	// Create vertex buffer
+	// Vertex Buffer
 	SimpleVertex vertices[] =
 	{
-		{XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},
-		{XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},
-		{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},
-		{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
-		{XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)}
+		{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},  // Vert 0 - White
+		{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},  // Vert 1 - Red
+		{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},  // Vert 2 - Green
+		{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},  // Vert 3 - Blue
+		{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},   // Vert 4 - Yellow
+		{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},   // Vert 5 - Cyan
+		{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)},   // Vert 6 - Pink
+		{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}    // Vert 7 - Black
+
 	};
 
 	D3D11_BUFFER_DESC bd;
@@ -189,25 +190,36 @@ HRESULT Application::InitIndexBuffer()
 	// Create index buffer
 	WORD indices[] =
 	{
-		0, 1, 2,    // side 1
-		2, 1, 3,
-		4, 0, 6,    // side 2
-		6, 0, 2,
-		7, 6, 5,    // side 3
-		6, 5, 4,
-		3, 1, 7,    // side 4
-		7, 1, 5,
-		4, 0, 5,    // side 5
-		0, 5, 1,
-		3, 7, 2,    // side 6
-		2, 7, 6
+		// Face 1
+		0,2,1, // -x
+		1,2,3,
+
+		// Face 2
+		4,5,6, // +x
+		5,7,6,
+
+		// Face 3
+		0,1,5, // -y
+		0,5,4,
+
+		// Face 4
+		2,6,7, // +y
+		2,7,3,
+
+		// Face 5
+		0,4,6, // -z
+		0,6,2,
+
+		// Face 6
+		1,3,7, // +z
+		1,7,5,
 	};
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(WORD) * 12;     
+	bd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces     
 	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 
@@ -432,7 +444,7 @@ void Application::Update()
 		if (dwTimeStart == 0)
 			dwTimeStart = dwTimeCur;
 
-		t = (dwTimeCur - dwTimeStart) / 1000.0f;
+		t = (dwTimeCur - dwTimeStart) / 500.0f;
 	}
 
 	//
@@ -469,7 +481,7 @@ void Application::Draw()
 	_pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
-	_pImmediateContext->DrawIndexed(12, 0, 0);        
+	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
 	//
 	// Present our back buffer to our front buffer
