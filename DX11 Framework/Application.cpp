@@ -367,7 +367,28 @@ HRESULT Application::InitDevice()
 	if (FAILED(hr))
 		return hr;
 
-	_pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, nullptr);
+
+	// Define depth/stencil buffer
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+	depthStencilDesc.Width = _WindowWidth;
+	depthStencilDesc.Height = _WindowHeight;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality= 0;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	//// Create depth.stencil buffer
+	hr = _pd3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, &_depthStencilBuffer);
+	if (_depthStencilBuffer != 0)
+		hr = _pd3dDevice->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
+
+	// Add it to the output merger
+	_pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView); // TODO: Fix access violation
 
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
@@ -405,6 +426,12 @@ HRESULT Application::InitDevice()
 	bd.CPUAccessFlags = 0;
 	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &_pConstantBuffer);
 
+
+
+	
+
+
+
 	if (FAILED(hr))
 		return hr;
 
@@ -415,16 +442,18 @@ void Application::Cleanup()
 {
 	if (_pImmediateContext) _pImmediateContext->ClearState();
 
-	if (_pConstantBuffer) _pConstantBuffer->Release();
-	if (_pVertexBuffer) _pVertexBuffer->Release();
-	if (_pIndexBuffer) _pIndexBuffer->Release();
-	if (_pVertexLayout) _pVertexLayout->Release();
-	if (_pVertexShader) _pVertexShader->Release();
-	if (_pPixelShader) _pPixelShader->Release();
-	if (_pRenderTargetView) _pRenderTargetView->Release();
-	if (_pSwapChain) _pSwapChain->Release();
-	if (_pImmediateContext) _pImmediateContext->Release();
-	if (_pd3dDevice) _pd3dDevice->Release();
+	if (_pConstantBuffer)	 _pConstantBuffer->Release();
+	if (_pVertexBuffer)		 _pVertexBuffer->Release();
+	if (_pIndexBuffer)		 _pIndexBuffer->Release();
+	if (_depthStencilView)	 _depthStencilView->Release();
+	if (_depthStencilBuffer) _depthStencilBuffer->Release();
+	if (_pVertexLayout)		 _pVertexLayout->Release();
+	if (_pVertexShader)      _pVertexShader->Release();
+	if (_pPixelShader)		 _pPixelShader->Release();
+	if (_pRenderTargetView)  _pRenderTargetView->Release();
+	if (_pSwapChain)		 _pSwapChain->Release();
+	if (_pImmediateContext)  _pImmediateContext->Release();
+	if (_pd3dDevice)		 _pd3dDevice->Release();
 }
 
 void Application::Update()
@@ -444,14 +473,16 @@ void Application::Update()
 		if (dwTimeStart == 0)
 			dwTimeStart = dwTimeCur;
 
-		t = (dwTimeCur - dwTimeStart) / 500.0f;
+		t = (dwTimeCur - dwTimeStart) / 750.0f;
 	}
 
-	//
+	
 	// Animate the cube
-	//
-	XMStoreFloat4x4(&_world, XMMatrixRotationY(t) * XMMatrixTranslation(-1.0f, 0.0f, 0.0f));
-	XMStoreFloat4x4(&_world2, XMMatrixRotationY(t) * XMMatrixTranslation(1.0f, 0.0f, 0.0f));
+	float scale1 = sin(t / 0.5f);
+	float scale2 = cos(t / 0.5f);
+
+	XMStoreFloat4x4(&_world, XMMatrixRotationY(t) * XMMatrixTranslation(-1.0f, 0.0f, 0.0f) * XMMatrixScaling(scale1, scale1, scale1));
+	XMStoreFloat4x4(&_world2, XMMatrixRotationX(t) * XMMatrixTranslation(1.0f, 0.0f, 0.0f) * XMMatrixScaling(scale2, scale2, scale2));
 }
 
 void Application::Draw()
@@ -461,6 +492,9 @@ void Application::Draw()
 	//
 	float ClearColor[4] = {0.0f, 0.125f, 0.3f, 1.0f}; // red,green,blue,alpha
 	_pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
+
+	// Clear depth stencil 
+	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	XMMATRIX world = XMLoadFloat4x4(&_world);
 	XMMATRIX view = XMLoadFloat4x4(&_view);
@@ -490,6 +524,7 @@ void Application::Draw()
 	cb.mWorld = XMMatrixTranspose(world);
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
 
 
 	//
