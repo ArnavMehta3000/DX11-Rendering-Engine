@@ -1,6 +1,4 @@
 ﻿  Application.cpp
 D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(481,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(482,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(481,8): warning C4189: 'scale1': local variable is initialized but not referenced
-D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(482,8): warning C4189: 'scale2': local variable is initialized but not referenced
   DX11 Framework.vcxproj -> D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Debug\DX11 Framework.exe
