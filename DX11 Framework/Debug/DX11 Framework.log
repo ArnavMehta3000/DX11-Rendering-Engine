@@ -1,5 +1,2 @@
 ﻿  Application.cpp
-  LINK : D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Debug\DX11 Framework.exe not found or not built by the last incremental link; performing full link
-Application.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
-DX11 Framework.obj : warning LNK4204: '' is missing debugging information for referencing module; linking object as if no debug info
   DX11 Framework.vcxproj -> D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Debug\DX11 Framework.exe
