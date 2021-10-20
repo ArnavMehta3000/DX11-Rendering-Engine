@@ -7,17 +7,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
-		case WM_PAINT:
-			hdc = BeginPaint(hWnd, &ps);
-			EndPaint(hWnd, &ps);
-			break;
+	case WM_PAINT:
+		hdc = BeginPaint(hWnd, &ps);
+		EndPaint(hWnd, &ps);
+		break;
 
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
 
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 
 	return 0;
@@ -66,7 +66,8 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	}
 
 	// Initialize the world matrix
-	XMStoreFloat4x4(&_world, XMMatrixIdentity());
+	for (auto w : _world)
+		XMStoreFloat4x4(&w, XMMatrixIdentity());
 
 	// Initialize the view matrix
 	XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);
@@ -76,7 +77,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	XMStoreFloat4x4(&_view, XMMatrixLookAtLH(Eye, At, Up));
 
 	// Initialize the projection matrix
-	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _WindowWidth / (FLOAT) _WindowHeight, 0.01f, 100.0f));
+	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _WindowWidth / (FLOAT)_WindowHeight, 0.01f, 100.0f));
 
 	return S_OK;
 }
@@ -92,7 +93,7 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
-				   L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+			L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
 		return hr;
 	}
 
@@ -100,7 +101,7 @@ HRESULT Application::InitShadersAndInputLayout()
 	hr = _pd3dDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &_pVertexShader);
 
 	if (FAILED(hr))
-	{	
+	{
 		pVSBlob->Release();
 		return hr;
 	}
@@ -112,7 +113,7 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
-				   L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+			L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
 		return hr;
 	}
 
@@ -134,7 +135,7 @@ HRESULT Application::InitShadersAndInputLayout()
 
 	// Create the input layout
 	hr = _pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(),
-										pVSBlob->GetBufferSize(), &_pVertexLayout);
+		pVSBlob->GetBufferSize(), &_pVertexLayout);
 	pVSBlob->Release();
 
 	if (FAILED(hr))
@@ -245,7 +246,7 @@ HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
 	wcex.hIcon = LoadIcon(hInstance, (LPCTSTR)IDI_TUTORIAL1);
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW );
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.lpszMenuName = nullptr;
 	wcex.lpszClassName = L"TutorialWindowClass";
@@ -255,11 +256,11 @@ HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 
 	// Create window
 	_hInst = hInstance;
-	RECT rc = {0, 0, 640, 480};
+	RECT rc = { 0, 0, 640, 480 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	_hWnd = CreateWindow(L"TutorialWindowClass", L"DX11 Framework", WS_OVERLAPPEDWINDOW,
-						 CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
-						 nullptr);
+		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
+		nullptr);
 	if (!_hWnd)
 		return E_FAIL;
 
@@ -282,7 +283,7 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 #endif
 
 	ID3DBlob* pErrorBlob;
-	hr = D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel, 
+	hr = D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel,
 		dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
 
 	if (FAILED(hr))
@@ -299,6 +300,8 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 
 	return S_OK;
 }
+
+
 
 HRESULT Application::InitDevice()
 {
@@ -346,7 +349,7 @@ HRESULT Application::InitDevice()
 	{
 		_driverType = driverTypes[driverTypeIndex];
 		hr = D3D11CreateDeviceAndSwapChain(nullptr, _driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-										   D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &_featureLevel, &_pImmediateContext);
+			D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &_featureLevel, &_pImmediateContext);
 		if (SUCCEEDED(hr))
 			break;
 	}
@@ -376,7 +379,7 @@ HRESULT Application::InitDevice()
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilDesc.SampleDesc.Count = 1;
-	depthStencilDesc.SampleDesc.Quality= 0;
+	depthStencilDesc.SampleDesc.Quality = 0;
 	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	depthStencilDesc.CPUAccessFlags = 0;
@@ -427,10 +430,20 @@ HRESULT Application::InitDevice()
 	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &_pConstantBuffer);
 
 
+	// Define rasterizer state - Wire Framee
+	D3D11_RASTERIZER_DESC wfdesc;
+	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));  // Clear memory
+	wfdesc.FillMode = D3D11_FILL_WIREFRAME; //D3D10_FILL_SOLID for solid rendering
+	wfdesc.CullMode = D3D11_CULL_NONE;  // FRONT: for front face culling (front face not rendered) | default is BACK
+	wfdesc.DepthClipEnable = true;  // Enable clipping
+	hr = _pd3dDevice->CreateRasterizerState(&wfdesc, &_wireFrame);
 
-	
-
-
+	// Define rasterizer state - Solid
+	D3D11_RASTERIZER_DESC solidDesc;
+	ZeroMemory(&solidDesc, sizeof(D3D11_RASTERIZER_DESC));  // Clear memory
+	solidDesc.FillMode = D3D11_FILL_SOLID;
+	solidDesc.CullMode = D3D11_CULL_BACK;
+	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solid);
 
 	if (FAILED(hr))
 		return hr;
@@ -440,8 +453,10 @@ HRESULT Application::InitDevice()
 
 void Application::Cleanup()
 {
-	if (_pImmediateContext) _pImmediateContext->ClearState();
+	if (_pImmediateContext)  _pImmediateContext->ClearState();
 
+	if (_wireFrame)			 _wireFrame->Release();
+	if (_solid)				 _solid->Release();
 	if (_pConstantBuffer)	 _pConstantBuffer->Release();
 	if (_pVertexBuffer)		 _pVertexBuffer->Release();
 	if (_pIndexBuffer)		 _pIndexBuffer->Release();
@@ -458,12 +473,26 @@ void Application::Cleanup()
 
 void Application::Update()
 {
+	// Input Handling
+	if (GetAsyncKeyState(VK_RSHIFT)) // Set wire frame
+	{
+		if (!isWireFrame)  // Is solid, set wire frame
+			_pImmediateContext->RSSetState(_wireFrame);
+		if (isWireFrame)  // Is wire frame, set solid
+			_pImmediateContext->RSSetState(_solid);
+
+		isWireFrame = !isWireFrame;
+	}
+
+
+
+
 	// Update our time
 	static float t = 0.0f;
 
 	if (_driverType == D3D_DRIVER_TYPE_REFERENCE)
 	{
-		t += (float) XM_PI * 0.0125f;
+		t += (float)XM_PI * 0.0125f;
 	}
 	else
 	{
@@ -473,37 +502,34 @@ void Application::Update()
 		if (dwTimeStart == 0)
 			dwTimeStart = dwTimeCur;
 
-		t = (dwTimeCur - dwTimeStart) / 750.0f;
+		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
-	
-	// Animate the cube
-	float scale1 = sin(t / 0.5f);
-	float scale2 = cos(t / 0.5f);
 
-	XMStoreFloat4x4(&_world, XMMatrixRotationY(t) * XMMatrixTranslation(-1.0f, 0.0f, 0.0f) * XMMatrixScaling(scale1, scale1, scale1));
-	XMStoreFloat4x4(&_world2, XMMatrixRotationX(t) * XMMatrixTranslation(1.0f, 0.0f, 0.0f) * XMMatrixScaling(scale2, scale2, scale2));
+	XMStoreFloat4x4(&_world[0], XMMatrixRotationZ(t / 3) * XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixScaling(0.8f, 0.8f, 0.8f));  // Sun cube
+	XMStoreFloat4x4(&_world[1], XMMatrixTranslation(6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet1 cube
+	XMStoreFloat4x4(&_world[2], XMMatrixTranslation(-6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet2 cube
+	// Radius of rotation around planet * rotation angle * scale * rotation origin
+	XMStoreFloat4x4(&_world[3], (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world[2]._41, _world[2]._42, _world[2]._43)));  // Planet1 moon cube
+	XMStoreFloat4x4(&_world[4], (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world[4]._41, _world[4]._42, _world[4]._43)));  // Planet2 moon cube
+
 }
 
 void Application::Draw()
 {
-	//
 	// Clear the back buffer
-	//
-	float ClearColor[4] = {0.0f, 0.125f, 0.3f, 1.0f}; // red,green,blue,alpha
+	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red,green,blue,alpha
 	_pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
 	// Clear depth stencil 
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	XMMATRIX world = XMLoadFloat4x4(&_world);
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
 	//
 	// Update variables
 	//
 	ConstantBuffer cb;
-	cb.mWorld = XMMatrixTranspose(world);
 	cb.mView = XMMatrixTranspose(view);
 	cb.mProjection = XMMatrixTranspose(projection);
 
@@ -518,12 +544,40 @@ void Application::Draw()
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
+	// Render cubes
+	for (auto w : _world)
+	{
+		XMMATRIX world = XMLoadFloat4x4(&w);
+		world = XMLoadFloat4x4(&w);
+		cb.mWorld = XMMatrixTranspose(world);
+		_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+		_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	}
 
-	// Second cube
-	world = XMLoadFloat4x4(&_world2);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Second cube
+	//world = XMLoadFloat4x4(&_world2);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Third cube
+	//world = XMLoadFloat4x4(&_world3);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Fourth cube
+	//world = XMLoadFloat4x4(&_world4);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Fifth cube
+	//world = XMLoadFloat4x4(&_world5);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
 
 

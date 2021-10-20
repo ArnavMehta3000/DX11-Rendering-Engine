@@ -39,11 +39,13 @@ private:
 	ID3D11Buffer*           _pVertexBuffer;
 	ID3D11Buffer*           _pIndexBuffer;
 	ID3D11Buffer*           _pConstantBuffer;
-	XMFLOAT4X4              _world, _world2;
+	XMFLOAT4X4              _world[5];// , _world2, _world3, _world4, _world5;
 	XMFLOAT4X4              _view;
 	XMFLOAT4X4              _projection;
 	ID3D11DepthStencilView* _depthStencilView;
 	ID3D11Texture2D*        _depthStencilBuffer = NULL;
+	ID3D11RasterizerState*  _wireFrame;
+	ID3D11RasterizerState*  _solid;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
@@ -56,6 +58,8 @@ private:
 
 	UINT _WindowHeight;
 	UINT _WindowWidth;
+
+	bool isWireFrame = false;
 
 public:
 	Application();
