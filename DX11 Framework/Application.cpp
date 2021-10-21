@@ -83,7 +83,9 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 HRESULT Application::InitShadersAndInputLayout()
 {
 	HRESULT hr;
-
+	Vector3 vec(1, 2, 3);
+	Vector3 vec1(1, 2, 3);
+	(vec + vec1).Debug("This is a test");
 	// Compile the vertex shader
 	ID3DBlob* pVSBlob = nullptr;
 	hr = CompileShaderFromFile(L"DX11 Framework.fx", "VS", "vs_4_0", &pVSBlob);
@@ -472,7 +474,8 @@ void Application::Cleanup()
 void Application::Update()
 {
 	// Input Handling
-	if (GetAsyncKeyState(VK_RSHIFT)) // Set wire frame
+	const char KEYUP = 0x1;
+	if (GetAsyncKeyState(VK_LCONTROL) & KEYUP) // Set wire frame
 	{
 		if (!isWireFrame)  // Is solid, set wire frame
 			_pImmediateContext->RSSetState(_wireFrame);
