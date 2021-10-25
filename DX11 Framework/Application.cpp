@@ -66,6 +66,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	}
 
 	XMStoreFloat4x4(&_world, XMMatrixIdentity());
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixIdentity());
 
 	// Initialize the view matrix
 	XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);
@@ -83,9 +84,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 HRESULT Application::InitShadersAndInputLayout()
 {
 	HRESULT hr;
-	Vector3 vec(1, 2, 3);
-	Vector3 vec1(1, 2, 3);
-	(vec + vec1).Debug("This is a test");
+
 	// Compile the vertex shader
 	ID3DBlob* pVSBlob = nullptr;
 	hr = CompileShaderFromFile(L"DX11 Framework.fx", "VS", "vs_4_0", &pVSBlob);
@@ -152,29 +151,39 @@ HRESULT Application::InitVertexBuffer()
 	HRESULT hr;
 
 	// Vertex Buffer
-	SimpleVertex vertices[] =
+	SimpleVertex cubeVertices[] =
 	{
 		{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},  // Vert 0 - White
 		{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},  // Vert 1 - Red
 		{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},  // Vert 2 - Green
 		{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},  // Vert 3 - Blue
-		{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},   // Vert 4 - Yellow
-		{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},   // Vert 5 - Cyan
-		{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)},   // Vert 6 - Pink
-		{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}    // Vert 7 - Black
+		{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},  // Vert 4 - Yellow
+		{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},  // Vert 5 - Cyan
+		{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)},  // Vert 6 - Pink
+		{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}   // Vert 7 - Black
+	};
 
+	SimpleVertex pyramidVertices[] =
+	{
+		// Base
+		{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3( 1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3( 1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		// Tip
+		{ XMFLOAT3( 0.0f,  1.0f,  0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
 	};
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex) * 8;
+	bd.ByteWidth = sizeof(SimpleVertex) * 5;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = vertices;
+	InitData.pSysMem = pyramidVertices;
 
 	hr = _pd3dDevice->CreateBuffer(&bd, &InitData, &_pVertexBuffer);
 
@@ -189,7 +198,7 @@ HRESULT Application::InitIndexBuffer()
 	HRESULT hr;
 
 	// Create index buffer
-	WORD indices[] =
+	WORD cubeIndices[] =
 	{
 		// Face 1
 		0,1,2, // -x
@@ -216,17 +225,27 @@ HRESULT Application::InitIndexBuffer()
 		1,5,7,
 	};
 
+	WORD pyramidIndices[] =
+	{
+		0, 2, 1,
+		1, 2, 3,
+		0, 1, 4,
+		1, 3, 4,
+		3, 2, 4,
+		2, 0, 4
+	};
+
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces     
+	bd.ByteWidth = sizeof(WORD) * 3 * 6;// * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
 	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = indices;
+	InitData.pSysMem = pyramidIndices;
 	hr = _pd3dDevice->CreateBuffer(&bd, &InitData, &_pIndexBuffer);
 
 	if (FAILED(hr))
@@ -276,8 +295,8 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #if defined(DEBUG) || defined(_DEBUG)
 	// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
-	// Setting this flag improves the shader debugging experience, but still allows 
-	// the shaders to be optimized and to run exactly the way they will run in 
+	// Setting this flag improves the shader debugging experience, but still allows
+	// the shaders to be optimized and to run exactly the way they will run in
 	// the release configuration of this program.
 	dwShaderFlags |= D3DCOMPILE_DEBUG;
 #endif
@@ -300,8 +319,6 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 
 	return S_OK;
 }
-
-
 
 HRESULT Application::InitDevice()
 {
@@ -370,7 +387,6 @@ HRESULT Application::InitDevice()
 	if (FAILED(hr))
 		return hr;
 
-
 	// Define depth/stencil buffer
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	depthStencilDesc.Width = _WindowWidth;
@@ -429,8 +445,7 @@ HRESULT Application::InitDevice()
 	bd.CPUAccessFlags = 0;
 	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &_pConstantBuffer);
 
-
-	// Define rasterizer state - Wire Framee
+	// Define rasterizer state - Wire Frame
 	D3D11_RASTERIZER_DESC wfdesc;
 	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));  // Clear memory
 	wfdesc.FillMode = D3D11_FILL_WIREFRAME; //D3D10_FILL_SOLID for solid rendering
@@ -485,9 +500,6 @@ void Application::Update()
 		isWireFrame = !isWireFrame;
 	}
 
-
-
-
 	// Update our time
 	static float t = 0.0f;
 
@@ -506,14 +518,16 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
+	// Pyramid
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t));
 
-	XMStoreFloat4x4(&_world, XMMatrixRotationZ(t / 3) * XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixScaling(0.8f, 0.8f, 0.8f));  // Sun cube
-	XMStoreFloat4x4(&_world2, XMMatrixTranslation(6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet1 cube
-	XMStoreFloat4x4(&_world3, XMMatrixTranslation(-6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet2 cube
-	// Radius of rotation around planet * rotation angle * scale * rotation origin
-	XMStoreFloat4x4(&_world4, (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world2._41, _world2._42, _world2._43)));  // Planet1 moon cube
-	XMStoreFloat4x4(&_world5, (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world3._41, _world3._42, _world3._43)));  // Planet2 moon cube
-
+	// Solar system
+	//XMStoreFloat4x4(&_world, XMMatrixRotationZ(t / 3) * XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixScaling(0.8f, 0.8f, 0.8f));  // Sun cube
+	//XMStoreFloat4x4(&_world2, XMMatrixTranslation(6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet1 cube
+	//XMStoreFloat4x4(&_world3, XMMatrixTranslation(-6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet2 cube
+	//// Radius of rotation around planet * rotation angle * scale * rotation origin
+	//XMStoreFloat4x4(&_world4, (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world2._41, _world2._42, _world2._43)));  // Planet1 moon cube
+	//XMStoreFloat4x4(&_world5, (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world3._41, _world3._42, _world3._43)));  // Planet2 moon cube
 }
 
 void Application::Draw()
@@ -522,10 +536,10 @@ void Application::Draw()
 	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red,green,blue,alpha
 	_pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
-	// Clear depth stencil 
+	// Clear depth stencil
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	XMMATRIX world = XMLoadFloat4x4(&_world);
+	//XMMATRIX world = XMLoadFloat4x4(&_world);
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
 	//
@@ -546,37 +560,42 @@ void Application::Draw()
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
 
-	// First cube
-	world = XMLoadFloat4x4(&_world);
-	cb.mWorld = XMMatrixTranspose(world);
+	// Draw pyramid
+	XMMATRIX pyramidWorld = XMLoadFloat4x4(&_pyramidWorld);
+	cb.mWorld = XMMatrixTranspose(pyramidWorld);
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Second cube
-	world = XMLoadFloat4x4(&_world2);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Third cube
-	world = XMLoadFloat4x4(&_world3);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Fourth cube
-	world = XMLoadFloat4x4(&_world4);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Fifth cube
-	world = XMLoadFloat4x4(&_world5);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
 
 
+	//// First cube
+	//world = XMLoadFloat4x4(&_world);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Second cube
+	//world = XMLoadFloat4x4(&_world2);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Third cube
+	//world = XMLoadFloat4x4(&_world3);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Fourth cube
+	//world = XMLoadFloat4x4(&_world4);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+	//// Fifth cube
+	//world = XMLoadFloat4x4(&_world5);
+	//cb.mWorld = XMMatrixTranspose(world);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
 	//
 	// Present our back buffer to our front buffer
