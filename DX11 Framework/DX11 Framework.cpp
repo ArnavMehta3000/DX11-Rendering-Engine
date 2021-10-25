@@ -5,7 +5,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	Application* theApp = new Application();
+	Application * theApp = new Application();
 
 	if (FAILED(theApp->Initialise(hInstance, nCmdShow)))
 	{
@@ -13,7 +13,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	// Main message loop
-	MSG msg = { 0 };
+	MSG msg = {0};
 
 	while (WM_QUIT != msg.message)
 	{
@@ -32,5 +32,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	delete theApp;
 	theApp = nullptr;
 
-	return (int)msg.wParam;
+	return (int) msg.wParam;
 }

@@ -2,7 +2,7 @@
 <DEFECTS>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -19,7 +19,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -36,7 +36,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -53,7 +53,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -70,7 +70,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -87,24 +87,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
-      <FILENAME>Application.cpp</FILENAME>
-      <LINE>26</LINE>
-      <COLUMN>13</COLUMN>
-    </SFA>
-    <DEFECTCODE>26495</DEFECTCODE>
-    <DESCRIPTION>Variable 'Application::_asteroidWorld' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
-    <FUNCTION>Application::{ctor}</FUNCTION>
-    <DECORATED>??0Application@@QAE@XZ</DECORATED>
-    <FUNCLINE>26</FUNCLINE>
-    <ADDITIONALINFO>
-      <targetSymbol>Application::_asteroidWorld</targetSymbol>
-    </ADDITIONALINFO>
-    <PATH></PATH>
-  </DEFECT>
-  <DEFECT>
-    <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -121,7 +104,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -138,7 +121,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -155,7 +138,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -172,24 +155,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
-      <FILENAME>Application.cpp</FILENAME>
-      <LINE>26</LINE>
-      <COLUMN>13</COLUMN>
-    </SFA>
-    <DEFECTCODE>26495</DEFECTCODE>
-    <DESCRIPTION>Variable 'Application::_solid' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
-    <FUNCTION>Application::{ctor}</FUNCTION>
-    <DECORATED>??0Application@@QAE@XZ</DECORATED>
-    <FUNCLINE>26</FUNCLINE>
-    <ADDITIONALINFO>
-      <targetSymbol>Application::_solid</targetSymbol>
-    </ADDITIONALINFO>
-    <PATH></PATH>
-  </DEFECT>
-  <DEFECT>
-    <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -206,7 +172,7 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -223,16 +189,16 @@
   </DEFECT>
   <DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
-      <LINE>514</LINE>
+      <LINE>475</LINE>
       <COLUMN>32</COLUMN>
     </SFA>
     <DEFECTCODE>28159</DEFECTCODE>
     <DESCRIPTION>Consider using 'GetTickCount64' instead of 'GetTickCount'. Reason: GetTickCount overflows roughly every 49 days.  Code that does not take that into account can loop indefinitely.  GetTickCount64 operates on 64 bit values and does not have that problem</DESCRIPTION>
     <FUNCTION>Application::Update</FUNCTION>
     <DECORATED>?Update@Application@@QAEXXZ</DECORATED>
-    <FUNCLINE>490</FUNCLINE>
+    <FUNCLINE>463</FUNCLINE>
     <PATH></PATH>
   </DEFECT>
 </DEFECTS>

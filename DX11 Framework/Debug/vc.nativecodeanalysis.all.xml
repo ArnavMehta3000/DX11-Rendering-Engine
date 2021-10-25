@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><DEFECTS><DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
       <LINE>26</LINE>
       <COLUMN>13</COLUMN>
@@ -16,28 +16,15 @@
     <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
+      <FILEPATH>D:\ARNAV\Uni Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
       <FILENAME>Application.cpp</FILENAME>
-      <LINE>514</LINE>
+      <LINE>475</LINE>
       <COLUMN>32</COLUMN>
     </SFA>
     <DEFECTCODE>28159</DEFECTCODE>
     <DESCRIPTION>Consider using 'GetTickCount64' instead of 'GetTickCount'. Reason: GetTickCount overflows roughly every 49 days.  Code that does not take that into account can loop indefinitely.  GetTickCount64 operates on 64 bit values and does not have that problem</DESCRIPTION>
     <FUNCTION>Application::Update</FUNCTION>
     <DECORATED>?Update@Application@@QAEXXZ</DECORATED>
-    <FUNCLINE>490</FUNCLINE>
-    <PATH></PATH>
-  </DEFECT><DEFECT>
-    <SFA>
-      <FILEPATH>C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\</FILEPATH>
-      <FILENAME>DX11 Framework.cpp</FILENAME>
-      <LINE>3</LINE>
-      <COLUMN>11</COLUMN>
-    </SFA>
-    <DEFECTCODE>28251</DEFECTCODE>
-    <DESCRIPTION>Inconsistent annotation for 'wWinMain': this instance has no annotations. See c:\program files (x86)\windows kits\10\include\10.0.19041.0\um\winbase.h(1019). </DESCRIPTION>
-    <FUNCTION>wWinMain</FUNCTION>
-    <DECORATED>wWinMain@16</DECORATED>
-    <FUNCLINE>3</FUNCLINE>
+    <FUNCLINE>463</FUNCLINE>
     <PATH></PATH>
   </DEFECT></DEFECTS>
