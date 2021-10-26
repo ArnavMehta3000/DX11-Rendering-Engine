@@ -1,3 +1,7 @@
+#pragma once
+#ifndef VECTOR3_H
+#define VECTOR3_H
+
 #include <iostream>
 #include <math.h>
 #include <string>
@@ -6,7 +10,6 @@
 
 
 
-#pragma once
 class Vector3
 {
 public:
@@ -36,3 +39,4 @@ public:
 
 	void Debug(std::string msg = "");
 };
+#endif

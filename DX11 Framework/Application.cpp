@@ -150,6 +150,7 @@ HRESULT Application::InitVertexBuffer()
 {
 	HRESULT hr;
 
+#pragma region Cube
 	SimpleVertex cubeVertices[] =
 	{
 		{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},  // Vert 0 - White
@@ -162,6 +163,21 @@ HRESULT Application::InitVertexBuffer()
 		{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}   // Vert 7 - Black
 	};
 
+	D3D11_BUFFER_DESC cubeBd;
+	ZeroMemory(&cubeBd, sizeof(cubeBd));
+	cubeBd.Usage = D3D11_USAGE_DEFAULT;
+	cubeBd.ByteWidth = sizeof(SimpleVertex) * 5;
+	cubeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	cubeBd.CPUAccessFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA CubeInitData;
+	ZeroMemory(&CubeInitData, sizeof(CubeInitData));
+	CubeInitData.pSysMem = cubeVertices;
+
+	hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pVertexBuffer);
+#pragma endregion
+
+#pragma region Pyramid
 	SimpleVertex pyramidVertices[] =
 	{
 		// Base
@@ -173,18 +189,25 @@ HRESULT Application::InitVertexBuffer()
 		{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
 	};
 
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex) * 5;
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+	D3D11_BUFFER_DESC pyramidBd;
+	ZeroMemory(&pyramidBd, sizeof(pyramidBd));
+	pyramidBd.Usage = D3D11_USAGE_DEFAULT;
+	pyramidBd.ByteWidth = sizeof(SimpleVertex) * 5;
+	pyramidBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	pyramidBd.CPUAccessFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA InitData;
-	ZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = pyramidVertices;
+	D3D11_SUBRESOURCE_DATA PyramidInitData;
+	ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
+	PyramidInitData.pSysMem = pyramidVertices;
 
-	hr = _pd3dDevice->CreateBuffer(&bd, &InitData, &_pVertexBuffer);
+	hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pVertexBuffer);
+#pragma endregion
+
+
+
+	
+
+	
 
 	if (FAILED(hr))
 		return hr;
@@ -196,7 +219,8 @@ HRESULT Application::InitIndexBuffer()
 {
 	HRESULT hr;
 
-	// Create index buffer
+#pragma region Cube
+	// Index buffer for cube
 	WORD cubeIndices[] =
 	{
 		// Face 1
@@ -224,6 +248,23 @@ HRESULT Application::InitIndexBuffer()
 		1,5,7,
 	};
 
+	// Buffer description for cube
+	D3D11_BUFFER_DESC cubeBd;
+	ZeroMemory(&cubeBd, sizeof(cubeBd));
+
+	cubeBd.Usage = D3D11_USAGE_DEFAULT;
+	cubeBd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
+	cubeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	cubeBd.CPUAccessFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA CubeInitData;
+	ZeroMemory(&CubeInitData, sizeof(CubeInitData));
+	CubeInitData.pSysMem = cubeIndices;
+	hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pIndexBuffer);
+#pragma endregion
+
+
+#pragma region Pyramid
 	WORD pyramidIndices[] =
 	{
 		0, 2, 1,
@@ -234,18 +275,20 @@ HRESULT Application::InitIndexBuffer()
 		2, 0, 4
 	};
 
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
+	D3D11_BUFFER_DESC pyramidBd;
+	ZeroMemory(&pyramidBd, sizeof(pyramidBd));
 
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(WORD) * 3 * 6;// * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
-	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+	pyramidBd.Usage = D3D11_USAGE_DEFAULT;
+	pyramidBd.ByteWidth = sizeof(WORD) * 3 * 6;
+	pyramidBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	pyramidBd.CPUAccessFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA InitData;
-	ZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = pyramidIndices;
-	hr = _pd3dDevice->CreateBuffer(&bd, &InitData, &_pIndexBuffer);
+	D3D11_SUBRESOURCE_DATA PyramidInitData;
+	ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
+	PyramidInitData.pSysMem = pyramidIndices;
+	hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pIndexBuffer);
+#pragma endregion
+
 
 	if (FAILED(hr))
 		return hr;
@@ -409,8 +452,7 @@ HRESULT Application::InitDevice()
 		hr = _pd3dDevice->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
 
 	// Add it to the output merger
-	_pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView); // TODO: Fix access violation
-
+	_pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView);
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
 	vp.Width = (FLOAT)_WindowWidth;
@@ -428,11 +470,13 @@ HRESULT Application::InitDevice()
 	// Set vertex buffer
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
+	//TODO: Change this for changing which vertex buffer to use
 	_pImmediateContext->IASetVertexBuffers(0, 1, &_pVertexBuffer, &stride, &offset);
 
 	InitIndexBuffer();
 
 	// Set index buffer
+	// TODO: Change this for changing which index buffer to use
 	_pImmediateContext->IASetIndexBuffer(_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 	// Set primitive topology
@@ -462,6 +506,19 @@ HRESULT Application::InitDevice()
 	solidDesc.FillMode = D3D11_FILL_SOLID;
 	solidDesc.CullMode = D3D11_CULL_BACK;
 	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solid);
+
+	// Matrix Tests
+	Matrix<double> mat1(4, 4, 1.0); //4X4 Matrix – component set to 1.0f
+	Matrix<double> mat2(4, 4, 2.0); //4X4 Matrix – component set to 2.0f
+
+
+
+
+
+
+
+
+
 
 	if (FAILED(hr))
 		return hr;
@@ -526,15 +583,16 @@ void Application::Update()
 
 
 	// Pyramid
+	time = t;
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t));
 
 	// Solar system
 	//XMStoreFloat4x4(&_world, XMMatrixRotationZ(t / 3) * XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixScaling(0.8f, 0.8f, 0.8f));  // Sun cube
-	//XMStoreFloat4x4(&_world2, XMMatrixTranslation(6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet1 cube
-	//XMStoreFloat4x4(&_world3, XMMatrixTranslation(-6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet2 cube
+	XMStoreFloat4x4(&_world2, XMMatrixTranslation(6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet1 cube
+	XMStoreFloat4x4(&_world3, XMMatrixTranslation(-6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet2 cube
 	//// Radius of rotation around planet * rotation angle * scale * rotation origin
-	//XMStoreFloat4x4(&_world4, (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world2._41, _world2._42, _world2._43)));  // Planet1 moon cube
-	//XMStoreFloat4x4(&_world5, (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world3._41, _world3._42, _world3._43)));  // Planet2 moon cube
+	XMStoreFloat4x4(&_world4, (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world2._41, _world2._42, _world2._43)));  // Planet1 moon cube
+	XMStoreFloat4x4(&_world5, (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world3._41, _world3._42, _world3._43)));  // Planet2 moon cube
 
 }
 
@@ -547,7 +605,8 @@ void Application::Draw()
 	// Clear depth stencil 
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	//XMMATRIX world = XMLoadFloat4x4(&_world);
+	XMMATRIX world = XMLoadFloat4x4(&_world);
+	XMMATRIX pyramidWorld;
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
 	//
@@ -568,9 +627,13 @@ void Application::Draw()
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
 
+	//_pImmediateContext->IASetVertexBuffers(0, 1, &_pVertexBuffer, (UINT*)sizeof(SimpleVertex), 0);
+	//_pImmediateContext->IASetIndexBuffer(_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
 	// Draw pyramid
-	XMMATRIX pyramidWorld = XMLoadFloat4x4(&_pyramidWorld);
+	pyramidWorld = XMLoadFloat4x4(&_pyramidWorld);
 	cb.mWorld = XMMatrixTranspose(pyramidWorld);
+	cb.mTime = time;
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
 
@@ -582,29 +645,29 @@ void Application::Draw()
 	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
-	//// Second cube
-	//world = XMLoadFloat4x4(&_world2);
-	//cb.mWorld = XMMatrixTranspose(world);
-	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	// Second cube
+	world = XMLoadFloat4x4(&_world2);
+	cb.mWorld = XMMatrixTranspose(world);
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
-	//// Third cube
-	//world = XMLoadFloat4x4(&_world3);
-	//cb.mWorld = XMMatrixTranspose(world);
-	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	// Third cube
+	world = XMLoadFloat4x4(&_world3);
+	cb.mWorld = XMMatrixTranspose(world);
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
-	//// Fourth cube
-	//world = XMLoadFloat4x4(&_world4);
-	//cb.mWorld = XMMatrixTranspose(world);
-	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	// Fourth cube
+	world = XMLoadFloat4x4(&_world4);
+	cb.mWorld = XMMatrixTranspose(world);
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
-	//// Fifth cube
-	//world = XMLoadFloat4x4(&_world5);
-	//cb.mWorld = XMMatrixTranspose(world);
-	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	// Fifth cube
+	world = XMLoadFloat4x4(&_world5);
+	cb.mWorld = XMMatrixTranspose(world);
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
 
 

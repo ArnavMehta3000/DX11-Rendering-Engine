@@ -7,6 +7,7 @@
 #include <directxcolors.h>
 #include "resource.h"
 #include "Vector3.h"
+#include "Matrix.h"
 using namespace DirectX;
 
 
@@ -23,6 +24,7 @@ public:
 	XMMATRIX mWorld;
 	XMMATRIX mView;
 	XMMATRIX mProjection;
+	float mTime;
 };
 
 class Application
@@ -50,6 +52,7 @@ private:
 	ID3D11Texture2D*        _depthStencilBuffer = NULL;
 	ID3D11RasterizerState*  _wireFrame;
 	ID3D11RasterizerState*  _solid;
+	float time;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
