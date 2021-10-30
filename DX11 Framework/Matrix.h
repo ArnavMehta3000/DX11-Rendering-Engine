@@ -13,10 +13,10 @@ template <typename T> class Matrix
 {
 private:
 	std::vector<std::vector<T>> mat;
-	unsigned rows, cols;
+	unsigned int rows, cols;
 
 public:
-	Matrix(unsigned _rows, unsigned _cols, const T& _initial);
+	Matrix(unsigned int _rows, unsigned int _cols, const T& _initial);
 	Matrix(const Matrix<T>& rhs);
 	virtual ~Matrix();
 
@@ -34,7 +34,7 @@ public:
 	Matrix<T> operator*(const T& rhs);
 	Matrix<T> operator/(const T& rhs);
 
-	
+
 	Matrix<T> Transpose();
 	std::vector<T> DiagonalVec();
 
@@ -44,6 +44,7 @@ public:
 	unsigned GetColSize() const;  // Get cols size
 
 	void Debug(std::string msg = "");
+	void Debug(unsigned row, unsigned col, std::string msg = "");
 };
 
 #include "Matrix.cpp"

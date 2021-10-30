@@ -1,23 +1,22 @@
 ﻿  Application.cpp
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(15,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(8): message : while compiling class template member function 'Matrix<int>::Matrix(unsigned int,unsigned int,const T &)'
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(510,9): warning C4189: 'x': local variable is initialized but not referenced
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(11,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(8): message : while compiling class template member function 'Matrix<double>::Matrix(unsigned int,unsigned int,const T &)'
           with
           [
-              T=int
+              T=double
           ]
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(511): message : see reference to function template instantiation 'Matrix<int>::Matrix(unsigned int,unsigned int,const T &)' being compiled
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(507): message : see reference to function template instantiation 'Matrix<double>::Matrix(unsigned int,unsigned int,const T &)' being compiled
           with
           [
-              T=int
+              T=double
           ]
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(511): message : see reference to class template instantiation 'Matrix<int>' being compiled
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(19,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(243,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(239): message : while compiling class template member function 'void Matrix<int>::Debug(std::string)'
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(512): message : see reference to function template instantiation 'void Matrix<int>::Debug(std::string)' being compiled
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(245,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(247,14): error C2064: term does not evaluate to a function taking 2 arguments
-  DX11 Framework.cpp
-  Matrix.cpp
-  Vector3.cpp
-  Generating Code...
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(507): message : see reference to class template instantiation 'Matrix<double>' being compiled
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(16,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(66,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(63): message : while compiling class template member function 'Matrix<double> Matrix<double>::operator +(const Matrix<double> &)'
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(509): message : see reference to function template instantiation 'Matrix<double> Matrix<double>::operator +(const Matrix<double> &)' being compiled
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Matrix.cpp(67,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(521): warning C4702: unreachable code
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(522): warning C4702: unreachable code
+  DX11 Framework.vcxproj -> C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Debug\DX11 Framework.exe

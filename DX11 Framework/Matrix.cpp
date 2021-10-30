@@ -4,23 +4,20 @@
 
 #pragma region Constructors
 template<typename T>
-Matrix<T>::Matrix(unsigned _rows, unsigned _cols, const T& _initial)
+Matrix<T>::Matrix(unsigned int _rows, unsigned int _cols, const T& _initial)
 {
 	mat.resize(_rows);
 
-	std::vector<T> v;
-	v.resize(_cols);
+	for (int i = 0; i < _rows; i++)
+	{
+		//std::vector<T> v = std::vector<T>();
+		 //Push back the entire row
 
-	// Populate the rows
-	for (int i = 0; i < v.size(); i++)
-		v.push_back(_initial);
-
-	// Populate the cols
-	for (int i = 0; i < mat.size(); i++)
-		mat.push_back(v);
-
-	v.clear();
-
+		for (int j = 0; j < _cols; j++)
+		{
+			mat[i].push_back(_initial);  // Push back each element (col) in that row
+		}
+	}
 
 	rows = _rows;
 	cols = _cols;
@@ -29,7 +26,7 @@ Matrix<T>::Matrix(unsigned _rows, unsigned _cols, const T& _initial)
 template<typename T>
 Matrix<T>::Matrix(const Matrix<T>& rhs)
 {
-	mat = rhs;
+	mat = rhs.mat;
 	rows = rhs.rows;
 	cols = rhs.cols;
 }
@@ -46,12 +43,19 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& rhs)
 {
 	if (&rhs == this)
 		return this;
-	
-	mat = rhs;
-	rows = rhs.rows; 
+
+	mat = rhs.mat;
+	rows = rhs.rows;
 	cols = rhs.cols;
 
 	return *this;
+}
+
+template<typename T>
+const T& Matrix<T>::operator()(const unsigned& row, const unsigned& col) const {
+
+	return this->mat[row][col];
+
 }
 
 template<typename T>
@@ -61,7 +65,9 @@ Matrix<T> Matrix<T>::operator+(const Matrix<T>& rhs)
 
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
-			result(i, j) = mat(i, j) + rhs(i, j);
+		{
+			result.mat[i][j] = mat[i][j] + rhs.mat[i][j];
+		}
 
 	return result;
 }
@@ -71,7 +77,7 @@ Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& rhs)
 {
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
-			mat(i, j) = mat(i, j) + rhs(i, j);
+			mat[i][j] = mat[i][j] + rhs.mat[i][j];
 
 	return *this;
 }
@@ -187,7 +193,7 @@ template<typename T>
 Matrix<T> Matrix<T>::Transpose()
 {
 	Matrix transpose(rows, cols, 0.0);
-	
+
 	// Get transpose
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
@@ -215,12 +221,6 @@ std::vector<T> Matrix<T>::DiagonalVec()
 	return diag;
 }
 
-template<typename T>
-const T& Matrix<T>::operator()(const unsigned& row, const unsigned& col) const {
-
-	return this->mat[row][col];
-
-}
 
 template<typename T>
 unsigned Matrix<T>::GetRowSize() const
@@ -256,6 +256,18 @@ void Matrix<T>::Debug(std::string msg)
 		os << "[" << msg << "]Matrix\n" << matrix;*/
 
 	OutputDebugStringA(matrix.str().c_str());
+}
+
+template<typename T>
+void Matrix<T>::Debug(unsigned row, unsigned col, std::string msg)
+{
+	std::ostringstream os;
+	if (msg == "")
+		os << "Matrix[" << row << "," << col << "]: " << mat(i, j);
+	else
+		os << "(" << msg << ") Matrix[" << row << "," << col << "]: " << mat(i, j);
+
+	OutputDebugStringA(os.str().c_str());
 }
 
 
