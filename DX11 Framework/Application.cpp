@@ -65,7 +65,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
-	XMStoreFloat4x4(&_world, XMMatrixIdentity());
+	XMStoreFloat4x4(&_cubeWorld, XMMatrixIdentity());
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixIdentity());
 
 	// Initialize the view matrix
@@ -218,7 +218,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x, -10, z), XMFLOAT4((float)rand()/ RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f) };
+				planeVertices[i] = { XMFLOAT3(x, 0, z), XMFLOAT4((float)rand()/ RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f) };
 				i++;
 			}
 		}
@@ -236,7 +236,6 @@ HRESULT Application::InitVertexBuffer()
 		PlaneInitData.pSysMem = planeVertices;
 
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
-		//XMStoreFloat4x4(&_planeWorld, XMMatrixScaling(0.75f, 0.75f, 0.75f));
 	}
 	#pragma endregion
 
@@ -648,21 +647,14 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
+	time = t;
 
 	// Pyramid
-	time = t;
-	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t));
-
-	// Solar system
-	//XMStoreFloat4x4(&_world, XMMatrixRotationZ(t / 3) * XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixScaling(0.8f, 0.8f, 0.8f));  // Sun cube
-	XMStoreFloat4x4(&_world2, XMMatrixTranslation(6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet1 cube
-	XMStoreFloat4x4(&_world3, XMMatrixTranslation(-6.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t) * XMMatrixScaling(0.3f, 0.3f, 0.3f));  // Planet2 cube
-	//// Radius of rotation around planet * rotation angle * scale * rotation origin
-	XMStoreFloat4x4(&_world4, (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world2._41, _world2._42, _world2._43)));  // Planet1 moon cube
-	XMStoreFloat4x4(&_world5, (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world3._41, _world3._42, _world3._43)));  // Planet2 moon cube
-
-	XMStoreFloat4x4(&_planeWorld, XMMatrixScaling(sin(t/2), sin(t/2), sin(t/5)) * XMMatrixRotationZ(t * 3) * (XMMatrixTranslation(_pyramidWorld._41, _pyramidWorld._42, _pyramidWorld._43)));
-
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));
+	// Cube
+	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-0.5f, 0, 3));
+	// Plane
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6, -3, 3) * XMMatrixScaling(0.4f, 0.4f, 0.4f));
 }
 
 void Application::Draw()
@@ -674,7 +666,7 @@ void Application::Draw()
 	// Clear depth stencil 
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	XMMATRIX world = XMLoadFloat4x4(&_world);
+	XMMATRIX world = XMLoadFloat4x4(&_cubeWorld);
 	XMMATRIX pyramidWorld;
 	XMMATRIX planeWorld;
 	XMMATRIX view = XMLoadFloat4x4(&_view);
@@ -730,32 +722,8 @@ void Application::Draw()
 	_pImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 
-	//// First cube
-	//world = XMLoadFloat4x4(&_world);
-	//cb.mWorld = XMMatrixTranspose(world);
-	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Second cube
-	world = XMLoadFloat4x4(&_world2);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Third cube
-	world = XMLoadFloat4x4(&_world3);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Fourth cube
-	world = XMLoadFloat4x4(&_world4);
-	cb.mWorld = XMMatrixTranspose(world);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-
-	// Fifth cube
-	world = XMLoadFloat4x4(&_world5);
+	// First cube
+	world = XMLoadFloat4x4(&_cubeWorld);
 	cb.mWorld = XMMatrixTranspose(world);
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);

@@ -48,7 +48,7 @@ private:
 	ID3D11Buffer*			_pPyramidIndexBuffer;
 	ID3D11Buffer*			_pPlaneIndexBuffer;
 	ID3D11Buffer*			_pConstantBuffer;
-	XMFLOAT4X4              _world, _world2, _world3, _world4, _world5;
+	XMFLOAT4X4              _cubeWorld;
 	XMFLOAT4X4              _pyramidWorld;
 	XMFLOAT4X4              _planeWorld;
 	XMFLOAT4X4              _view;

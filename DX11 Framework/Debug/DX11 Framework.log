@@ -1,10 +1,10 @@
 ﻿  Application.cpp
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(221,43): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(221,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(221,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(343,35): warning C4244: '=': conversion from 'int' to 'WORD', possible loss of data
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(344,43): warning C4244: '=': conversion from 'unsigned int' to 'WORD', possible loss of data
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(342,35): warning C4244: '=': conversion from 'int' to 'WORD', possible loss of data
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(343,43): warning C4244: '=': conversion from 'unsigned int' to 'WORD', possible loss of data
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(344,35): warning C4244: '=': conversion from 'int' to 'WORD', possible loss of data
 C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(345,35): warning C4244: '=': conversion from 'int' to 'WORD', possible loss of data
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(346,35): warning C4244: '=': conversion from 'int' to 'WORD', possible loss of data
+C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(346,43): warning C4244: '=': conversion from 'unsigned int' to 'WORD', possible loss of data
 C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(347,43): warning C4244: '=': conversion from 'unsigned int' to 'WORD', possible loss of data
-C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Application.cpp(348,43): warning C4244: '=': conversion from 'unsigned int' to 'WORD', possible loss of data
   DX11 Framework.vcxproj -> C:\Users\Arnav\Documents\ARNAV\University Stuff\YR2\FGCC\DirectX-11-Framework\DX11 Framework\Debug\DX11 Framework.exe
