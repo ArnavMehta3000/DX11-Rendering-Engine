@@ -150,58 +150,95 @@ HRESULT Application::InitVertexBuffer()
 {
 	HRESULT hr;
 
-#pragma region Cube
-	SimpleVertex cubeVertices[] =
+	#pragma region Cube
 	{
-		{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},  // Vert 0 - White
-		{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},  // Vert 1 - Red
-		{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},  // Vert 2 - Green
-		{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},  // Vert 3 - Blue
-		{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},  // Vert 4 - Yellow
-		{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},  // Vert 5 - Cyan
-		{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)},  // Vert 6 - Pink
-		{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}   // Vert 7 - Black
-	};
+		SimpleVertex cubeVertices[] =
+		{
+			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},  // Vert 0 - White
+			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},  // Vert 1 - Red
+			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},  // Vert 2 - Green
+			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},  // Vert 3 - Blue
+			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},  // Vert 4 - Yellow
+			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},  // Vert 5 - Cyan
+			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)},  // Vert 6 - Pink
+			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}   // Vert 7 - Black
+		};
 
-	D3D11_BUFFER_DESC cubeBd;
-	ZeroMemory(&cubeBd, sizeof(cubeBd));
-	cubeBd.Usage = D3D11_USAGE_DEFAULT;
-	cubeBd.ByteWidth = sizeof(SimpleVertex) * 8;
-	cubeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	cubeBd.CPUAccessFlags = 0;
+		D3D11_BUFFER_DESC cubeBd;
+		ZeroMemory(&cubeBd, sizeof(cubeBd));
+		cubeBd.Usage = D3D11_USAGE_DEFAULT;
+		cubeBd.ByteWidth = sizeof(SimpleVertex) * 8;
+		cubeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		cubeBd.CPUAccessFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA CubeInitData;
-	ZeroMemory(&CubeInitData, sizeof(CubeInitData));
-	CubeInitData.pSysMem = cubeVertices;
+		D3D11_SUBRESOURCE_DATA CubeInitData;
+		ZeroMemory(&CubeInitData, sizeof(CubeInitData));
+		CubeInitData.pSysMem = cubeVertices;
 
-	hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeVertexBuffer);
-#pragma endregion
+		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeVertexBuffer);
+	}
+	#pragma endregion
 
-#pragma region Pyramid
-	SimpleVertex pyramidVertices[] =
+	#pragma region Pyramid
 	{
-		// Base
-		{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		// Tip
-		{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-	};
+		SimpleVertex pyramidVertices[] =
+		{
+			// Base
+			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+			// Tip
+			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		};
 
-	D3D11_BUFFER_DESC pyramidBd;
-	ZeroMemory(&pyramidBd, sizeof(pyramidBd));
-	pyramidBd.Usage = D3D11_USAGE_DEFAULT;
-	pyramidBd.ByteWidth = sizeof(SimpleVertex) * 5;
-	pyramidBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	pyramidBd.CPUAccessFlags = 0;
+		D3D11_BUFFER_DESC pyramidBd;
+		ZeroMemory(&pyramidBd, sizeof(pyramidBd));
+		pyramidBd.Usage = D3D11_USAGE_DEFAULT;
+		pyramidBd.ByteWidth = sizeof(SimpleVertex) * 5;
+		pyramidBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		pyramidBd.CPUAccessFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA PyramidInitData;
-	ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
-	PyramidInitData.pSysMem = pyramidVertices;
+		D3D11_SUBRESOURCE_DATA PyramidInitData;
+		ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
+		PyramidInitData.pSysMem = pyramidVertices;
 
-	hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
-#pragma endregion
+		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
+	}
+	#pragma endregion
+
+	#pragma region Plane
+	{
+		// Define plane size
+		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the index buffer
+		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
+		
+		// Populate the plane vertex buffer
+		for (int i = 0, z = 0; z <= zSize; z++)
+		{
+			for (int x = 0; x <= xSize; x++)
+			{
+				planeVertices[i] = { XMFLOAT3(x, -10, z), XMFLOAT4((float)rand()/ RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f) };
+				i++;
+			}
+		}
+
+		// Set buffer description
+		D3D11_BUFFER_DESC planeBd;
+		ZeroMemory(&planeBd, sizeof(planeBd));
+		planeBd.Usage = D3D11_USAGE_DEFAULT;
+		planeBd.ByteWidth = sizeof(SimpleVertex) * (xSize + 1) * (zSize + 1);
+		planeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		planeBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA PlaneInitData;
+		ZeroMemory(&PlaneInitData, sizeof(PlaneInitData));
+		PlaneInitData.pSysMem = planeVertices;
+
+		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
+		//XMStoreFloat4x4(&_planeWorld, XMMatrixScaling(0.75f, 0.75f, 0.75f));
+	}
+	#pragma endregion
 
 
 
@@ -219,75 +256,119 @@ HRESULT Application::InitIndexBuffer()
 {
 	HRESULT hr;
 
-#pragma region Cube
-	// Index buffer for cube
-	WORD cubeIndices[] =
+	#pragma region Cube
 	{
-		// Face 1
-		0,1,2, // -x
-		1,3,2,
+		// Index buffer for cube
+		WORD cubeIndices[] =
+		{
+			// Face 1
+			0,1,2, // -x
+			1,3,2,
 
-		// Face 2
-		4,6,5, // +x
-		5,6,7,
+			// Face 2
+			4,6,5, // +x
+			5,6,7,
 
-		// Face 3
-		0,5,1, // -y
-		0,4,5,
+			// Face 3
+			0,5,1, // -y
+			0,4,5,
 
-		// Face 4
-		2,7,6, // +y
-		2,3,7,
+			// Face 4
+			2,7,6, // +y
+			2,3,7,
 
-		// Face 5
-		0,6,4, // -z
-		0,2,6,
+			// Face 5
+			0,6,4, // -z
+			0,2,6,
 
-		// Face 6
-		1,7,3, // +z
-		1,5,7,
-	};
+			// Face 6
+			1,7,3, // +z
+			1,5,7,
+		};
 
-	// Buffer description for cube
-	D3D11_BUFFER_DESC cubeBd;
-	ZeroMemory(&cubeBd, sizeof(cubeBd));
+		// Buffer description for cube
+		D3D11_BUFFER_DESC cubeBd;
+		ZeroMemory(&cubeBd, sizeof(cubeBd));
 
-	cubeBd.Usage = D3D11_USAGE_DEFAULT;
-	cubeBd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
-	cubeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	cubeBd.CPUAccessFlags = 0;
+		cubeBd.Usage = D3D11_USAGE_DEFAULT;
+		cubeBd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
+		cubeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		cubeBd.CPUAccessFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA CubeInitData;
-	ZeroMemory(&CubeInitData, sizeof(CubeInitData));
-	CubeInitData.pSysMem = cubeIndices;
-	hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeIndexBuffer);
-#pragma endregion
+		D3D11_SUBRESOURCE_DATA CubeInitData;
+		ZeroMemory(&CubeInitData, sizeof(CubeInitData));
+		CubeInitData.pSysMem = cubeIndices;
+		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeIndexBuffer);
+	}
+	#pragma endregion
 
 
-#pragma region Pyramid
-	WORD pyramidIndices[] =
+	#pragma region Pyramid
 	{
-		0, 2, 1,
-		1, 2, 3,
-		0, 1, 4,
-		1, 3, 4,
-		3, 2, 4,
-		2, 0, 4
-	};
+		WORD pyramidIndices[] =
+		{
+			0, 2, 1,
+			1, 2, 3,
+			0, 1, 4,
+			1, 3, 4,
+			3, 2, 4,
+			2, 0, 4
+		};
 
-	D3D11_BUFFER_DESC pyramidBd;
-	ZeroMemory(&pyramidBd, sizeof(pyramidBd));
+		D3D11_BUFFER_DESC pyramidBd;
+		ZeroMemory(&pyramidBd, sizeof(pyramidBd));
 
-	pyramidBd.Usage = D3D11_USAGE_DEFAULT;
-	pyramidBd.ByteWidth = sizeof(WORD) * 3 * 6;
-	pyramidBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	pyramidBd.CPUAccessFlags = 0;
+		pyramidBd.Usage = D3D11_USAGE_DEFAULT;
+		pyramidBd.ByteWidth = sizeof(WORD) * 3 * 6;
+		pyramidBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		pyramidBd.CPUAccessFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA PyramidInitData;
-	ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
-	PyramidInitData.pSysMem = pyramidIndices;
-	hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
-#pragma endregion
+		D3D11_SUBRESOURCE_DATA PyramidInitData;
+		ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
+		PyramidInitData.pSysMem = pyramidIndices;
+		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
+	}
+	#pragma endregion
+
+	#pragma region Plane
+	{
+		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the vertex buffer
+		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
+
+		int vert = 0, tris = 0;
+		for (int z = 0; z < zSize; z++)
+		{
+			for (int x = 0; x < xSize; x++)
+			{
+				planeIndices[tris + 0] = vert + 0;
+				planeIndices[tris + 1] = vert + xSize + 1;
+				planeIndices[tris + 2] = vert + 1;
+				planeIndices[tris + 3] = vert + 1;
+				planeIndices[tris + 4] = vert + xSize + 1;
+				planeIndices[tris + 5] = vert + xSize + 2;
+
+				vert++;
+				tris += 6;
+			}
+			vert++;
+		}
+
+		//  Create buffer description
+		D3D11_BUFFER_DESC planeBd;
+		ZeroMemory(&planeBd, sizeof(planeBd));
+
+		planeBd.Usage = D3D11_USAGE_DEFAULT;
+		planeBd.ByteWidth = sizeof(WORD) * xSize * zSize * 6;
+		planeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		planeBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA PlaneInitData;
+		ZeroMemory(&PlaneInitData, sizeof(PlaneInitData));
+		PlaneInitData.pSysMem = planeIndices;
+		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneIndexBuffer);
+	}
+	#pragma endregion
+
 
 
 	if (FAILED(hr))
@@ -295,6 +376,8 @@ HRESULT Application::InitIndexBuffer()
 
 	return S_OK;
 }
+
+
 
 HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 {
@@ -361,8 +444,6 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 
 	return S_OK;
 }
-
-
 
 HRESULT Application::InitDevice()
 {
@@ -503,20 +584,6 @@ HRESULT Application::InitDevice()
 	solidDesc.CullMode = D3D11_CULL_BACK;
 	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solid);
 
-	// Matrix Tests
-	Matrix<double> mat1(4, 4, 1.0); //4X4 Matrix – component set to 1.0f
-	Matrix<double> mat2(4, 4, 2.0); //4X4 Matrix – component set to 2.0f
-	Matrix<double> mat3 = mat1 + mat2;
-	double x = mat3(2, 2);
-
-	return 0;
-
-
-
-
-
-
-
 
 	if (FAILED(hr))
 		return hr;
@@ -543,6 +610,8 @@ void Application::Cleanup()
 	if (_pImmediateContext)  _pImmediateContext->Release();
 	if (_pd3dDevice)		 _pd3dDevice->Release();
 }
+
+
 
 void Application::Update()
 {
@@ -592,6 +661,8 @@ void Application::Update()
 	XMStoreFloat4x4(&_world4, (XMMatrixTranslation(5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world2._41, _world2._42, _world2._43)));  // Planet1 moon cube
 	XMStoreFloat4x4(&_world5, (XMMatrixTranslation(-5.0f, 0.0f, 0.0f) * XMMatrixRotationZ(-t * 5)) * XMMatrixScaling(0.15f, 0.15f, 0.15f) * (XMMatrixTranslation(_world3._41, _world3._42, _world3._43)));  // Planet2 moon cube
 
+	XMStoreFloat4x4(&_planeWorld, XMMatrixScaling(sin(t/2), sin(t/2), sin(t/5)) * XMMatrixRotationZ(t * 3) * (XMMatrixTranslation(_pyramidWorld._41, _pyramidWorld._42, _pyramidWorld._43)));
+
 }
 
 void Application::Draw()
@@ -605,6 +676,7 @@ void Application::Draw()
 
 	XMMATRIX world = XMLoadFloat4x4(&_world);
 	XMMATRIX pyramidWorld;
+	XMMATRIX planeWorld;
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
 	//
@@ -624,9 +696,24 @@ void Application::Draw()
 	_pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
-	// Use pyramid mesh data
+
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
+	// HACK: Set plane size
+	int xSize = 10, zSize = 10;
+	// Use plane mesh data
+	_pImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
+	_pImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
+	// Draw plane
+	planeWorld = XMLoadFloat4x4(&_planeWorld);
+	cb.mWorld = XMMatrixTranspose(planeWorld);
+	cb.mTime = time;
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	_pImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
+
+
+	// Use pyramid mesh data
 	_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
 	_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 

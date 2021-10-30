@@ -263,9 +263,9 @@ void Matrix<T>::Debug(unsigned row, unsigned col, std::string msg)
 {
 	std::ostringstream os;
 	if (msg == "")
-		os << "Matrix[" << row << "," << col << "]: " << mat(i, j);
+		os << "Matrix[" << row << "," << col << "]: " << mat[row][col] << "\n";
 	else
-		os << "(" << msg << ") Matrix[" << row << "," << col << "]: " << mat(i, j);
+		os << "(" << msg << ") Matrix[" << row << "," << col << "]: " << mat[row][col] << "\n";
 
 	OutputDebugStringA(os.str().c_str());
 }
