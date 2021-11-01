@@ -15,7 +15,7 @@ struct SimpleVertex
 {
 public:
 	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+	XMFLOAT3 Normal;
 };
 
 struct ConstantBuffer
@@ -24,7 +24,9 @@ public:
 	XMMATRIX mWorld;
 	XMMATRIX mView;
 	XMMATRIX mProjection;
-	float mTime;
+	XMFLOAT4 DiffuseMtrl;
+	XMFLOAT4 DIffuseLight;
+	XMFLOAT3 LightVecW;
 };
 
 class Application
@@ -48,6 +50,9 @@ private:
 	ID3D11Buffer*			_pPyramidIndexBuffer;
 	ID3D11Buffer*			_pPlaneIndexBuffer;
 	ID3D11Buffer*			_pConstantBuffer;
+	XMFLOAT3				lightDirection;
+	XMFLOAT4				diffuseMaterial;
+	XMFLOAT4				diffuseLight;
 	XMFLOAT4X4              _cubeWorld;
 	XMFLOAT4X4              _pyramidWorld;
 	XMFLOAT4X4              _planeWorld;
@@ -57,7 +62,6 @@ private:
 	ID3D11Texture2D*		_depthStencilBuffer = NULL;
 	ID3D11RasterizerState*	_wireFrame;
 	ID3D11RasterizerState*	_solid;
-	float time;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);

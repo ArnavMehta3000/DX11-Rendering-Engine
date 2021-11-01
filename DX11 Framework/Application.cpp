@@ -123,11 +123,20 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 		return hr;
 
+
+	// Init lighting 
+	lightDirection = XMFLOAT3(0.25f, 0.5f, -1.0f);  // Light direction from surface (XYZ)
+	diffuseMaterial = XMFLOAT4(0.8f, 0.5f, 0.5f, 1.0f);  // Diffuse material properties (RGBA)
+	diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);  // Diffuse light color (RGBA)
+
+
+
+	
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -154,14 +163,14 @@ HRESULT Application::InitVertexBuffer()
 	{
 		SimpleVertex cubeVertices[] =
 		{
-			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)},  // Vert 0 - White
-			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},  // Vert 1 - Red
-			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},  // Vert 2 - Green
-			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},  // Vert 3 - Blue
-			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)},  // Vert 4 - Yellow
-			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},  // Vert 5 - Cyan
-			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)},  // Vert 6 - Pink
-			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}   // Vert 7 - Black
+			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f)},  // Vert 0 - White
+			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f)},  // Vert 1 - Red
+			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f)},  // Vert 2 - Green
+			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f)},  // Vert 3 - Blue
+			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT3(0.5773f, -0.5773f, -0.5773f)},  // Vert 4 - Yellow
+			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT3(0.5773f, 0.5773f, 0.5773f)},  // Vert 5 - Cyan
+			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT3(0.5773f, 0.5773f, -0.5773f)},  // Vert 6 - Pink
+			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.5773f, -0.5773f, 0.5773f)}   // Vert 7 - Black
 		};
 
 		D3D11_BUFFER_DESC cubeBd;
@@ -184,12 +193,12 @@ HRESULT Application::InitVertexBuffer()
 		SimpleVertex pyramidVertices[] =
 		{
 			// Base
-			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(-0.6626f, -0.3490f, -0.6626f) },
+			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(0.6626f, -0.3490f, 0.6626f) },
+			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.6626f, -0.3490f, 0.6626f) },
+			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.6626f, -0.3490f, -0.6626f) },
 			// Tip
-			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 		};
 
 		D3D11_BUFFER_DESC pyramidBd;
@@ -218,7 +227,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x, 0, z), XMFLOAT4((float)rand()/ RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX, 1.0f) };
+				planeVertices[i] = { XMFLOAT3(x, 0, z), XMFLOAT3(0.0f, 1.0f, 0.0f) };
 				i++;
 			}
 		}
@@ -647,7 +656,6 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
-	time = t;
 
 	// Pyramid
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));
@@ -666,23 +674,20 @@ void Application::Draw()
 	// Clear depth stencil 
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	XMMATRIX world = XMLoadFloat4x4(&_cubeWorld);
+	XMMATRIX cubeworld;
 	XMMATRIX pyramidWorld;
 	XMMATRIX planeWorld;
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
-	//
+
 	// Update variables
-	//
 	ConstantBuffer cb;
 	cb.mView = XMMatrixTranspose(view);
 	cb.mProjection = XMMatrixTranspose(projection);
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
-	//
 	// Renders a triangle
-	//
 	_pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
 	_pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
@@ -691,16 +696,15 @@ void Application::Draw()
 
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
+
 	// HACK: Set plane size
 	int xSize = 10, zSize = 10;
 	// Use plane mesh data
 	_pImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
 	_pImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
 	// Draw plane
 	planeWorld = XMLoadFloat4x4(&_planeWorld);
 	cb.mWorld = XMMatrixTranspose(planeWorld);
-	cb.mTime = time;
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
 
@@ -708,11 +712,9 @@ void Application::Draw()
 	// Use pyramid mesh data
 	_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
 	_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
 	// Draw pyramid
 	pyramidWorld = XMLoadFloat4x4(&_pyramidWorld);
 	cb.mWorld = XMMatrixTranspose(pyramidWorld);
-	cb.mTime = time;
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
 
@@ -720,18 +722,14 @@ void Application::Draw()
 	// Use cube mesh data
 	_pImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
 	_pImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
-
-	// First cube
-	world = XMLoadFloat4x4(&_cubeWorld);
-	cb.mWorld = XMMatrixTranspose(world);
+	// Draw cube
+	cubeworld = XMLoadFloat4x4(&_cubeWorld);
+	cb.mWorld = XMMatrixTranspose(cubeworld);
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
 
 
-	//
 	// Present our back buffer to our front buffer
-	//
 	_pSwapChain->Present(0, 0);
 }

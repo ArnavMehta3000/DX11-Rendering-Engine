@@ -12,7 +12,9 @@ cbuffer ConstantBuffer : register( b0 )
 	matrix World;
 	matrix View;
 	matrix Projection;
-	float gTime;
+	float4 DiffuseMtrl;
+	float4 DiffuseLight;
+	float3 LightVecW;
 }
 
 //--------------------------------------------------------------------------------------
@@ -25,17 +27,23 @@ struct VS_OUTPUT
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : COLOR )
+VS_OUTPUT VS( float4 Pos : POSITION, float4 Normal : NORMAL )
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
-	
-	//Pos.xy += 0.5f * sin(Pos.x) * sin(3.0f * gTime);
-	//Pos.z *= 0.6f + 0.4f * sin(2.0f * gTime);
 	
 	output.Pos = mul( Pos, World );
 	output.Pos = mul( output.Pos, View );
 	output.Pos = mul( output.Pos, Projection );
-	output.Color = Color;
+	
+	// Convert from local space to world space (W component is 0)
+	float3 normalW = mul(float4(Normal.xyz, 0.0f), World).xyz;
+	normalW = normalize(normalW);
+	
+	// Compute color using diffuse lighting only
+	float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
+	output.Color.rgb = diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb;
+	output.Color.a = DiffuseMtrl.a;
+	
 	return output;
 }
 
