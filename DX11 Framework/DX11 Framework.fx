@@ -41,6 +41,8 @@ VS_OUTPUT VS( float4 Pos : POSITION, float4 Normal : NORMAL )
 	
 	// Compute color using diffuse lighting only
 	float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
+	
+	
 	output.Color.rgb = diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb;
 	output.Color.a = DiffuseMtrl.a;
 	

@@ -25,7 +25,7 @@ public:
 	XMMATRIX mView;
 	XMMATRIX mProjection;
 	XMFLOAT4 DiffuseMtrl;
-	XMFLOAT4 DIffuseLight;
+	XMFLOAT4 DiffuseLight;
 	XMFLOAT3 LightVecW;
 };
 
@@ -59,9 +59,10 @@ private:
 	XMFLOAT4X4              _view;
 	XMFLOAT4X4              _projection;
 	ID3D11DepthStencilView* _depthStencilView;
-	ID3D11Texture2D*		_depthStencilBuffer = NULL;
+	ID3D11Texture2D*		_depthStencilBuffer = nullptr;
 	ID3D11RasterizerState*	_wireFrame;
 	ID3D11RasterizerState*	_solid;
+	float time;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
@@ -69,6 +70,7 @@ private:
 	void Cleanup();
 	HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut);
 	HRESULT InitShadersAndInputLayout();
+	void InitLights();
 	HRESULT InitVertexBuffer();
 	HRESULT InitIndexBuffer();
 

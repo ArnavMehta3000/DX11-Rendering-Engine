@@ -123,14 +123,8 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 		return hr;
 
-
-	// Init lighting 
-	lightDirection = XMFLOAT3(0.25f, 0.5f, -1.0f);  // Light direction from surface (XYZ)
-	diffuseMaterial = XMFLOAT4(0.8f, 0.5f, 0.5f, 1.0f);  // Diffuse material properties (RGBA)
-	diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);  // Diffuse light color (RGBA)
-
-
-
+	// Initialize lighting
+	InitLights();
 	
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -153,6 +147,14 @@ HRESULT Application::InitShadersAndInputLayout()
 	_pImmediateContext->IASetInputLayout(_pVertexLayout);
 
 	return hr;
+}
+
+void Application::InitLights()
+{
+	// NOTE: Light direction is updated in Update()
+	//lightDirection = XMFLOAT3(0.0f, time, 0.0f);  // Light direction from surface (XYZ)
+	diffuseMaterial = XMFLOAT4(0.0f, 1.0f, 0.5f, 1.0f);  // Diffuse material properties (RGBA)
+	diffuseLight = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);  // Diffuse light color (RGBA)
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -193,12 +195,12 @@ HRESULT Application::InitVertexBuffer()
 		SimpleVertex pyramidVertices[] =
 		{
 			// Base
-			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(-0.6626f, -0.3490f, -0.6626f) },
-			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(0.6626f, -0.3490f, 0.6626f) },
-			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.6626f, -0.3490f, 0.6626f) },
-			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.6626f, -0.3490f, -0.6626f) },
+			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(-0.6626f * -1, -0.3490f * -1, -0.6626f * -1) },
+			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(0.6626f * -1, -0.3490f * -1, 0.6626f * -1) },
+			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.6626f * -1, -0.3490f * -1, 0.6626f * -1) },
+			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.6626f * -1, -0.3490f * -1, -0.6626f * -1) },
 			// Tip
-			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
 		};
 
 		D3D11_BUFFER_DESC pyramidBd;
@@ -219,6 +221,7 @@ HRESULT Application::InitVertexBuffer()
 	#pragma region Plane
 	{
 		// Define plane size
+		int offset = 5;
 		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the index buffer
 		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
 		
@@ -227,7 +230,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x, 0, z), XMFLOAT3(0.0f, 1.0f, 0.0f) };
+				planeVertices[i] = { XMFLOAT3(x - offset, 0, z - offset), XMFLOAT3(0.0f, -1.0f, 0.0f) };
 				i++;
 			}
 		}
@@ -655,14 +658,14 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
-
+	lightDirection = XMFLOAT3(0.0f, sin(t) * 2, 0.0f);
 
 	// Pyramid
-	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationZ(t) * XMMatrixTranslation(-5.5, 0, 3));
 	// Cube
-	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-0.5f, 0, 3));
+	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationX(t) * XMMatrixTranslation(-0.5f, 0, 3));
 	// Plane
-	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6, -3, 3) * XMMatrixScaling(0.4f, 0.4f, 0.4f));
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6, -1.5, -3) * XMMatrixScaling(0.4f, 0.4f, 0.4f));
 }
 
 void Application::Draw()
@@ -684,6 +687,10 @@ void Application::Draw()
 	ConstantBuffer cb;
 	cb.mView = XMMatrixTranspose(view);
 	cb.mProjection = XMMatrixTranspose(projection);
+	// Lights
+	cb.DiffuseLight = diffuseLight;
+	cb.DiffuseMtrl = diffuseMaterial;
+	cb.LightVecW = lightDirection;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
