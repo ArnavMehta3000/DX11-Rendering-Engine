@@ -151,10 +151,14 @@ HRESULT Application::InitShadersAndInputLayout()
 
 void Application::InitLights()
 {
-	// NOTE: Light direction is updated in Update()
+	// TODO: Light direction is updated from Update method
 	//lightDirection = XMFLOAT3(0.0f, time, 0.0f);  // Light direction from surface (XYZ)
-	diffuseMaterial = XMFLOAT4(0.0f, 1.0f, 0.5f, 1.0f);  // Diffuse material properties (RGBA)
-	diffuseLight = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);  // Diffuse light color (RGBA)
+	diffuseMaterial = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);  // Diffuse material color
+	diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);  // Diffuse light color and intensity
+
+	// Ambient lighting
+	ambientMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -627,7 +631,7 @@ void Application::Cleanup()
 void Application::Update()
 {
 	// Input Handling
-	const char KEYUP = 0x1;
+	constexpr char KEYUP = 0x1;
 	if (GetAsyncKeyState(VK_LCONTROL) & KEYUP) // Set wire frame
 	{
 		if (!isWireFrame)  // Is solid, set wire frame
@@ -658,14 +662,14 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
-	lightDirection = XMFLOAT3(0.0f, sin(t) * 2, 0.0f);
+	lightDirection = XMFLOAT3(0.0f, sin(t * 2) * 5, 0.0f);
 
 	// Pyramid
-	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationZ(t) * XMMatrixTranslation(-5.5, 0, 3));
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));
 	// Cube
-	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationX(t) * XMMatrixTranslation(-0.5f, 0, 3));
+	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-0.5f, 0, 3));
 	// Plane
-	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6, -1.5, -3) * XMMatrixScaling(0.4f, 0.4f, 0.4f));
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6.5, -1.5, 2) * XMMatrixScaling(0.4f, 0.4f, 0.4f));
 }
 
 void Application::Draw()
@@ -681,15 +685,25 @@ void Application::Draw()
 	XMMATRIX pyramidWorld;
 	XMMATRIX planeWorld;
 	XMMATRIX view = XMLoadFloat4x4(&_view);
+	XMMATRIX transposeView = XMMatrixTranspose(view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
+	XMFLOAT4X4 eye;
+	XMStoreFloat4x4(&eye, view);
 
 	// Update variables
 	ConstantBuffer cb;
-	cb.mView = XMMatrixTranspose(view);
+	cb.mView = transposeView;
 	cb.mProjection = XMMatrixTranspose(projection);
+
 	// Lights
 	cb.DiffuseLight = diffuseLight;
 	cb.DiffuseMtrl = diffuseMaterial;
+	cb.AmbientLight = ambientLight;
+	cb.AmbientMtrl = ambientMaterial;
+	cb.SpecularLight = specularLight;
+	cb.SpecularMtrl = specularMaterial;
+	cb.SpecularPower = specularPower;
+	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);   // https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
 	cb.LightVecW = lightDirection;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);

@@ -26,6 +26,12 @@ public:
 	XMMATRIX mProjection;
 	XMFLOAT4 DiffuseMtrl;
 	XMFLOAT4 DiffuseLight;
+	XMFLOAT4 AmbientMtrl;
+	XMFLOAT4 AmbientLight;
+	XMFLOAT4 SpecularMtrl;
+	XMFLOAT4 SpecularLight;
+	float    SpecularPower;
+	XMFLOAT3 EyePosW; // Camera position in world space
 	XMFLOAT3 LightVecW;
 };
 
@@ -53,6 +59,10 @@ private:
 	XMFLOAT3				lightDirection;
 	XMFLOAT4				diffuseMaterial;
 	XMFLOAT4				diffuseLight;
+	XMFLOAT4				ambientMaterial;
+	XMFLOAT4				ambientLight;
+	XMFLOAT4				specularMaterial;
+	XMFLOAT4				specularLight;
 	XMFLOAT4X4              _cubeWorld;
 	XMFLOAT4X4              _pyramidWorld;
 	XMFLOAT4X4              _planeWorld;
@@ -62,7 +72,7 @@ private:
 	ID3D11Texture2D*		_depthStencilBuffer = nullptr;
 	ID3D11RasterizerState*	_wireFrame;
 	ID3D11RasterizerState*	_solid;
-	float time;
+	float					specularPower;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
