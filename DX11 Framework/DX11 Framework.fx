@@ -40,37 +40,31 @@ VS_OUTPUT VS( float4 Pos : POSITION, float4 Normal : NORMAL )
 	output.Pos = mul( Pos, World );
 	
 	// Compute the vector from the vertex to the eye position (normalize the difference)
-	// output.Pos is currently the position in world space
-    //float3 toEye = normalize(EyePosW - output.Pos.xyz);
+    float3 viewToEye = (EyePosW.xyz - output.Pos.xyz) / normalize(EyePosW - output.Pos.xyz);
+	
 	// Apply view and projection transformations
+    output.Pos = mul(output.Pos, View);
+    output.Pos = mul(output.Pos, Projection);
+	
 	// Convert normal from local space to world space
-	// Compute color
-	// Compute the reflection vector
-	// foat3 r = reflect(-LightVecW, normalW)
-	// Determine how much of the specular light makes it into your eye
-	//float specularAmount = pow(max(dot(r, toEye), 0.0f), SpecularPower);
+    float3 normalW = mul(float4(Normal.xyz, 0.0f), World).xyz;
+    normalW = normalize(normalW);
+	
 	// Calculate diffuse and ambient lighting
+    float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
+    float ambientAmount = AmbientLight * AmbientMtrl;
+	
+	// Compute the reflection vector
+    float3 r = reflect(-LightVecW, normalW);
+	
+	// Determine how much of the specular light makes it into your eye
+    float specularAmount = pow(max(dot(r, viewToEye), 0.0f), SpecularPower);
+	
 	// Compute specular amount separately
-	// float3 specular = specularAmount * (SpecularMtrl * SpecularLight).rgb;
+    float3 specular = specularAmount * (SpecularMtrl * SpecularLight).rgb;
+	
 	// Sum all the terms together and copy over the diffuse alpha
-	// output.Color.rgb = ambient + diffuse + specular;
-	// output.Color.a = DiffuseMtrl.a;
-	// return output
-	
-	
-	
-	output.Pos = mul( output.Pos, View );
-	output.Pos = mul( output.Pos, Projection );
-	
-	// Convert from local space to world space (W component is 0)
-	float3 normalW = mul(float4(Normal.xyz, 0.0f), World).xyz;
-	normalW = normalize(normalW);
-	
-	// Compute color using lighting
-	float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
-	float ambientAmount = AmbientLight * AmbientMtrl;
-	
-	output.Color.rgb = (diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb) + ambientAmount;
+	output.Color.rgb = (diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb) + ambientAmount + specular;
 	output.Color.a = DiffuseMtrl.a;
 	
 	return output;

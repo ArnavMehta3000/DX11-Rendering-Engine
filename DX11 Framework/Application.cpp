@@ -159,6 +159,11 @@ void Application::InitLights()
 	// Ambient lighting
 	ambientMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+
+	// Specular lighting
+	specularMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	specularLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	specularPower = 2.0f;
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -662,7 +667,7 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
-	lightDirection = XMFLOAT3(0.0f, sin(t * 2) * 5, 0.0f);
+	lightDirection = XMFLOAT3(0.0f, 0.0f, -3.0f);
 
 	// Pyramid
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));
@@ -703,7 +708,8 @@ void Application::Draw()
 	cb.SpecularLight = specularLight;
 	cb.SpecularMtrl = specularMaterial;
 	cb.SpecularPower = specularPower;
-	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);   // https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
+	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
+	// https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
 	cb.LightVecW = lightDirection;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
