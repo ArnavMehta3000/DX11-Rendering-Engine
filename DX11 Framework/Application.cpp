@@ -125,12 +125,13 @@ HRESULT Application::InitShadersAndInputLayout()
 
 	// Initialize lighting
 	InitLights();
-	
+
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -151,37 +152,39 @@ HRESULT Application::InitShadersAndInputLayout()
 
 void Application::InitLights()
 {
-	// TODO: Light direction is updated from Update method
-	//lightDirection = XMFLOAT3(0.0f, time, 0.0f);  // Light direction from surface (XYZ)
-	diffuseMaterial = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);  // Diffuse material color
-	diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);  // Diffuse light color and intensity
-
-	// Ambient lighting
-	ambientMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-
-	// Specular lighting
-	specularMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	specularLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	specularPower = 2.0f;
+	lightDirection = XMFLOAT3(1.0f, 0.5f, 0.0f);
+	// Diffuse material properties (RGBA)
+	diffuseMaterial = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	// Diffuse light colour (RGBA)
+	diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	// Ambient material properties (RGBA)
+	ambientMaterial = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	// Ambient Light Colour (RGBA)
+	ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 0.2f);
+	// Specular material properties (RGBA)
+	specularMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	// Specular Light Colour (RGBA)
+	specularLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	// Specular Power
+	specularPower = 15.0f;
 }
 
 HRESULT Application::InitVertexBuffer()
 {
 	HRESULT hr;
 
-	#pragma region Cube
+#pragma region Cube
 	{
 		SimpleVertex cubeVertices[] =
 		{
-			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f)},  // Vert 0 - White
-			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f)},  // Vert 1 - Red
-			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f)},  // Vert 2 - Green
-			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f)},  // Vert 3 - Blue
-			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT3(0.5773f, -0.5773f, -0.5773f)},  // Vert 4 - Yellow
-			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT3(0.5773f, 0.5773f, 0.5773f)},  // Vert 5 - Cyan
-			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT3(0.5773f, 0.5773f, -0.5773f)},  // Vert 6 - Pink
-			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.5773f, -0.5773f, 0.5773f)}   // Vert 7 - Black
+			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f), XMFLOAT2(1.0f, 1.0f)},
+			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f), XMFLOAT2(0.0f, 0.0f)},
+			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f), XMFLOAT2(1.0f, 1.0f)},
+			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f)},
+			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT3(0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 0.0f)},
+			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT3(0.5773f, 0.5773f, 0.5773f),XMFLOAT2(1.0f, 0.0f) },
+			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT3(0.5773f, 0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f)},
+			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.5773f, -0.5773f, 0.5773f), XMFLOAT2(1.0f, 1.0f)}
 		};
 
 		D3D11_BUFFER_DESC cubeBd;
@@ -197,9 +200,9 @@ HRESULT Application::InitVertexBuffer()
 
 		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeVertexBuffer);
 	}
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Pyramid
+#pragma region Pyramid
 	{
 		SimpleVertex pyramidVertices[] =
 		{
@@ -225,21 +228,21 @@ HRESULT Application::InitVertexBuffer()
 
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
 	}
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Plane
+#pragma region Plane
 	{
 		// Define plane size
 		int offset = 5;
 		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the index buffer
 		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
-		
+
 		// Populate the plane vertex buffer
 		for (int i = 0, z = 0; z <= zSize; z++)
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x - offset, 0, z - offset), XMFLOAT3(0.0f, -1.0f, 0.0f) };
+				planeVertices[i] = { XMFLOAT3(x - offset, 0, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f) };
 				i++;
 			}
 		}
@@ -258,7 +261,7 @@ HRESULT Application::InitVertexBuffer()
 
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
 	}
-	#pragma endregion
+#pragma endregion
 
 
 
@@ -276,7 +279,7 @@ HRESULT Application::InitIndexBuffer()
 {
 	HRESULT hr;
 
-	#pragma region Cube
+#pragma region Cube
 	{
 		// Index buffer for cube
 		WORD cubeIndices[] =
@@ -320,10 +323,10 @@ HRESULT Application::InitIndexBuffer()
 		CubeInitData.pSysMem = cubeIndices;
 		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeIndexBuffer);
 	}
-	#pragma endregion
+#pragma endregion
 
 
-	#pragma region Pyramid
+#pragma region Pyramid
 	{
 		WORD pyramidIndices[] =
 		{
@@ -348,9 +351,9 @@ HRESULT Application::InitIndexBuffer()
 		PyramidInitData.pSysMem = pyramidIndices;
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
 	}
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Plane
+#pragma region Plane
 	{
 		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the vertex buffer
 		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
@@ -387,7 +390,7 @@ HRESULT Application::InitIndexBuffer()
 		PlaneInitData.pSysMem = planeIndices;
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneIndexBuffer);
 	}
-	#pragma endregion
+#pragma endregion
 
 
 
@@ -667,7 +670,7 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
-	lightDirection = XMFLOAT3(0.0f, 0.0f, -3.0f);
+	//lightDirection = XMFLOAT3(0.0f, -1.0f, 1.0f);
 
 	// Pyramid
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));

@@ -7,7 +7,7 @@
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
-cbuffer ConstantBuffer : register( b0 )
+cbuffer ConstantBuffer : register(b0)
 {
 	matrix World;
 	matrix View;
@@ -19,7 +19,7 @@ cbuffer ConstantBuffer : register( b0 )
 	float4 SpecularMtrl;
 	float4 SpecularLight;
 	float  SpecularPower;
-	float3 EyePosW; // Camera position in world space
+	float3 EyePosW; // Eye/camera in world
 	float3 LightVecW;
 }
 
@@ -27,45 +27,24 @@ cbuffer ConstantBuffer : register( b0 )
 struct VS_OUTPUT
 {
 	float4 Pos : SV_POSITION;
-	float4 Color : COLOR0;
+	float4 NormalW : NORMAL;
+	float3 PosW : POSITION; // Position in world
 };
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS( float4 Pos : POSITION, float4 Normal : NORMAL )
+VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL)
 {
-	VS_OUTPUT output = (VS_OUTPUT)0;
+	VS_OUTPUT output = (VS_OUTPUT) 0;
 	
-	output.Pos = mul( Pos, World );
+	output.Pos = mul(Pos, World);
+	output.PosW = output.Pos;
 	
-	// Compute the vector from the vertex to the eye position (normalize the difference)
-    float3 viewToEye = (EyePosW.xyz - output.Pos.xyz) / normalize(EyePosW - output.Pos.xyz);
+	output.Pos = mul(output.Pos, View);
+	output.Pos = mul(output.Pos, Projection);
 	
-	// Apply view and projection transformations
-    output.Pos = mul(output.Pos, View);
-    output.Pos = mul(output.Pos, Projection);
-	
-	// Convert normal from local space to world space
-    float3 normalW = mul(float4(Normal.xyz, 0.0f), World).xyz;
-    normalW = normalize(normalW);
-	
-	// Calculate diffuse and ambient lighting
-    float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
-    float ambientAmount = AmbientLight * AmbientMtrl;
-	
-	// Compute the reflection vector
-    float3 r = reflect(-LightVecW, normalW);
-	
-	// Determine how much of the specular light makes it into your eye
-    float specularAmount = pow(max(dot(r, viewToEye), 0.0f), SpecularPower);
-	
-	// Compute specular amount separately
-    float3 specular = specularAmount * (SpecularMtrl * SpecularLight).rgb;
-	
-	// Sum all the terms together and copy over the diffuse alpha
-	output.Color.rgb = (diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb) + ambientAmount + specular;
-	output.Color.a = DiffuseMtrl.a;
+	output.NormalW = mul(Normal, World);
 	
 	return output;
 }
@@ -74,7 +53,36 @@ VS_OUTPUT VS( float4 Pos : POSITION, float4 Normal : NORMAL )
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
-float4 PS( VS_OUTPUT input ) : SV_Target
+float4 PS(VS_OUTPUT vsInput) : SV_Target
 {
-	return input.Color;
+	float4 psOutput = (0, 0, 0, 0);
+	
+	// Compute the vector from the vertex to the eye position (normalize the difference)
+	float3 viewToEye = normalize(EyePosW - vsInput.Pos.xyz);
+	//float3 viewToEye = (EyePosW.xyz - vsInput.Pos.xyz) / normalize(EyePosW - vsInput.Pos.xyz);
+	
+	// Convert normal from local space to world space
+	float3 normalW = vsInput.NormalW; /* = mul(float4(vsInput.NormalW.xyz, 0.0f), World).xyz;*/
+	normalW = normalize(normalW);
+	
+	// Calculate diffuse and ambient lighting
+	float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
+	float3 ambient = (AmbientLight * AmbientMtrl).rgb;
+	
+ 
+	float3 diffuse = diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb;
+	// Compute the reflection vector
+	float3 r = reflect(-LightVecW, normalW);
+	
+	// Determine how much of the specular light makes it into your eye
+	float specularAmount = pow(max(dot(r, viewToEye), 0.0f), SpecularPower);
+	
+	// Compute specular amount separately
+	float3 specular = specularAmount * (SpecularMtrl * SpecularLight).rgb;
+	
+	// Sum all the terms together and copy over the diffuse alpha
+	psOutput.rgb = diffuse + specular + ambient;
+	psOutput.a = DiffuseMtrl.a;
+	
+	return psOutput;
 }
