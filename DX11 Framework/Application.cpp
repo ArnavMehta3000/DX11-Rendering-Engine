@@ -152,21 +152,33 @@ HRESULT Application::InitShadersAndInputLayout()
 
 void Application::InitLights()
 {
-	lightDirection = XMFLOAT3(1.0f, 0.5f, 0.0f);
+	// Light intensities
+	directionalLight.Ambient           = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	directionalLight.Diffuse           = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Specular          = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Direction         = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	
+	// Light materials
+	directionalLight.Material.ambient  = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight.Material.diffuse  = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.SpecularPower     = 1.0f;
+
+	//lightDirection = XMFLOAT3(1.0f, 0.5f, 0.0f);
 	// Diffuse material properties (RGBA)
-	diffuseMaterial = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	//diffuseMaterial = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	// Diffuse light colour (RGBA)
-	diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	// Ambient material properties (RGBA)
-	ambientMaterial = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//ambientMaterial = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	// Ambient Light Colour (RGBA)
-	ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 0.2f);
+	//ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 0.2f);
 	// Specular material properties (RGBA)
-	specularMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	//specularMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	// Specular Light Colour (RGBA)
-	specularLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	//specularLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	// Specular Power
-	specularPower = 15.0f;
+	//specularPower = 15.0f;
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -177,14 +189,14 @@ HRESULT Application::InitVertexBuffer()
 	{
 		SimpleVertex cubeVertices[] =
 		{
-			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f), XMFLOAT2(1.0f, 1.0f)},
-			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f), XMFLOAT2(0.0f, 0.0f)},
-			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f), XMFLOAT2(1.0f, 1.0f)},
-			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f)},
-			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT3(0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 0.0f)},
-			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT3(0.5773f, 0.5773f, 0.5773f),XMFLOAT2(1.0f, 0.0f) },
-			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT3(0.5773f, 0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f)},
-			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.5773f, -0.5773f, 0.5773f), XMFLOAT2(1.0f, 1.0f)}
+			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f),  },
+			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f), },
+			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f), },
+			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f),},
+			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT3(0.5773f, -0.5773f, -0.5773f),  },
+			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT3(0.5773f, 0.5773f, 0.5773f),     },
+			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT3(0.5773f, 0.5773f, -0.5773f),   },
+			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.5773f, -0.5773f, 0.5773f),   }
 		};
 
 		D3D11_BUFFER_DESC cubeBd;
@@ -242,7 +254,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x - offset, 0, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f) };
+				planeVertices[i] = { XMFLOAT3(x - offset, 0.0f, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f) };
 				i++;
 			}
 		}
@@ -640,7 +652,7 @@ void Application::Update()
 {
 	// Input Handling
 	constexpr char KEYUP = 0x1;
-	if (GetAsyncKeyState(VK_LCONTROL) & KEYUP) // Set wire frame
+	if (GetAsyncKeyState(VK_RCONTROL) & KEYUP) // Set wire frame
 	{
 		if (!isWireFrame)  // Is solid, set wire frame
 			_pImmediateContext->RSSetState(_wireFrame);
@@ -649,7 +661,6 @@ void Application::Update()
 
 		isWireFrame = !isWireFrame;
 	}
-
 
 
 
@@ -670,14 +681,13 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
-	//lightDirection = XMFLOAT3(0.0f, -1.0f, 1.0f);
 
 	// Pyramid
-	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-5.5, 0, 3));
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationX(t) * XMMatrixTranslation(cos(t * -1) * 6, 0, 3));
 	// Cube
-	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationY(t) * XMMatrixTranslation(-0.5f, 0, 3));
+	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationX(t) * XMMatrixTranslation(sin(t) * 6, 0, 3));
 	// Plane
-	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6.5, -1.5, 2) * XMMatrixScaling(0.4f, 0.4f, 0.4f));
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6.5, -1.5, 2));// *XMMatrixScaling(0.4f, 0.4f, 0.4f));
 }
 
 void Application::Draw()
@@ -704,13 +714,16 @@ void Application::Draw()
 	cb.mProjection = XMMatrixTranspose(projection);
 
 	// Lights
-	cb.DiffuseLight = diffuseLight;
-	cb.DiffuseMtrl = diffuseMaterial;
-	cb.AmbientLight = ambientLight;
-	cb.AmbientMtrl = ambientMaterial;
-	cb.SpecularLight = specularLight;
-	cb.SpecularMtrl = specularMaterial;
-	cb.SpecularPower = specularPower;
+	cb.dirLight = directionalLight;
+
+	 
+	//cb.DiffuseLight = diffuseLight;
+	//cb.DiffuseMtrl = diffuseMaterial;
+	//cb.AmbientLight = ambientLight;
+	//cb.AmbientMtrl = ambientMaterial;
+	//cb.SpecularLight = specularLight;
+	//cb.SpecularMtrl = specularMaterial;
+	//cb.SpecularPower = specularPower;
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
 	// https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
 	cb.LightVecW = lightDirection;

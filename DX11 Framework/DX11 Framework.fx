@@ -1,24 +1,33 @@
-//--------------------------------------------------------------------------------------
-// File: DX11 Framework.fx
-//
-// Copyright (c) Microsoft Corporation. All rights reserved.
-//--------------------------------------------------------------------------------------
+// Material struct
+struct Material
+{
+    float4 Ambient;
+    float4 Diffuse;
+    float4 Specular;
+};
 
-//--------------------------------------------------------------------------------------
-// Constant Buffer Variables
-//--------------------------------------------------------------------------------------
+
+// Light strcts
+struct DirectionalLight
+{
+    float4 Ambient;
+    float4 Diffuse;
+    float4 Specular;
+    Material Material;
+
+    float3 Direction;
+    float SpecularPower;
+};
+
+
 cbuffer ConstantBuffer : register(b0)
 {
 	matrix World;
 	matrix View;
 	matrix Projection;
-	float4 DiffuseMtrl;
-	float4 DiffuseLight;
-	float4 AmbientMtrl;
-	float4 AmbientLight;
-	float4 SpecularMtrl;
-	float4 SpecularLight;
-	float  SpecularPower;
+	
+    DirectionalLight dirLight;
+
 	float3 EyePosW; // Eye/camera in world
 	float3 LightVecW;
 }
@@ -45,7 +54,6 @@ VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL)
 	output.Pos = mul(output.Pos, Projection);
 	
 	output.NormalW = mul(Normal, World);
-	
 	return output;
 }
 
@@ -67,22 +75,22 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 	
 	// Calculate diffuse and ambient lighting
 	float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
-	float3 ambient = (AmbientLight * AmbientMtrl).rgb;
+	float3 ambient = (dirLight.Ambient * dirLight.Material.Ambient).rgb;
 	
  
-	float3 diffuse = diffuseAmount * (DiffuseMtrl * DiffuseLight).rgb;
+	float3 diffuse = diffuseAmount * (dirLight.Material.Diffuse * dirLight.Diffuse).rgb;
 	// Compute the reflection vector
 	float3 r = reflect(-LightVecW, normalW);
 	
 	// Determine how much of the specular light makes it into your eye
-	float specularAmount = pow(max(dot(r, viewToEye), 0.0f), SpecularPower);
+	float specularAmount = pow(max(dot(r, viewToEye), 0.0f), dirLight.SpecularPower);
 	
 	// Compute specular amount separately
-	float3 specular = specularAmount * (SpecularMtrl * SpecularLight).rgb;
+	float3 specular = specularAmount * (dirLight.Material.Specular * dirLight.Specular).rgb;
 	
 	// Sum all the terms together and copy over the diffuse alpha
 	psOutput.rgb = diffuse + specular + ambient;
-	psOutput.a = DiffuseMtrl.a;
+	psOutput.a = dirLight.Material.Diffuse.a;
 	
 	return psOutput;
 }
