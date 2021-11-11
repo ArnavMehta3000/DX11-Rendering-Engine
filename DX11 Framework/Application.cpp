@@ -163,6 +163,11 @@ void Application::InitLights()
 	directionalLight.Material.diffuse  = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	directionalLight.Material.specular = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	directionalLight.SpecularPower     = 1.0f;
+
+	// Light colors
+	// Ambient: Red
+	// Specular: Green
+	// Diffuse: Blue
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -671,7 +676,7 @@ void Application::Update()
 	// Cube
 	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationX(t) * XMMatrixTranslation(sin(t) * 6, 0, 3));
 	// Plane
-	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(6.5, -1.5, 2));// *XMMatrixScaling(0.4f, 0.4f, 0.4f));
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(2.0f, -1.5f, 2.0f));// *XMMatrixScaling(0.4f, 0.4f, 0.4f));
 }
 
 void Application::Draw()
