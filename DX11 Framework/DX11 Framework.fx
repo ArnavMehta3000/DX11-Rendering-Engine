@@ -1,22 +1,22 @@
 // Material struct
 struct Material
 {
-    float4 Ambient;
-    float4 Diffuse;
-    float4 Specular;
+	float4 Ambient;
+	float4 Diffuse;
+	float4 Specular;
 };
 
 
 // Light strcts
 struct DirectionalLight
 {
-    float4 Ambient;
-    float4 Diffuse;
-    float4 Specular;
-    Material Material;
+	float4 Ambient;
+	float4 Diffuse;
+	float4 Specular;
+	Material Material;
 
-    float3 Direction;
-    float SpecularPower;
+	float3 Direction;
+	float SpecularPower;
 };
 
 
@@ -26,9 +26,10 @@ cbuffer ConstantBuffer : register(b0)
 	matrix View;
 	matrix Projection;
 	
-    DirectionalLight dirLight;
+	DirectionalLight dirLight;
 
 	float3 EyePosW; // Eye/camera in world
+	float padding;
 	float3 LightVecW;
 }
 

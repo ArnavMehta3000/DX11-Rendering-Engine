@@ -24,13 +24,6 @@ private:
 	ID3D11Buffer*			_pPyramidIndexBuffer;
 	ID3D11Buffer*			_pPlaneIndexBuffer;
 	ID3D11Buffer*			_pConstantBuffer;
-	XMFLOAT3				lightDirection;
-	XMFLOAT4				diffuseMaterial;
-	XMFLOAT4				diffuseLight;
-	XMFLOAT4				ambientMaterial;
-	XMFLOAT4				ambientLight;
-	XMFLOAT4				specularMaterial;
-	XMFLOAT4				specularLight;
 	XMFLOAT4X4              _cubeWorld;
 	XMFLOAT4X4              _pyramidWorld;
 	XMFLOAT4X4              _planeWorld;

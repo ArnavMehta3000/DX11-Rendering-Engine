@@ -28,5 +28,7 @@ public:
     Light::DirectionalLight dirLight;
     
     XMFLOAT3 EyePosW; // Camera position in world space
+    float padding;
+
     XMFLOAT3 LightVecW;
 };

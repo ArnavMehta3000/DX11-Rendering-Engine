@@ -157,28 +157,12 @@ void Application::InitLights()
 	directionalLight.Diffuse           = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Specular          = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Direction         = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	
+
 	// Light materials
 	directionalLight.Material.ambient  = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	directionalLight.Material.diffuse  = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
-	directionalLight.Material.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Material.diffuse  = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	directionalLight.SpecularPower     = 1.0f;
-
-	//lightDirection = XMFLOAT3(1.0f, 0.5f, 0.0f);
-	// Diffuse material properties (RGBA)
-	//diffuseMaterial = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	// Diffuse light colour (RGBA)
-	//diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	// Ambient material properties (RGBA)
-	//ambientMaterial = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	// Ambient Light Colour (RGBA)
-	//ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 0.2f);
-	// Specular material properties (RGBA)
-	//specularMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	// Specular Light Colour (RGBA)
-	//specularLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	// Specular Power
-	//specularPower = 15.0f;
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -715,6 +699,7 @@ void Application::Draw()
 
 	// Lights
 	cb.dirLight = directionalLight;
+	cb.LightVecW = directionalLight.Direction;
 
 	 
 	//cb.DiffuseLight = diffuseLight;
@@ -726,7 +711,6 @@ void Application::Draw()
 	//cb.SpecularPower = specularPower;
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
 	// https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
-	cb.LightVecW = lightDirection;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
