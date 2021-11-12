@@ -26,6 +26,7 @@ public:
     XMMATRIX mProjection;
 
     Light::DirectionalLight dirLight;
+    Light::PointLight pointLight;
     
     XMFLOAT3 EyePosW; // Camera position in world space
     float padding;

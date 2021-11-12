@@ -37,6 +37,7 @@ private:
 
 	// Lights
 	Light::DirectionalLight directionalLight;
+	Light::PointLight       pointLight;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);

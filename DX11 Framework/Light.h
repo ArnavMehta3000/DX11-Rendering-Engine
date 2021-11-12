@@ -10,34 +10,51 @@ using namespace DirectX;
 class Light
 {
 public:
+
+	// Structure for different light intensities
+	struct Intensity
+	{
+		Intensity() { ZeroMemory(this, sizeof(this)); }
+
+		XMFLOAT4 Ambient;  // Ambient light intensity
+		XMFLOAT4 Diffuse;  // Diffuse light intensity
+		XMFLOAT4 Specular; // Specular light intensity
+	};
+
+	// Structure for different light materials
 	struct Material
 	{
 	public:
 		Material() { ZeroMemory(this, sizeof(this)); }
-		// Ambient light material
-		XMFLOAT4 ambient;
-		// Diffuse light material
-		XMFLOAT4 diffuse;
-		// Specular light material
-		XMFLOAT4 specular;
+
+		XMFLOAT4 ambient;  // Ambient light material
+		XMFLOAT4 diffuse;  // Diffuse light material
+		XMFLOAT4 specular; // Specular light material
 	};
 
+	// Structure for directional lights
 	struct DirectionalLight
 	{
 	public:
 		DirectionalLight() { ZeroMemory(this, sizeof(this)); }
 
-		// Ambient light intensty
-		XMFLOAT4 Ambient;
-		// Diffuse light intensity
-		XMFLOAT4 Diffuse;
-		// Specular light intensity
-		XMFLOAT4 Specular;
+		Intensity Intensity;
+		Material Material; 
+
+		XMFLOAT3 Direction;
+		float SpecularPower;
+	};
+
+	// Structure for point lights
+	struct PointLight
+	{
+		Intensity Intensity;
 		Material Material;
 
-		// Direction the light is facing
-		XMFLOAT3 Direction;
-		// The specular power
-		float SpecularPower;
+		XMFLOAT3 Position;
+		float Range;  // Max reach distance of point light
+
+		XMFLOAT3 Attenuation;  // Fading of light
+		float padding;
 	};
 };
