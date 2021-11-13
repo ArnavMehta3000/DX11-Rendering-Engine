@@ -55,6 +55,6 @@ public:
 		float Range;  // Max reach distance of point light
 
 		XMFLOAT3 Attenuation;  // Fading of light
-		float padding;
+		float SpecularPower;
 	};
 };

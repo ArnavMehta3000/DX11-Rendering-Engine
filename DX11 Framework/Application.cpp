@@ -155,7 +155,7 @@ void Application::InitLights()
 	// Directional light
 	directionalLight.Intensity.Ambient           = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Intensity.Diffuse           = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Specular          = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Specular          = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Material.ambient            = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Material.diffuse            = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	directionalLight.Material.specular           = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -169,15 +169,16 @@ void Application::InitLights()
 
 
 	//Point lights (WIP)
-	pointLight.Intensity.Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-	pointLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.ambient = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Material.diffuse = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	pointLight.Material.specular = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	pointLight.Position = XMFLOAT3(1.0f, 2.0f, -2.5f);
-	pointLight.Attenuation = XMFLOAT3(50.0f, 50.0f, 50.0f);
-	pointLight.Range = 75.0f;
+	pointLight.Intensity.Ambient  = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	pointLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	pointLight.Material.ambient   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.diffuse   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Material.specular  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Position           = XMFLOAT3(2.0f, 2.0f, 1.5f);
+	pointLight.Attenuation        = XMFLOAT3(5.0f, 5.0f, 5.0f);
+	pointLight.Range              = 10.0f;
+	pointLight.SpecularPower	  = 10.2f;
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -680,6 +681,9 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
+
+	//directionalLight.Direction = XMFLOAT3(sin(t), 1.0f, 1.0f);
+
 
 	// Pyramid
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationX(t) * XMMatrixTranslation(cos(t * -1) * 6, 0, 3));

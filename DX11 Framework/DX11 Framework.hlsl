@@ -34,7 +34,7 @@ struct PointLight
 	float Range;
 
 	float3 Attenuation; 
-	float padding;
+    float SpecularPower;
 };
 
 
@@ -63,53 +63,77 @@ struct VS_OUTPUT
 
 
 
-float4 ComputePointLights(float3 normal, float3 viewToEye, float3 position)
+float4 PointLights(float3 worldPos, float4 inputNormal, float3 toEyeNormalized)
 {
 	float4 output = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float4 diffuse = float4(0.0f, 0.0f, 1.0f, 0.0f);
 	float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	// Vector from surface to light
-	float3 lightVec = pointLight.Position - position;
+	// Vector between light position and pixel position
+	float3 lightToPixelVec = pointLight.Position - worldPos.xyz;
 
-	// Distance from ligth to surface
-	float dist = length(lightVec);
-	if (dist > pointLight.Range)
-		return output;  // OUtput will be zero since surface point is out of light range
+	// Distance between light pos and pixel pos
+	float d = length(lightToPixelVec);
 
-	lightVec /= dist;
+	// Create the ambient light
+	ambient = pointLight.Intensity.Diffuse * pointLight.Intensity.Ambient;
 
-	// Ambient
-	ambient = pointLight.Intensity.Ambient * pointLight.Material.Ambient;
+	// If pixel is too far then return ambient light
+	if (d > pointLight.Range)
+		return float4(ambient.rgb, diffuse.a);
 
-	// Diffuse and specular if surface is in line of sight
-	float diffuseFactor = dot(lightVec, normal);
-	
+	lightToPixelVec = normalize(lightToPixelVec);
 
-	// Flatten to avoid dynamic branching
-	[flatten]
-	if (diffuseFactor > 0.0f)
+	float lightAmount = dot(lightToPixelVec, inputNormal.xyz);
+
+	// Reflection vector
+    float3 r = reflect(-LightVecW, inputNormal.xyz);
+    float specularAmount = pow(max(dot(r, toEyeNormalized), 0.0f), pointLight.SpecularPower);
+    specular = specularAmount * (pointLight.Material.Specular * pointLight.Intensity.Specular);
+
+	if (lightAmount > 0.0f)
 	{
-		float3 r = reflect(-lightVec, normal);
-		float specFactor = pow(max(dot(r, viewToEye), 0.0f), pointLight.Material.Specular);
+        output += lightAmount * pointLight.Material.Diffuse * pointLight.Intensity.Diffuse;
 
-		diffuse = diffuseFactor * pointLight.Material.Diffuse * pointLight.Intensity.Diffuse;
-		specular = specFactor * pointLight.Material.Specular * pointLight.Intensity.Specular;
-	}
+		// Calculate light falloff based on attenuation
+        float att = pointLight.Attenuation + (pointLight.Attenuation * d) + (pointLight.Attenuation * d * d);
+        output /= float4(att, att, att, 1.0f);
+    }
 
-	// Attenuate
-	float att = 1.0f / dot(pointLight.Attenuation, float3(1.0, dist, dist * dist));
 
-	diffuse *= att;
-	specular *= att;
 
 	output = diffuse + specular + ambient;
-
 	return output;
 }
 
 
+float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
+{
+
+    float4 output = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 diffuse = float4(0.0f, 0.0f, 1.0f, 0.0f);
+    float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// Calculate diffuse and ambient lighting
+    float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
+    diffuse = diffuseAmount * (dirLight.Material.Diffuse * dirLight.Intensity.Diffuse);
+	
+    ambient = (dirLight.Intensity.Ambient * dirLight.Material.Ambient);
+ 
+	// Compute the reflection vector
+    float3 r = reflect(-LightVecW, normalW);
+	
+	// Determine how much of the specular light makes it into your eye
+    float specularAmount = pow(max(dot(r, toEyeNormalized), 0.0f), dirLight.SpecularPower);
+	
+	// Compute specular amount separately
+    specular = specularAmount * (dirLight.Material.Specular * dirLight.Intensity.Specular);
+
+    output = diffuse + specular + ambient;
+    return output;
+}
 
 
 
@@ -135,37 +159,22 @@ VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL)
 // Pixel Shader
 float4 PS(VS_OUTPUT vsInput) : SV_Target
 {
-	float4 psOutput = (0, 0, 0, 0);
+	float4 psOutput = (0.0f, 0.0f, 0.0f, 0.0f);
 	
 	// Compute the vector from the vertex to the eye position (normalize the difference)
 	float3 viewToEye = EyePosW - vsInput.Pos.xyz;
 	float3 toEyeNormalized = normalize(EyePosW - vsInput.Pos.xyz);
 	
 	// Convert normal from local space to world space
-	float3 normalW = vsInput.NormalW;
-	normalW = normalize(normalW);
+    float3 normalW = normalize(vsInput.NormalW);
 
 
-	float4 pointLights = ComputePointLights(normalW, viewToEye, vsInput.Pos.xyz);
+    float4 pointLights = PointLights(vsInput.Pos.xyz, (normalW, 0.0f), toEyeNormalized);
+    float4 directionalLights = DirectionalLights(normalW, toEyeNormalized);
+
 
 	
-	// Calculate diffuse and ambient lighting
-	float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
-	float3 ambient = (dirLight.Intensity.Ambient * dirLight.Material.Ambient).rgb;
-	
- 
-	float3 diffuse = diffuseAmount * (dirLight.Material.Diffuse * dirLight.Intensity.Diffuse).rgb;
-	// Compute the reflection vector
-	float3 r = reflect(-LightVecW, normalW);
-	
-	// Determine how much of the specular light makes it into your eye
-	float specularAmount = pow(max(dot(r, toEyeNormalized), 0.0f), dirLight.SpecularPower);
-	
-	// Compute specular amount separately
-	float3 specular = specularAmount * (dirLight.Material.Specular * dirLight.Intensity.Specular).rgb;
-	
-	// Sum all the terms together and copy over the diffuse alpha
-	psOutput.rgb = diffuse + specular + ambient;
+	psOutput.rgb = pointLights.rgb + directionalLights.rgb;
 	psOutput.a = dirLight.Material.Diffuse.a;
 	
 	return psOutput;
