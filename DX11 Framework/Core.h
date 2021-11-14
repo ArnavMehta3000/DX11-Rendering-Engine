@@ -5,6 +5,7 @@
 #include <directxmath.h>
 #include <directxcolors.h>
 #include "resource.h"
+#include "DDSTextureLoader.h"
 #include "Vector3.h"
 #include "Matrix.h"
 #include "Light.h"
@@ -16,6 +17,7 @@ struct SimpleVertex
 public:
     XMFLOAT3 Pos;
     XMFLOAT3 Normal;
+    XMFLOAT2 TexCoord;
 };
 
 struct ConstantBuffer

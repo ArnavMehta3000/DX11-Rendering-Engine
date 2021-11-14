@@ -123,8 +123,12 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 		return hr;
 
+
 	// Initialize lighting
 	InitLights();
+
+	// Initialize textures
+	InitTextures();
 
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -169,7 +173,7 @@ void Application::InitLights()
 
 
 	//Point lights (WIP)
-	pointLight.Intensity.Ambient  = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	pointLight.Intensity.Ambient  = XMFLOAT4(0.5, 0.1f, 0.1f, 1.0f);
 	pointLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	pointLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	pointLight.Material.ambient   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -181,6 +185,30 @@ void Application::InitLights()
 	pointLight.SpecularPower	  = 10.2f;
 }
 
+void Application::InitTextures()
+{
+	// Load texture
+	CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &_pTextureRV);
+
+	// Tell shader to use the texture
+	_pImmediateContext->CSSetShaderResources(0, 1, &_pTextureRV);
+
+	// Define and create sampler state
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+	samplerDesc.Filter         = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU       = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV       = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW       = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	samplerDesc.MinLOD         = 0;
+	samplerDesc.MaxLOD         = D3D11_FLOAT32_MAX;
+	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
+
+	// Set sampler state
+	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+}
+
 HRESULT Application::InitVertexBuffer()
 {
 	HRESULT hr;
@@ -189,14 +217,14 @@ HRESULT Application::InitVertexBuffer()
 	{
 		SimpleVertex cubeVertices[] =
 		{
-			{XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f),  },
-			{XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f), },
-			{XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f), },
-			{XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f),},
-			{XMFLOAT3(1.0f,-1.0f,-1.0f), XMFLOAT3(0.5773f, -0.5773f, -0.5773f),  },
-			{XMFLOAT3(1.0f,-1.0f, 1.0f), XMFLOAT3(0.5773f, 0.5773f, 0.5773f),     },
-			{XMFLOAT3(1.0f, 1.0f,-1.0f), XMFLOAT3(0.5773f, 0.5773f, -0.5773f),   },
-			{XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT3(0.5773f, -0.5773f, 0.5773f),   }
+			{ XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f),   XMFLOAT2(1.0f, 0.0f) } ,
+			{ XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f)  },
+			{ XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f),  XMFLOAT2(1.0f, 1.0f)  },
+			{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f) },
+			{ XMFLOAT3(1.0f,-1.0f,-1.0f),  XMFLOAT3(0.5773f, -0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f) },
+			{ XMFLOAT3(1.0f,-1.0f, 1.0f),  XMFLOAT3(0.5773f, 0.5773f, 0.5773f),    XMFLOAT2(1.0f, 0.0f) },
+			{ XMFLOAT3(1.0f, 1.0f,-1.0f),  XMFLOAT3(0.5773f, 0.5773f, -0.5773f),   XMFLOAT2(0.0f, 1.0f) },
+			{ XMFLOAT3(1.0f, 1.0f, 1.0f),  XMFLOAT3(0.5773f, -0.5773f, 0.5773f),   XMFLOAT2(1.0f, 1.0f) }
 		};
 
 		D3D11_BUFFER_DESC cubeBd;
@@ -682,7 +710,7 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
-	//directionalLight.Direction = XMFLOAT3(sin(t), 1.0f, 1.0f);
+	directionalLight.Direction = XMFLOAT3(sin(t) * 2, 1.0f, 1.0f);
 
 
 	// Pyramid
@@ -739,6 +767,8 @@ void Application::Draw()
 	_pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
+	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+
 
 
 	UINT stride = sizeof(SimpleVertex);

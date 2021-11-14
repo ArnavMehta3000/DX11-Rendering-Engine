@@ -1,5 +1,10 @@
-// Material struct
+// Texturing
+Texture2D txDiffuse : TEXTURE : register(t0);
+SamplerState samLinear : SAMPLER : register(s0);
 
+
+
+// Material struct
 struct Intensity
 {
 	float4 Ambient;
@@ -59,6 +64,7 @@ struct VS_OUTPUT
 	float4 Pos : SV_POSITION;
 	float4 NormalW : NORMAL;
 	float3 PosW : POSITION; // Position in world
+    float2 Tex : TEXCOORD0;
 };
 
 
@@ -107,7 +113,6 @@ float4 PointLights(float3 worldPos, float4 inputNormal, float3 toEyeNormalized)
 	return output;
 }
 
-
 float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
 {
 
@@ -141,7 +146,7 @@ float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
 
 
 // Vertex Shader
-VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL)
+VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL, float2 Tex : TEXCOORD0)
 {
 	VS_OUTPUT output = (VS_OUTPUT) 0;
 	
@@ -152,6 +157,9 @@ VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL)
 	output.Pos = mul(output.Pos, Projection);
 	
 	output.NormalW = mul(Normal, World);
+
+    output.Tex = Tex;
+
 	return output;
 }
 
@@ -168,13 +176,16 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 	// Convert normal from local space to world space
     float3 normalW = normalize(vsInput.NormalW);
 
-
+	// Calculate lighting
     float4 pointLights = PointLights(vsInput.Pos.xyz, (normalW, 0.0f), toEyeNormalized);
     float4 directionalLights = DirectionalLights(normalW, toEyeNormalized);
 
+	// Texturing
+    float4 textureColor = txDiffuse.Sample(samLinear, vsInput.Tex);
+
 
 	
-	psOutput.rgb = pointLights.rgb + directionalLights.rgb;
+    psOutput.rgb = textureColor.rgb + pointLights.rgb /*+ directionalLights.rgb*/;
 	psOutput.a = dirLight.Material.Diffuse.a;
 	
 	return psOutput;
