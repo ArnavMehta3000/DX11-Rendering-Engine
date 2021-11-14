@@ -1,27 +1,27 @@
 #include "Application.h"
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	PAINTSTRUCT ps;
-	HDC hdc;
-
-	switch (message)
-	{
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		EndPaint(hWnd, &ps);
-		break;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-
-	return 0;
-}
+//LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//	PAINTSTRUCT ps;
+//	HDC hdc;
+//
+//	switch (message)
+//	{
+//	case WM_PAINT:
+//		hdc = BeginPaint(hWnd, &ps);
+//		EndPaint(hWnd, &ps);
+//		break;
+//
+//	case WM_DESTROY:
+//		PostQuitMessage(0);
+//		break;
+//
+//	default:
+//		return DefWindowProc(hWnd, message, wParam, lParam);
+//	}
+//
+//	return 0;
+//}
 
 Application::Application()
 {
@@ -448,7 +448,7 @@ HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
+	//wcex.lpfnWndProc = WndProc;  //TODO: Update this and uncomment top func
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
@@ -590,7 +590,7 @@ HRESULT Application::InitDevice()
 	depthStencilDesc.CPUAccessFlags = 0;
 	depthStencilDesc.MiscFlags = 0;
 
-	//// Create depth.stencil buffer
+	// Create depth.stencil buffer
 	hr = _pd3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, &_depthStencilBuffer);
 	if (_depthStencilBuffer != 0)
 		hr = _pd3dDevice->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
@@ -608,10 +608,7 @@ HRESULT Application::InitDevice()
 	_pImmediateContext->RSSetViewports(1, &vp);
 
 	hr = InitShadersAndInputLayout();
-	if (FAILED(hr))
-	{
-		return hr;
-	}
+	if (FAILED(hr)) return hr;
 
 	InitVertexBuffer();
 

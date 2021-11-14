@@ -17,6 +17,9 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -24,6 +27,8 @@
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

@@ -380,7 +380,9 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DX11 Framework.cpp" />
+    <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Matrix.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -392,9 +394,12 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="Engine.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Matrix.h" />
     <CLInclude Include="resource.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Vector3.h" />
     <ResourceCompile Include="DX11 Framework.rc" />
   </ItemGroup>
