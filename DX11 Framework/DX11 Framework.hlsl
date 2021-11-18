@@ -2,8 +2,6 @@
 Texture2D txDiffuse : TEXTURE : register(t0);
 SamplerState samLinear : SAMPLER : register(s0);
 
-
-
 // Material struct
 struct Intensity
 {
@@ -18,7 +16,6 @@ struct Material
 	float4 Diffuse;
 	float4 Specular;
 };
-
 
 // Light strcts
 struct DirectionalLight
@@ -50,7 +47,7 @@ cbuffer ConstantBuffer : register(b0)
 	matrix View;
 	matrix Projection;
 	
-	DirectionalLight dirLight;
+	DirectionalLight dirLight;	
 	PointLight pointLight;
 
 	float3 EyePosW; // Eye/camera in world
@@ -68,38 +65,40 @@ struct VS_OUTPUT
 };
 
 
-
-float4 PointLights(float3 worldPos, float4 inputNormal, float3 toEyeNormalized)
+// Compute all the point lights
+float4 PointLights(float3 worldPos, float3 inputNormal, float3 toEyeNormalized)
 {
-	float4 output = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 diffuse = float4(0.0f, 0.0f, 1.0f, 0.0f);
-	float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float4 output = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 ambient = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Vector between light position and pixel position
-	float3 lightToPixelVec = pointLight.Position - worldPos.xyz;
+    float3 lightToPixelVec = mul(pointLight.Position, World).xyz - worldPos.xyz;
 
 	// Distance between light pos and pixel pos
 	float d = length(lightToPixelVec);
 
 	// Create the ambient light
-	ambient = pointLight.Intensity.Diffuse * pointLight.Intensity.Ambient;
+	ambient = pointLight.Material.Ambient * pointLight.Intensity.Ambient;
 
 	// If pixel is too far then return ambient light
-	if (d > pointLight.Range)
-		return float4(ambient.rgb, diffuse.a);
+	//if (d > pointLight.Range)
+		//return float4(ambient.rgb, diffuse.a);
 
 	lightToPixelVec = normalize(lightToPixelVec);
 
-	float lightAmount = dot(lightToPixelVec, inputNormal.xyz);
-
+    float lightAmount = max(dot(lightToPixelVec, inputNormal.xyz),0.0f);
+	
+    lightAmount = 1.0f;
+	
 	// Reflection vector
     float3 r = reflect(-LightVecW, inputNormal.xyz);
     float specularAmount = pow(max(dot(r, toEyeNormalized), 0.0f), pointLight.SpecularPower);
     specular = specularAmount * (pointLight.Material.Specular * pointLight.Intensity.Specular);
 
-	if (lightAmount > 0.0f)
-	{
+    if (lightAmount > 0.0f)
+    {
         output += lightAmount * pointLight.Material.Diffuse * pointLight.Intensity.Diffuse;
 
 		// Calculate light falloff based on attenuation
@@ -108,11 +107,11 @@ float4 PointLights(float3 worldPos, float4 inputNormal, float3 toEyeNormalized)
     }
 
 
-
-	output = diffuse + specular + ambient;
+    output += diffuse + specular + ambient;
 	return output;
 }
 
+// Compute  all the directional lights
 float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
 {
 
@@ -140,13 +139,8 @@ float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
     return output;
 }
 
-
-
-
-
-
 // Vertex Shader
-VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL, float2 Tex : TEXCOORD0)
+VS_OUTPUT VS(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOORD0)
 {
 	VS_OUTPUT output = (VS_OUTPUT) 0;
 	
@@ -157,9 +151,9 @@ VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL, float2 Tex : TEXCOOR
 	output.Pos = mul(output.Pos, Projection);
 	
 	output.NormalW = mul(Normal, World);
-
-    output.Tex = Tex;
-
+	
+    output.Tex = Tex;	
+	
 	return output;
 }
 
@@ -167,7 +161,7 @@ VS_OUTPUT VS(float4 Pos : POSITION, float4 Normal : NORMAL, float2 Tex : TEXCOOR
 // Pixel Shader
 float4 PS(VS_OUTPUT vsInput) : SV_Target
 {
-	float4 psOutput = (0.0f, 0.0f, 0.0f, 0.0f);
+	float4 psOutput = (0.0f, 0.0f, 0.0f, 1.0f);
 	
 	// Compute the vector from the vertex to the eye position (normalize the difference)
 	float3 viewToEye = EyePosW - vsInput.Pos.xyz;
@@ -176,17 +170,19 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 	// Convert normal from local space to world space
     float3 normalW = normalize(vsInput.NormalW);
 
+
+	
 	// Calculate lighting
-    float4 pointLights = PointLights(vsInput.Pos.xyz, (normalW, 0.0f), toEyeNormalized);
+    float4 pointLights = PointLights(vsInput.PosW,  (normalW, 0.0f), toEyeNormalized);
     float4 directionalLights = DirectionalLights(normalW, toEyeNormalized);
 
 	// Texturing
     float4 textureColor = txDiffuse.Sample(samLinear, vsInput.Tex);
 
-
+    //discard;
 	
-    psOutput.rgb = textureColor.rgb + pointLights.rgb + directionalLights.rgb;
-	psOutput.a = dirLight.Material.Diffuse.a;
+    psOutput.rgb = directionalLights.rgb * textureColor.rgb;
+    psOutput.a = dirLight.Material.Diffuse.a;
 	
 	return psOutput;
 }

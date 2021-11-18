@@ -157,12 +157,12 @@ HRESULT Application::InitShadersAndInputLayout()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient           = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Intensity.Ambient           = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	directionalLight.Intensity.Diffuse           = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Intensity.Specular          = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.ambient            = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.diffuse            = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	directionalLight.Material.specular           = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	directionalLight.Material.ambient            = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Material.diffuse            = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Material.specular           = XMFLOAT4(0.2f, 0.2f, 1.0f, 1.0f);
 	directionalLight.Direction                   = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	directionalLight.SpecularPower               = 0.8f;
 
@@ -173,13 +173,13 @@ void Application::InitLights()
 
 
 	//Point lights (WIP)
-	pointLight.Intensity.Ambient  = XMFLOAT4(0.5, 0.1f, 0.1f, 1.0f);
+	pointLight.Intensity.Ambient  = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	pointLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	pointLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	pointLight.Material.ambient   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	pointLight.Material.diffuse   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	pointLight.Material.specular  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Position           = XMFLOAT3(2.0f, 2.0f, 1.5f);
+	pointLight.Position           = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	pointLight.Attenuation        = XMFLOAT3(5.0f, 5.0f, 5.0f);
 	pointLight.Range              = 10.0f;
 	pointLight.SpecularPower	  = 10.2f;
@@ -188,10 +188,15 @@ void Application::InitLights()
 void Application::InitTextures()
 {
 	// Load texture
-	CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &_pTextureRV);
+	HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &_pTextureRV);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
 
 	// Tell shader to use the texture
-	_pImmediateContext->CSSetShaderResources(0, 1, &_pTextureRV);
+	_pImmediateContext->PSSetShaderResources(0, 1, &_pTextureRV);
 
 	// Define and create sampler state
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -203,10 +208,11 @@ void Application::InitTextures()
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	samplerDesc.MinLOD         = 0;
 	samplerDesc.MaxLOD         = D3D11_FLOAT32_MAX;
+
 	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
 
-	// Set sampler state
-	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+	//// Set sampler state
+	//_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -710,7 +716,9 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
-	directionalLight.Direction = XMFLOAT3(sin(t) * 2, 1.0f, 1.0f);
+	// Animate the light
+	//directionalLight.Direction = XMFLOAT3(sin(t) * 2, 1.0f, 1.0f);
+	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 
 	// Pyramid
@@ -773,6 +781,7 @@ void Application::Draw()
 
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
+	
 
 	// HACK: Set plane size
 	int xSize = 10, zSize = 10;
