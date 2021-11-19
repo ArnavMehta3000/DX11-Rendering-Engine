@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "OBJLoader.h"
 
 
 class Application
@@ -20,13 +21,16 @@ private:
 	ID3D11Buffer*			  _pCubeVertexBuffer;
 	ID3D11Buffer*			  _pPyramidVertexBuffer;
 	ID3D11Buffer*			  _pPlaneVertexBuffer;
+	ID3D11Buffer*			  _pMeshVertexBuffer;
 	ID3D11Buffer*			  _pCubeIndexBuffer;
 	ID3D11Buffer*			  _pPyramidIndexBuffer;
 	ID3D11Buffer*			  _pPlaneIndexBuffer;
+	ID3D11Buffer*			  _pMeshIndexBuffer;
 	ID3D11Buffer*			  _pConstantBuffer;
 	XMFLOAT4X4                _cubeWorld;
 	XMFLOAT4X4                _pyramidWorld;
 	XMFLOAT4X4                _planeWorld;
+	XMFLOAT4X4                _meshWorld;
 	XMFLOAT4X4                _view;
 	XMFLOAT4X4                _projection;
 	ID3D11DepthStencilView*   _depthStencilView;
@@ -35,7 +39,8 @@ private:
 	ID3D11RasterizerState*	  _solid;
 	ID3D11Texture2D*		  _myTexture;
 	ID3D11ShaderResourceView* _pTextureRV = nullptr;
-	ID3D11SamplerState*		 _pSamplerLinear = nullptr;
+	ID3D11SamplerState*		  _pSamplerLinear = nullptr;
+	MeshData				  objMeshData;
 
 	// Lights
 	Light::DirectionalLight directionalLight;
@@ -49,6 +54,7 @@ private:
 	HRESULT InitShadersAndInputLayout();
 	void InitLights();
 	void InitTextures();
+	void InitModels();
 	HRESULT InitVertexBuffer();
 	HRESULT InitIndexBuffer();
 

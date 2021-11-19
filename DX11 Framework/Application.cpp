@@ -65,6 +65,9 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
+
+	InitModels();
+
 	XMStoreFloat4x4(&_cubeWorld, XMMatrixIdentity());
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixIdentity());
 
@@ -124,11 +127,7 @@ HRESULT Application::InitShadersAndInputLayout()
 		return hr;
 
 
-	// Initialize lighting
-	InitLights();
-
-	// Initialize textures
-	InitTextures();
+	
 
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -213,6 +212,13 @@ void Application::InitTextures()
 
 	//// Set sampler state
 	//_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+}
+
+void Application::InitModels()
+{
+	objMeshData = OBJLoader::Load("Assets/Models/Blender/cylinder.obj", _pd3dDevice, false);
+	_pMeshIndexBuffer = objMeshData.IndexBuffer;
+	_pMeshVertexBuffer = objMeshData.VertexBuffer;
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -623,7 +629,11 @@ HRESULT Application::InitDevice()
 
 	InitIndexBuffer();
 
+	// Initialize lighting
+	InitLights();
 
+	// Initialize textures
+	InitTextures();
 
 	// Set primitive topology
 	_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -720,6 +730,8 @@ void Application::Update()
 	//directionalLight.Direction = XMFLOAT3(sin(t) * 2, 1.0f, 1.0f);
 	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
+	// Pyramid
+	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
 
 	// Pyramid
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationX(t) * XMMatrixTranslation(cos(t * -1) * 6, 0, 3));
@@ -741,6 +753,7 @@ void Application::Draw()
 	XMMATRIX cubeworld;
 	XMMATRIX pyramidWorld;
 	XMMATRIX planeWorld;
+	XMMATRIX meshWorld;
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX transposeView = XMMatrixTranspose(view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
@@ -814,7 +827,16 @@ void Application::Draw()
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
+	
+	// Draw mesh
+	_pImmediateContext->IASetVertexBuffers(0, 1, &_pMeshVertexBuffer, &objMeshData.VBStride, &objMeshData.VBOffset);
+	_pImmediateContext->IASetIndexBuffer(_pMeshIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
+	// Use cube mesh data
+	meshWorld = XMLoadFloat4x4(&_meshWorld);
+	cb.mWorld = XMMatrixTranspose(meshWorld);
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	_pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
 
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);
