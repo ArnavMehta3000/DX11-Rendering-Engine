@@ -3,6 +3,9 @@
 #define VECTOR3_H
 
 #include <iostream>
+#include <d3dcompiler.h>
+#include <directxmath.h>
+#include <DirectXMath.h>
 #include <math.h>
 #include <string>
 #include <sstream>
@@ -38,5 +41,12 @@ public:
 	float Magnitude();
 
 	void Debug(std::string msg = "");
+
+	// Static helper functions
+	static DirectX::XMFLOAT3 V3ToXMFLOAT3(const Vector3& vec);
+	static Vector3 XMFLOAT3ToV3(const DirectX::XMFLOAT3& other);
+
+	static DirectX::XMVECTOR V3ToXMVECTOR(const Vector3& vec);
+	static Vector3 XMVECTORToV3(const DirectX::XMVECTOR& other);
 };
 #endif

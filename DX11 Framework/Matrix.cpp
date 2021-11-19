@@ -249,12 +249,6 @@ void Matrix<T>::Debug(std::string msg)
 		matrix << std::endl;
 	}
 
-
-	/*if (msg == "")
-		os << "Matrix\n" << matrix;
-	else
-		os << "[" << msg << "]Matrix\n" << matrix;*/
-
 	OutputDebugStringA(matrix.str().c_str());
 }
 
@@ -268,6 +262,62 @@ void Matrix<T>::Debug(unsigned row, unsigned col, std::string msg)
 		os << "(" << msg << ") Matrix[" << row << "," << col << "]: " << mat[row][col] << "\n";
 
 	OutputDebugStringA(os.str().c_str());
+}
+
+template<typename T>
+Matrix<float> Matrix<T>::Float4x4ToMatrix(const DirectX::XMFLOAT4X4& other)
+{
+	Matrix output(4, 4, 0.f);
+
+	output[0][0] = other._11;
+	output[0][1] = other._12;
+	output[0][2] = other._13;
+	output[0][3] = other._14;
+
+	output[1][0] = other._21;
+	output[1][1] = other._22;
+	output[1][2] = other._23;
+	output[1][3] = other._24;
+
+	output[2][0] = other._31;
+	output[2][1] = other._32;
+	output[2][2] = other._33;
+	output[2][3] = other._34;
+
+	output[3][0] = other._41;
+	output[3][1] = other._42;
+	output[3][2] = other._43;
+	output[3][3] = other._44;
+
+	return output;
+}
+
+template<typename T>
+DirectX::XMFLOAT4X4 Matrix<T>::MatrixToFloat4x4(const Matrix<float>& mat)
+{
+	DirectX::XMFLOAT4X4 output(
+		mat[0][1], mat[0][1], mat[0][2], mat[0][3],
+		mat[1][1], mat[1][1], mat[1][2], mat[1][3],
+		mat[2][1], mat[2][1], mat[2][2], mat[2][3],
+		mat[3][1], mat[3][1], mat[3][2], mat[3][3],
+	);
+
+	
+
+	return output;
+}
+
+template<typename T>
+DirectX::XMMATRIX Matrix<T>::MatrixToXMMATRIX(const Matrix<float>& mat)
+{
+	return DirectX::XMLoadFloat4x4(MatrixToFloat4x4(mat));;
+}
+
+template<typename T>
+Matrix<float> Matrix<T>::XMMATRIXToMatrix(const DirectX::XMMATRIX& mat)
+{
+	DirectX::XMFLOAT4X4 f(DirectX::XMStoreFloat4x4(mat));
+	return Float4x4ToMatrix(f);
 }
 
 

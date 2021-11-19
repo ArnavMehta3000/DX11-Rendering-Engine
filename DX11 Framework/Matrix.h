@@ -4,6 +4,9 @@
 
 #include <vector>
 #include <iostream>
+#include <d3dcompiler.h>
+#include <directxmath.h>
+#include <DirectXMath.h>
 #include <math.h>
 #include <string>
 #include <sstream>
@@ -45,6 +48,12 @@ public:
 
 	void Debug(std::string msg = "");
 	void Debug(unsigned row, unsigned col, std::string msg = "");
+
+	static Matrix<float> Float4x4ToMatrix(const DirectX::XMFLOAT4X4& other);
+	static DirectX::XMFLOAT4X4 MatrixToFloat4x4(const Matrix<float>& mat);
+
+	static DirectX::XMMATRIX MatrixToXMMATRIX(const Matrix<float>& mat);
+	static Matrix<float> XMMATRIXToMatrix(const DirectX::XMMATRIX& mat);
 };
 
 #include "Matrix.cpp"

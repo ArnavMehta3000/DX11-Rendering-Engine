@@ -52,3 +52,27 @@ void Vector3::Debug(std::string msg)
 
 	OutputDebugStringA(os.str().c_str());
 }
+
+
+DirectX::XMFLOAT3 Vector3::V3ToXMFLOAT3(const Vector3& vec)
+{
+	return DirectX::XMFLOAT3(vec.x, vec.y, vec.z);
+}
+
+Vector3 Vector3::XMFLOAT3ToV3(const DirectX::XMFLOAT3& other)
+{
+	return Vector3(other.x, other.y, other.z);
+}
+
+
+DirectX::XMVECTOR Vector3::V3ToXMVECTOR(const Vector3& vec)
+{
+	return DirectX::XMVectorSet(vec.x, vec.y, vec.z, 0.0f);
+}
+
+Vector3 Vector3::XMVECTORToV3(const DirectX::XMVECTOR& other)
+{
+	DirectX::XMFLOAT3 output;
+	DirectX::XMStoreFloat3(&output, other);
+	return XMFLOAT3ToV3(output);
+}

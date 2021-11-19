@@ -216,7 +216,7 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
-	objMeshData = OBJLoader::Load("Assets/Models/Blender/cylinder.obj", _pd3dDevice, false);
+	objMeshData = OBJLoader::Load("Assets/Models/Blender/donut.obj", _pd3dDevice, false);
 	_pMeshIndexBuffer = objMeshData.IndexBuffer;
 	_pMeshVertexBuffer = objMeshData.VertexBuffer;
 }
@@ -832,7 +832,7 @@ void Application::Draw()
 	_pImmediateContext->IASetVertexBuffers(0, 1, &_pMeshVertexBuffer, &objMeshData.VBStride, &objMeshData.VBOffset);
 	_pImmediateContext->IASetIndexBuffer(_pMeshIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
-	// Use cube mesh data
+	// Use  mesh data
 	meshWorld = XMLoadFloat4x4(&_meshWorld);
 	cb.mWorld = XMMatrixTranspose(meshWorld);
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
