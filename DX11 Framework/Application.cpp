@@ -65,21 +65,18 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
+	// Create camera
+	m_camera = new Camera
+	(
+		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
+		_WindowWidth, _WindowHeight,
+		0.01, 100.0f
+	);
 
 	InitModels();
 
 	XMStoreFloat4x4(&_cubeWorld, XMMatrixIdentity());
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixIdentity());
-
-	// Initialize the view matrix
-	XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);
-	XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMStoreFloat4x4(&_view, XMMatrixLookAtLH(Eye, At, Up));
-
-	// Initialize the projection matrix
-	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _WindowWidth / (FLOAT)_WindowHeight, 0.01f, 100.0f));
 
 	return S_OK;
 }
@@ -726,9 +723,7 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
-	// Animate the light
-	//directionalLight.Direction = XMFLOAT3(sin(t) * 2, 1.0f, 1.0f);
-	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_camera->SetFarDepth(sin(t) * 100);
 
 	// Pyramid
 	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
@@ -754,10 +749,13 @@ void Application::Draw()
 	XMMATRIX pyramidWorld;
 	XMMATRIX planeWorld;
 	XMMATRIX meshWorld;
-	XMMATRIX view = XMLoadFloat4x4(&_view);
+
+	// Camera
+	XMMATRIX view = XMLoadFloat4x4(&m_camera->GetViewMatrix());
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&_projection);
+	XMMATRIX projection = XMLoadFloat4x4(&m_camera->GetProjectionMatrix());
 	XMFLOAT4X4 eye;
+	
 	XMStoreFloat4x4(&eye, view);
 
 	// Update variables

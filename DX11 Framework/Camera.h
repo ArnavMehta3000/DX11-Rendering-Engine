@@ -5,27 +5,46 @@
 class Camera
 {
 private:
-	XMFLOAT3 m_eye;
-	XMFLOAT3 m_at;
-	XMFLOAT3 m_up;
-	FLOAT    m_windowWidth;
-	FLOAT    m_windowHeight;
-	FLOAT    m_nearDepth;
-	FLOAT    m_farDepth;
+	Vector3    m_eye;
+	Vector3    m_at;
+	Vector3    m_up;
+	float      m_windowWidth;
+	float      m_windowHeight;
+	float      m_nearDepth;
+	float      m_farDepth;
 
 	XMFLOAT4X4 m_view;
 	XMFLOAT4X4 m_projection;
 
 public:
-	Camera(XMFLOAT3 position, XMFLOAT3 at, XMFLOAT3 up, FLOAT windowWidth, FLOAT windowHeight, FLOAT nearDepth, FLOAT farDepth);
-	~Camera();
+	/// <summary>
+	/// Create a camera
+	/// </summary>
+	/// <param name="position">Position of camera in world coordinates</param>
+	/// <param name="at">Target position the camera is looking 'At'</param>
+	/// <param name="up">Define the 'Up-Axis'</param>
+	/// <param name="nearDepth">Near clip plane of the camera</param>
+	/// <param name="farDepth">Far clip plane of the camera</param>
+	Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearDepth, float farDepth);
+	~Camera() {}
 
 	void Update();
 	
-	// Getters and setters for private variables
+	inline Vector3 GetEye()                 { return m_eye; }
+	inline Vector3 GetAt()                  { return m_at; }
+	inline Vector3 GetUp()                  { return m_up; }
+	inline void SetEye(Vector3 value)       { return m_eye; }
+	inline void SetAt(Vector3 value)        { return m_at; }
+	inline void SetUp(Vector3 value)        { return m_up; }
+	inline float GetWindowWidth()           { return m_windowWidth; }
+	inline float GetWindowHeight()          { return m_windowHeight; }
+	inline float GetNearDepth()             { return m_nearDepth; }
+	inline float GetFarDepth()              { return m_farDepth; }
+	inline void SetNearDepth(float value)   { m_nearDepth = value; }
+	inline void SetFarDepth(float value)    { m_farDepth = value; }
+	inline XMFLOAT4X4 GetViewMatrix()       { return m_view; }
+	inline XMFLOAT4X4 GetProjectionMatrix() { return m_projection; }
 
-	// Getters for the view/projection/combined matrices
-
-	void Reshape(FLOAT windowWidth, FLOAT windowHeight, FLOAT nearDepth, FLOAT farDepth);
+	void Reshape(float windowWidth, float windowHeight, float nearDepth, float farDepth);
 };
 
