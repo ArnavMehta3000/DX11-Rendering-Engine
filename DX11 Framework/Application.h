@@ -15,7 +15,8 @@ private:
 	ID3D11DeviceContext*	  _pImmediateContext;
 	IDXGISwapChain*			  _pSwapChain;
 	ID3D11RenderTargetView*   _pRenderTargetView;
-	Camera* staticCam;
+	//Camera* staticCam;
+	FirstPersonCamera* fpsCam;
 
 	ID3D11VertexShader*		  _pVertexShader;
 	ID3D11PixelShader*		  _pPixelShader;

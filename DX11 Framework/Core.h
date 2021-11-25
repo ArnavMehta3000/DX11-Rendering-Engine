@@ -10,7 +10,7 @@
 #include "Vector3.h"
 #include "Matrix.h"
 #include "Light.h"
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 using namespace DirectX;
 
 struct SimpleVertex

@@ -1,13 +1,13 @@
 #pragma once
 #include "Core.h"
 
-
 class Camera
 {
 public:
 	Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearZ, float farZ);
 	~Camera();
-	void Update();
+
+	virtual void Update();
 
 	// Get/Set world camera position
 	inline Vector3  GetPosition() const { return m_Position; }
@@ -15,6 +15,8 @@ public:
 	void SetPosition(const Vector3& pos);
 	void SetLookAt(float x, float y, float z);
 	void SetLookAt(const Vector3& at);
+	void SetUp(float x, float y, float z);
+	void SetUp(const Vector3& up);
 
 	// Get camera basis vectors
 	inline Vector3 GetAt() const  { return m_At; }
@@ -31,10 +33,10 @@ public:
 	// Get View/Proj matrices.
 	inline XMFLOAT4X4 GetView()const { return m_View; }
 	inline XMFLOAT4X4 GetProj()const { return m_Proj; }
-	inline XMFLOAT4X4 GetViewProj()const;
+	XMFLOAT4X4 GetViewProj()const;
 
 
-private:
+protected:
 	// Camera coordinate relative to world space.
 	Vector3 m_Position; //EYE
 	Vector3 m_At; 
@@ -47,5 +49,5 @@ private:
 	XMFLOAT4X4 m_View;
 	XMFLOAT4X4 m_Proj;
 
-	void SetLens();
+	virtual void SetLens();
 };
