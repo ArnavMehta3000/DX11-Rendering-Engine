@@ -4,47 +4,48 @@
 
 class Camera
 {
-private:
-	Vector3    m_eye;
-	Vector3    m_at;
-	Vector3    m_up;
-	float      m_windowWidth;
-	float      m_windowHeight;
-	float      m_nearDepth;
-	float      m_farDepth;
-
-	XMFLOAT4X4 m_view;
-	XMFLOAT4X4 m_projection;
-
 public:
-	/// <summary>
-	/// Create a camera
-	/// </summary>
-	/// <param name="position">Position of camera in world coordinates</param>
-	/// <param name="at">Target position the camera is looking 'At'</param>
-	/// <param name="up">Define the 'Up-Axis'</param>
-	/// <param name="nearDepth">Near clip plane of the camera</param>
-	/// <param name="farDepth">Far clip plane of the camera</param>
-	Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearDepth, float farDepth);
-	~Camera() {}
-
+	Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearZ, float farZ);
+	~Camera();
 	void Update();
+
+	// Get/Set world camera position
+	inline Vector3  GetPosition() const { return m_Position; }
+	void SetPosition(float x, float y, float z);
+	void SetPosition(const Vector3& pos);
+	void SetLookAt(float x, float y, float z);
+	void SetLookAt(const Vector3& at);
+
+	// Get camera basis vectors
+	inline Vector3 GetAt() const  { return m_At; }
+	inline Vector3 GetUp()const   { return m_Up; }
+
+	// Get/Set frustum properties
+	inline float GetNearZ()const { return m_NearZ; }
+	inline float GetFarZ()const { return m_FarZ; }
+	void SetNearZ(float nearZ);
+	void SetFarZ(float farZ);
+
+	// Define camera space via LookAt parameters.
+
+	// Get View/Proj matrices.
+	inline XMFLOAT4X4 GetView()const { return m_View; }
+	inline XMFLOAT4X4 GetProj()const { return m_Proj; }
+	inline XMFLOAT4X4 GetViewProj()const;
+
+
+private:
+	// Camera coordinate relative to world space.
+	Vector3 m_Position; //EYE
+	Vector3 m_At; 
+	Vector3 m_Up;
 	
-	inline Vector3 GetEye()                 { return m_eye; }
-	inline Vector3 GetAt()                  { return m_at; }
-	inline Vector3 GetUp()                  { return m_up; }
-	inline void SetEye(Vector3 value)       { return m_eye; }
-	inline void SetAt(Vector3 value)        { return m_at; }
-	inline void SetUp(Vector3 value)        { return m_up; }
-	inline float GetWindowWidth()           { return m_windowWidth; }
-	inline float GetWindowHeight()          { return m_windowHeight; }
-	inline float GetNearDepth()             { return m_nearDepth; }
-	inline float GetFarDepth()              { return m_farDepth; }
-	inline void SetNearDepth(float value)   { m_nearDepth = value; }
-	inline void SetFarDepth(float value)    { m_farDepth = value; }
-	inline XMFLOAT4X4 GetViewMatrix()       { return m_view; }
-	inline XMFLOAT4X4 GetProjectionMatrix() { return m_projection; }
+	float m_NearZ;
+	float m_FarZ;
+	float m_WindowWidth, m_WindowHeight;
+	
+	XMFLOAT4X4 m_View;
+	XMFLOAT4X4 m_Proj;
 
-	void Reshape(float windowWidth, float windowHeight, float nearDepth, float farDepth);
+	void SetLens();
 };
-

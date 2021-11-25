@@ -66,11 +66,12 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	}
 
 	// Create camera
-	m_camera = new Camera
+	staticCam = new Camera
 	(
 		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
 		_WindowWidth, _WindowHeight,
-		0.01, 100.0f
+		0.1f, 100.0f
+
 	);
 
 	InitModels();
@@ -722,8 +723,9 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
-
-	m_camera->SetFarDepth(sin(t) * 100);
+	staticCam->Update();
+	staticCam->SetLookAt(0.0f, sin(t * 2) * 2, 0.0f);
+	staticCam->SetPosition(0.0f, sin(t * 2) * 2, -3.0f);
 
 	// Pyramid
 	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
@@ -751,9 +753,9 @@ void Application::Draw()
 	XMMATRIX meshWorld;
 
 	// Camera
-	XMMATRIX view = XMLoadFloat4x4(&m_camera->GetViewMatrix());
+	XMMATRIX view = XMLoadFloat4x4(&staticCam->GetView());
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&m_camera->GetProjectionMatrix());
+	XMMATRIX projection = XMLoadFloat4x4(&staticCam->GetProj());
 	XMFLOAT4X4 eye;
 	
 	XMStoreFloat4x4(&eye, view);
