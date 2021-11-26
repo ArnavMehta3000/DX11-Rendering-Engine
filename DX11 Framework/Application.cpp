@@ -66,21 +66,21 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	}
 
 	// HACK: Static cam
-	/*staticCam = new Camera
-	(
-		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
-		_WindowWidth, _WindowHeight,
-		0.1f, 100.0f
-
-	);*/
-
-	fpsCam = new FirstPersonCamera
+	staticCam = new Camera
 	(
 		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
 		_WindowWidth, _WindowHeight,
 		0.1f, 100.0f
 
 	);
+
+	/*fpsCam = new FirstPersonCamera
+	(
+		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
+		_WindowWidth, _WindowHeight,
+		0.1f, 100.0f
+
+	);*/
 
 	InitModels();
 
@@ -732,7 +732,7 @@ void Application::Update()
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
 
-	fpsCam->Update();
+	staticCam->Update();
 
 	// Pyramid
 	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
@@ -760,9 +760,9 @@ void Application::Draw()
 	XMMATRIX meshWorld;
 
 	// HACK: Static camera
-	XMMATRIX view = XMLoadFloat4x4(&fpsCam->GetView());
+	XMMATRIX view = XMLoadFloat4x4(&staticCam->GetView());
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&fpsCam->GetProj());
+	XMMATRIX projection = XMLoadFloat4x4(&staticCam->GetProj());
 	XMFLOAT4X4 eye;
 	
 	XMStoreFloat4x4(&eye, view);

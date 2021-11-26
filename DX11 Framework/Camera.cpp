@@ -18,45 +18,21 @@ void Camera::Update()
 	SetLens();
 }
 
-void Camera::SetPosition(float x, float y, float z)
-{
-	m_Position = Vector3(x, y, z);
-}
+void Camera::SetPosition(float x, float y, float z) { m_Position = Vector3(x, y, z); }
 
-void Camera::SetPosition(const Vector3& pos)
-{
-	m_Position = pos;
-}
+void Camera::SetPosition(const Vector3& pos) { m_Position = pos; }
 
-void Camera::SetLookAt(float x, float y, float z)
-{
-	m_At = Vector3(x, y, z);
-}
+void Camera::SetLookAt(float x, float y, float z) { m_At = Vector3(x, y, z); }
 
-void Camera::SetLookAt(const Vector3& at)
-{
-	m_At = at;
-}
+void Camera::SetLookAt(const Vector3& at) { m_At = at; }
 
-void Camera::SetUp(float x, float y, float z)
-{
-	m_Up = Vector3(x, y, z);
-}
+void Camera::SetUp(float x, float y, float z) { m_Up = Vector3(x, y, z); }
 
-void Camera::SetUp(const Vector3& up)
-{
-	m_Up = up;
-}
+void Camera::SetUp(const Vector3& up) { m_Up = up; }
 
-void Camera::SetNearZ(float nearZ)
-{
-	m_NearZ = nearZ;
-}
+void Camera::SetNearZ(float nearZ) { m_NearZ = nearZ; }
 
-void Camera::SetFarZ(float farZ)
-{
-	m_FarZ = farZ;
-}
+void Camera::SetFarZ(float farZ) { m_FarZ = farZ; }
 
 XMFLOAT4X4 Camera::GetViewProj() const
 {

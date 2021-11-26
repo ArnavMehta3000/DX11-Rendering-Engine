@@ -19,7 +19,6 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="FirstPersonCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -29,7 +28,6 @@
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FirstPersonCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

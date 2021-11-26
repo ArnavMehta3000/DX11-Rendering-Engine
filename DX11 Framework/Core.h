@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CORE_H
+#define CORE_H
+
 #include <windows.h>
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
@@ -10,7 +13,6 @@
 #include "Vector3.h"
 #include "Matrix.h"
 #include "Light.h"
-#include "FirstPersonCamera.h"
 using namespace DirectX;
 
 struct SimpleVertex
@@ -41,3 +43,4 @@ public:
 
     XMFLOAT3 LightVecW;
 };
+#endif // !CORE_H

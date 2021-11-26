@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include "Core.h"
 
 class Camera
@@ -19,8 +22,8 @@ public:
 	void SetUp(const Vector3& up);
 
 	// Get camera basis vectors
-	inline Vector3 GetAt() const  { return m_At; }
-	inline Vector3 GetUp()const   { return m_Up; }
+	inline Vector3 GetAt() const { return m_At; }
+	inline Vector3 GetUp()const { return m_Up; }
 
 	// Get/Set frustum properties
 	inline float GetNearZ()const { return m_NearZ; }
@@ -39,15 +42,16 @@ public:
 protected:
 	// Camera coordinate relative to world space.
 	Vector3 m_Position; //EYE
-	Vector3 m_At; 
+	Vector3 m_At;
 	Vector3 m_Up;
-	
+
 	float m_NearZ;
 	float m_FarZ;
 	float m_WindowWidth, m_WindowHeight;
-	
+
 	XMFLOAT4X4 m_View;
 	XMFLOAT4X4 m_Proj;
 
 	virtual void SetLens();
 };
+#endif // !CAMERA_H
