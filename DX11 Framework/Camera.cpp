@@ -32,6 +32,16 @@ void Camera::SetUp(float x, float y, float z) { m_Up = Vector3(x, y, z); }
 
 void Camera::SetUp(const Vector3& up) { m_Up = up; }
 
+void Camera::TranslatePosition(Vector3 delta)
+{
+	SetPosition(m_Position + (delta / 10000));
+}
+
+void Camera::TranslateLookAt(Vector3 delta)
+{
+	SetLookAt(m_At + (delta / 10000));
+}
+
 void Camera::SetNearZ(float nearZ) { m_NearZ = nearZ; }
 
 void Camera::SetFarZ(float farZ) { m_FarZ = farZ; }

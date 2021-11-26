@@ -20,6 +20,8 @@ public:
 	void SetLookAt(const Vector3& at);
 	void SetUp(float x, float y, float z);
 	void SetUp(const Vector3& up);
+	void TranslatePosition(Vector3 delta);
+	void TranslateLookAt(Vector3 delta);
 
 	// Get camera basis vectors
 	inline Vector3 GetAt() const { return m_At; }
@@ -45,16 +47,12 @@ protected:
 	Vector3 m_At;
 	Vector3 m_Up;
 
-	Vector3 m_Forward = Vector3(0.0f, 0.0f, 1.0f);
-	Vector3 m_Right = Vector3(1.0f, 0.0f, 0.0f);
-
 	float m_NearZ;
 	float m_FarZ;
 	float m_WindowWidth, m_WindowHeight;
 
 	XMFLOAT4X4 m_View;
 	XMFLOAT4X4 m_Proj;
-	XMFLOAT4X4 m_RotationMatrix;
 
 	virtual void SetLens();
 };

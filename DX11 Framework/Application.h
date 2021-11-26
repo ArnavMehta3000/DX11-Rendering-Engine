@@ -4,7 +4,7 @@
 
 #include "Core.h"
 #include "OBJLoader.h"
-#include "FirstPersonCamera.h"
+#include "Camera.h"
 
 
 class Application
@@ -18,8 +18,8 @@ private:
 	ID3D11DeviceContext* _pImmediateContext;
 	IDXGISwapChain* _pSwapChain;
 	ID3D11RenderTargetView* _pRenderTargetView;
-	//Camera* staticCam;
-	FirstPersonCamera* fpsCam;
+	Camera* staticCam;
+	//FirstPersonCamera* fpsCam;
 
 	ID3D11VertexShader* _pVertexShader;
 	ID3D11PixelShader* _pPixelShader;
