@@ -1,14 +1,13 @@
 #pragma once
 #ifndef FIRSTPERSONCAMERA_H
 #define FIRSTPERSONCAMERA_H
-#include "Core.h"
 #include "Camera.h"
 
 // WASDQE to move camera, Arrow keys to change look at point
 class FirstPersonCamera  : public Camera
 {
 public:
-	FirstPersonCamera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearZ, float farZ);
+	FirstPersonCamera(CameraInitData cam);
 	~FirstPersonCamera();
 
 	void Update() override;

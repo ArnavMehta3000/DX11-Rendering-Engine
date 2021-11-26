@@ -4,10 +4,24 @@
 
 #include "Core.h"
 
+
+struct CameraInitData
+{
+	Vector3 position;
+	Vector3 at;
+	Vector3 up;
+	float windowWidth;
+	float windowHeight;
+	float nearZ;
+	float farZ;
+};
+
+
+
 class Camera
 {
 public:
-	Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearZ, float farZ);
+	Camera(CameraInitData cam);
 	~Camera();
 
 	virtual void Update();
@@ -46,6 +60,9 @@ protected:
 	Vector3 m_Position; //EYE
 	Vector3 m_At;
 	Vector3 m_Up;
+
+	Vector3 m_CamForward;
+	Vector3 m_CamRight;
 
 	float m_NearZ;
 	float m_FarZ;

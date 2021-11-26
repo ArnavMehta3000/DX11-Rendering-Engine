@@ -20,6 +20,7 @@
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FirstPersonCamera.h" />
+    <ClInclude Include="OrbitCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FirstPersonCamera.cpp" />
+    <ClCompile Include="OrbitCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

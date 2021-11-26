@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "OBJLoader.h"
 #include "FirstPersonCamera.h"
+#include "OrbitCamera.h"
 
 
 class Application
@@ -20,6 +21,7 @@ private:
 	ID3D11RenderTargetView*   _pRenderTargetView;
 	Camera* staticCam;
 	FirstPersonCamera* fpsCam;
+	OrbitCamera* orbitCam;
 
 	ID3D11VertexShader*       _pVertexShader;
 	ID3D11PixelShader*        _pPixelShader;
@@ -80,6 +82,8 @@ public:
 	~Application();
 
 	HRESULT Initialise(HINSTANCE hInstance, int nCmdShow);
+
+	void InitCamera();
 
 	void Update();
 	void Draw();

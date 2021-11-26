@@ -65,28 +65,33 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
-	// HACK: Static cam
-	staticCam = new Camera
-	(
-		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
-		_WindowWidth, _WindowHeight,
-		0.1f, 100.0f
 
-	);
-
-	fpsCam = new FirstPersonCamera
-	(
-		Vector3(0.0f, 0.0f, -3.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
-		_WindowWidth, _WindowHeight,
-		0.1f, 100.0f
-	);
-
+	InitCamera();
 	InitModels();
+
 
 	XMStoreFloat4x4(&_cubeWorld, XMMatrixIdentity());
 	XMStoreFloat4x4(&_pyramidWorld, XMMatrixIdentity());
 
 	return S_OK;
+}
+
+void Application::InitCamera()
+{
+	// Create camera init data
+	CameraInitData cameraInitData;
+	cameraInitData.position = Vector3(0.0f, 0.0f, -3.0f);
+	cameraInitData.at = Vector3(0.0f, 0.0f, 0.0f);
+	cameraInitData.up = Vector3(0.0f, 1.0f, 0.0f);
+	cameraInitData.windowWidth = _WindowWidth;
+	cameraInitData.windowHeight = _WindowHeight;
+	cameraInitData.nearZ = 0.1f;
+	cameraInitData.farZ = 100.0f;
+
+
+	staticCam = new Camera(cameraInitData);
+	fpsCam = new FirstPersonCamera(cameraInitData);
+	orbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 }
 
 HRESULT Application::InitShadersAndInputLayout()
@@ -695,7 +700,7 @@ void Application::Cleanup()
 	if (_pd3dDevice)		 _pd3dDevice->Release();
 }
 
-
+Vector3 point = Vector3();
 
 void Application::Update()
 {
@@ -734,7 +739,7 @@ void Application::Update()
 	// Update cameras here
 	fpsCam->Update();
 	staticCam->Update();
-	
+	orbitCam->Update();
 
 	// Donut
 	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
@@ -761,9 +766,9 @@ void Application::Draw()
 	XMMATRIX meshWorld;
 
 	// TODO: Change camera here
-	XMMATRIX view = XMLoadFloat4x4(&fpsCam->GetView());
+	XMMATRIX view = XMLoadFloat4x4(&orbitCam->GetView());
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&fpsCam->GetProj());
+	XMMATRIX projection = XMLoadFloat4x4(&orbitCam->GetProj());
 	XMFLOAT4X4 eye;
 	
 	XMStoreFloat4x4(&eye, view);
@@ -777,15 +782,6 @@ void Application::Draw()
 	cb.dirLight = directionalLight;
 	cb.LightVecW = directionalLight.Direction;
 	cb.pointLight = pointLight;
-
-	 
-	//cb.DiffuseLight = diffuseLight;
-	//cb.DiffuseMtrl = diffuseMaterial;
-	//cb.AmbientLight = ambientLight;
-	//cb.AmbientMtrl = ambientMaterial;
-	//cb.SpecularLight = specularLight;
-	//cb.SpecularMtrl = specularMaterial;
-	//cb.SpecularPower = specularPower;
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
 	// https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
 

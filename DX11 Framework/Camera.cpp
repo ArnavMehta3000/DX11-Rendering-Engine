@@ -1,14 +1,19 @@
 #include "Camera.h"
 
-Camera::Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, float windowHeight, float nearZ, float farZ)
+Camera::Camera(CameraInitData cam)
 {
-	m_Position = position;
-	m_At = at;
-	m_Up = up;
-	m_WindowWidth = windowWidth;
-	m_WindowHeight = windowHeight;
-	m_NearZ = nearZ;
-	m_FarZ = farZ;
+	m_Position = cam.position;
+	m_At = cam.at;
+	m_Up = cam.up;
+
+	m_WindowWidth = cam.windowWidth;
+	m_WindowHeight = cam.windowHeight;
+	
+	m_NearZ = cam.nearZ;
+	m_FarZ = cam.farZ;
+
+	m_CamForward = Vector3(0.0f, 0.0f, 1.0f);
+	m_CamRight = Vector3(1.0f, 0.0f, 0.0f);
 
 	SetLens();
 }
