@@ -4,7 +4,7 @@
 #include "Core.h"
 #include "Camera.h"
 
-
+// WASDQE to move camera, Arrow keys to change look at point
 class FirstPersonCamera  : public Camera
 {
 public:
@@ -14,12 +14,12 @@ public:
 	void Update() override;
 	void SetLens() override;
 
-	void SetMoveSpeed(float xMove, float zMove);
-	void SetLookSpeed(float xSens, float ySens);
+	void SetMoveSpeed(float move = 5.0f);
+	void SetLookSpeed(float look = 5.0f);
 
 private:
-	float m_LookSensX, m_LookSensY;
-	float m_MoveSensX, m_MoveSensY;
+	float m_MovementSens;
+	float m_LookSens;
 		
 };
 #endif // !FIRSTPERSONCAMERA_H
