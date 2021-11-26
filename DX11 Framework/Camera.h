@@ -45,12 +45,16 @@ protected:
 	Vector3 m_At;
 	Vector3 m_Up;
 
+	Vector3 m_Forward = Vector3(0.0f, 0.0f, 1.0f);
+	Vector3 m_Right = Vector3(1.0f, 0.0f, 0.0f);
+
 	float m_NearZ;
 	float m_FarZ;
 	float m_WindowWidth, m_WindowHeight;
 
 	XMFLOAT4X4 m_View;
 	XMFLOAT4X4 m_Proj;
+	XMFLOAT4X4 m_RotationMatrix;
 
 	virtual void SetLens();
 };

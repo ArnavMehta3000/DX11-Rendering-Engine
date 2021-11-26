@@ -9,6 +9,8 @@ Camera::Camera(Vector3 position, Vector3 at, Vector3 up, float windowWidth, floa
 	m_WindowHeight = windowHeight;
 	m_NearZ = nearZ;
 	m_FarZ = farZ;
+
+	SetLens();
 }
 
 Camera::~Camera() {}
