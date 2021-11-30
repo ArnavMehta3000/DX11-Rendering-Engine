@@ -7,16 +7,30 @@
 
 struct CameraInitData
 {
-	Vector3 position;
-	Vector3 at;
-	Vector3 up;
-	float windowWidth;
-	float windowHeight;
-	float nearZ;
-	float farZ;
+	Vector3 position = Vector3();
+	Vector3 at = Vector3();
+	Vector3 up = Vector3();
+	float windowWidth = 0;
+	float windowHeight = 0;
+	float nearZ = 0;
+	float farZ = 0;
 };
 
+struct CameraMats
+{
+	XMFLOAT4X4 View;
+	XMFLOAT4X4 Projection;
 
+	XMFLOAT4X4 GetCombined()
+	{
+		XMMATRIX view = XMLoadFloat4x4(&View);
+		XMMATRIX proj = XMLoadFloat4x4(&Projection);
+		XMFLOAT4X4 output;
+		XMStoreFloat4x4(&output, view * proj);
+
+		return output;
+	}
+};
 
 class Camera
 {
@@ -53,6 +67,9 @@ public:
 	inline XMFLOAT4X4 GetView()const { return m_View; }
 	inline XMFLOAT4X4 GetProj()const { return m_Proj; }
 	XMFLOAT4X4 GetViewProj()const;
+
+
+	bool enabled = false;
 
 
 protected:

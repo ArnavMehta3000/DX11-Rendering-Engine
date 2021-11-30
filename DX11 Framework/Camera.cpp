@@ -16,12 +16,15 @@ Camera::Camera(CameraInitData cam)
 	m_CamRight = Vector3(1.0f, 0.0f, 0.0f);
 
 	SetLens();
+	bool enabled = true;
 }
 
 Camera::~Camera() {}
 
 void Camera::Update()
 {
+	if (!enabled) return;
+
 	SetLens();
 }
 

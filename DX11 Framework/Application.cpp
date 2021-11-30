@@ -92,6 +92,10 @@ void Application::InitCamera()
 	staticCam = new Camera(cameraInitData);
 	fpsCam = new FirstPersonCamera(cameraInitData);
 	orbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
+
+	// Default camerais static camera
+	currentCamera.View = staticCam->GetView();
+	currentCamera.Projection = staticCam->GetProj();
 }
 
 HRESULT Application::InitShadersAndInputLayout()
@@ -700,11 +704,11 @@ void Application::Cleanup()
 	if (_pd3dDevice)		 _pd3dDevice->Release();
 }
 
-Vector3 point = Vector3();
+
 
 void Application::Update()
 {
-	// Input Handling
+	// Change draw type
 	constexpr char KEYUP = 0x1;
 	if (GetAsyncKeyState(VK_RCONTROL) & KEYUP) // Set wire frame
 	{
@@ -714,6 +718,35 @@ void Application::Update()
 			_pImmediateContext->RSSetState(_solid);
 
 		isWireFrame = !isWireFrame;
+	}
+
+	// Change current camera
+	if (GetAsyncKeyState(0x31) || staticCam->enabled)  // 1: Static camera
+	{
+		currentCamera.View = staticCam->GetView();
+		currentCamera.Projection = staticCam->GetProj();
+
+		staticCam->enabled = true;
+		orbitCam->enabled = false;
+		fpsCam->enabled = false;
+	}
+	if (GetAsyncKeyState(0x32) || orbitCam->enabled)  // 2: Orbit camera
+	{
+		currentCamera.View = orbitCam->GetView();
+		currentCamera.Projection = orbitCam->GetProj();
+
+		staticCam->enabled = false;
+		orbitCam->enabled = true;
+		fpsCam->enabled = false;
+	}
+	if (GetAsyncKeyState(0x33) || fpsCam->enabled)  // 3: FPS camera
+	{
+		currentCamera.View = fpsCam->GetView();
+		currentCamera.Projection = fpsCam->GetProj();
+
+		staticCam->enabled = false;
+		orbitCam->enabled = false;
+		fpsCam->enabled = true;
 	}
 
 
@@ -766,9 +799,9 @@ void Application::Draw()
 	XMMATRIX meshWorld;
 
 	// TODO: Change camera here
-	XMMATRIX view = XMLoadFloat4x4(&orbitCam->GetView());
+	XMMATRIX view = XMLoadFloat4x4(&currentCamera.View);
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&orbitCam->GetProj());
+	XMMATRIX projection = XMLoadFloat4x4(&currentCamera.Projection);
 	XMFLOAT4X4 eye;
 	
 	XMStoreFloat4x4(&eye, view);
