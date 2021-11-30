@@ -14,6 +14,8 @@ OrbitCamera::~OrbitCamera() {}
 
 void OrbitCamera::Update()
 {
+	if (!enabled) return;
+
 	// Update angle
 	switch (m_OrbitMode)
 	{

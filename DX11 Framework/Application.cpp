@@ -720,6 +720,7 @@ void Application::Update()
 		isWireFrame = !isWireFrame;
 	}
 
+
 	// Change current camera
 	if (GetAsyncKeyState(0x31) || staticCam->enabled)  // 1: Static camera
 	{
@@ -749,11 +750,8 @@ void Application::Update()
 		fpsCam->enabled = true;
 	}
 
-
-
-	// Update our time
+	#pragma region Timer
 	static float t = 0.0f;
-
 	if (_driverType == D3D_DRIVER_TYPE_REFERENCE)
 	{
 		t += (float)XM_PI * 0.0125f;
@@ -768,11 +766,14 @@ void Application::Update()
 
 		t = (dwTimeCur - dwTimeStart) / 1000.0f;
 	}
+	#pragma endregion
 
-	// Update cameras here
+
+	// Update cameras
 	fpsCam->Update();
 	staticCam->Update();
 	orbitCam->Update();
+
 
 	// Donut
 	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
@@ -781,7 +782,7 @@ void Application::Update()
 	// Cube
 	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationX(t) * XMMatrixTranslation(sin(t) * 6, 0, 3));
 	// Plane
-	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(2.0f, -1.5f, 2.0f));// *XMMatrixScaling(0.4f, 0.4f, 0.4f));
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(2.0f, -1.5f, 2.0f));
 }
 
 void Application::Draw()
