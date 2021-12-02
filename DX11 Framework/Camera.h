@@ -4,7 +4,6 @@
 
 #include "Core.h"
 
-
 struct CameraInitData
 {
 	Vector3 position = Vector3();
@@ -73,6 +72,7 @@ public:
 
 
 protected:
+
 	// Camera coordinate relative to world space.
 	Vector3 m_Position; //EYE
 	Vector3 m_At;
