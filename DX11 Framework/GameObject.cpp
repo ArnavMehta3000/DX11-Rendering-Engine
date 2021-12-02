@@ -19,7 +19,6 @@ void GameObject::SetMesh(char* file, ID3D11Device* device, bool invertTexCoords)
 
 void GameObject::Update()
 {
-	m_Transform.GetRotation().Debug();
 }
 
 void GameObject::Draw(ConstantBuffer* cb)

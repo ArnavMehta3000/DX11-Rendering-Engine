@@ -231,8 +231,8 @@ void Application::InitModels()
 	goid.position = Vector3(0.0f, 0.0f, 0.0f);
 	goid.rotation = Vector3();
 	goid.scale = Vector3::One();
-	go = new GameObject(goid);
-	go->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+	herculesPlane = new GameObject(goid);
+	herculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -678,6 +678,28 @@ HRESULT Application::InitDevice()
 	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solid);
 
 
+	// Define blend state
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof(blendDesc));
+
+	D3D11_RENDER_TARGET_BLEND_DESC rtbd;
+	ZeroMemory(&rtbd, sizeof(rtbd));
+
+	rtbd.BlendEnable           = true;
+	rtbd.SrcBlend              = D3D11_BLEND_SRC_COLOR;
+	rtbd.DestBlend             = D3D11_BLEND_BLEND_FACTOR;
+	rtbd.BlendOp               = D3D11_BLEND_OP_ADD;
+	rtbd.SrcBlendAlpha         = D3D11_BLEND_ONE;
+	rtbd.DestBlendAlpha        = D3D11_BLEND_ZERO;
+	rtbd.BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+	rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.RenderTarget[0] = rtbd;
+
+	_pd3dDevice->CreateBlendState(&blendDesc, &_transparency);
+
+
 	if (FAILED(hr))
 		return hr;
 
@@ -690,6 +712,7 @@ void Application::Cleanup()
 
 	if (_wireFrame)			 _wireFrame->Release();
 	if (_solid)				 _solid->Release();
+	if (_transparency)		 _transparency->Release();
 	if (_pConstantBuffer)	 _pConstantBuffer->Release();
 	if (_depthStencilView)	 _depthStencilView->Release();
 	if (_depthStencilBuffer) _depthStencilBuffer->Release();
@@ -774,7 +797,7 @@ void Application::Update()
 
 
 	// Update gameobject
-	go->Update();
+	herculesPlane->Update();
 
 }
 
@@ -822,9 +845,17 @@ void Application::Draw()
 	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 
 
+	float blendfactor[] = { 0.75f, 0.75f, 0.75f, 1.0f };
+
+	// Default blend state (no blending for opaqque objects
+	_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
+
 	// Draw game object on screen;
-	cb.mWorld = XMMatrixTranspose(go->GetTransform().GetWorldMatrixXM());
-	go->Draw(&cb);
+	cb.mWorld = XMMatrixTranspose(herculesPlane->GetTransform().GetWorldMatrixXM());
+	herculesPlane->Draw(&cb);
+
+	// Set mode to transparency
+	_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
 
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);

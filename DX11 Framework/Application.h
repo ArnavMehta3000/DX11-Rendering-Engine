@@ -25,7 +25,9 @@ private:
 	FirstPersonCamera* fpsCam;
 	OrbitCamera* orbitCam;
 	CameraMats currentCamera;
-	GameObject* go;
+
+	// Game objects
+	GameObject* herculesPlane;
 
 	ID3D11VertexShader*       _pVertexShader;
 	ID3D11PixelShader*        _pPixelShader;
@@ -38,6 +40,7 @@ private:
 
 	ID3D11RasterizerState*    _wireFrame;
 	ID3D11RasterizerState*    _solid;
+	ID3D11BlendState* _transparency;
 
 	ID3D11Texture2D*          _myTexture;
 	ID3D11ShaderResourceView* _pTextureRV = nullptr;
