@@ -230,9 +230,18 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
-	objMeshData = OBJLoader::Load("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+	objMeshData = OBJLoader::Load("Assets/Models/Airplane/Hercules.obj", _pd3dDevice);
 	_pMeshIndexBuffer = objMeshData.IndexBuffer;
 	_pMeshVertexBuffer = objMeshData.VertexBuffer;
+
+	GOInitData goid;
+	goid.constantBuffer = _pConstantBuffer;
+	goid.deviceContext = _pImmediateContext;
+	goid.position = Vector3(0.0f, 0.0f, 0.0f);
+	goid.rotation = Vector3();
+	goid.scale = Vector3::One();
+	go = new GameObject(goid);
+	go->SetMesh("Assets/Models/Blender/donut.obj", _pd3dDevice, false);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -774,6 +783,8 @@ void Application::Update()
 	staticCam->Update();
 	orbitCam->Update();
 
+	go->Update();
+
 
 	XMStoreFloat4x4(&_meshWorld, XMMatrixTranslation(0, 0, 0));
 }
@@ -866,10 +877,13 @@ void Application::Draw()
 	_pImmediateContext->IASetIndexBuffer(_pMeshIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 	// Use  mesh data
-	meshWorld = XMLoadFloat4x4(&_meshWorld);
+	/*meshWorld = XMLoadFloat4x4(&_meshWorld);
 	cb.mWorld = XMMatrixTranspose(meshWorld);
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
+	_pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);*/
+
+	cb.mWorld = XMMatrixTranspose(go->GetTransform().GetWorldMatrixXM());
+	go->Draw(&cb);
 
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);

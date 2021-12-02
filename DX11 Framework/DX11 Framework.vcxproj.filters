@@ -21,6 +21,8 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FirstPersonCamera.h" />
     <ClInclude Include="OrbitCamera.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -32,6 +34,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FirstPersonCamera.cpp" />
     <ClCompile Include="OrbitCamera.cpp" />
+    <ClCompile Include="GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

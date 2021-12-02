@@ -48,5 +48,9 @@ public:
 
 	static DirectX::XMVECTOR V3ToXMVECTOR(const Vector3& vec);
 	static Vector3 XMVECTORToV3(const DirectX::XMVECTOR& other);
+
+public:
+	static Vector3 One() { return Vector3(1.0f, 1.0f, 1.0f); }
+	static Vector3 MinusOne() { return Vector3(-1.0f, -1.0f, -1.0f); }
 };
 #endif

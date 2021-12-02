@@ -6,6 +6,7 @@
 #include "OBJLoader.h"
 #include "FirstPersonCamera.h"
 #include "OrbitCamera.h"
+#include "GameObject.h"
 
 
 class Application
@@ -24,6 +25,7 @@ private:
 	FirstPersonCamera* fpsCam;
 	OrbitCamera* orbitCam;
 	CameraMats currentCamera;
+	GameObject* go;
 
 	ID3D11VertexShader*       _pVertexShader;
 	ID3D11PixelShader*        _pPixelShader;

@@ -54,10 +54,10 @@ void OrbitCamera::Update()
 		m_Position.y -= changeSpeed;
 
 	if (GetAsyncKeyState(0xBB))  // + Key
-		m_OrbitSpeed += changeSpeed / 100;
+		m_OrbitSpeed += changeSpeed / 1000;
 
 	if (GetAsyncKeyState(0xBD))  // - Key
-		m_OrbitSpeed -= changeSpeed / 100;
+		m_OrbitSpeed -= changeSpeed / 1000;
 	
 
 	vec = Vector3(x, m_Position.y, z);

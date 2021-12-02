@@ -382,6 +382,7 @@
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DX11 Framework.cpp" />
     <ClCompile Include="FirstPersonCamera.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="OrbitCamera.cpp" />
@@ -398,11 +399,13 @@
     <ClInclude Include="Core.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="FirstPersonCamera.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="OrbitCamera.h" />
     <CLInclude Include="resource.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector3.h" />
     <ResourceCompile Include="DX11 Framework.rc" />
   </ItemGroup>
