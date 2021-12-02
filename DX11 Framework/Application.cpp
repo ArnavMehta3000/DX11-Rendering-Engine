@@ -201,7 +201,7 @@ void Application::InitLights()
 void Application::InitTextures()
 {
 	// Load texture
-	HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &_pTextureRV);
+	HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds", nullptr, &_pTextureRV);
 
 	if (FAILED(hr))
 	{
@@ -230,7 +230,7 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
-	objMeshData = OBJLoader::Load("Assets/Models/Blender/donut.obj", _pd3dDevice, false);
+	objMeshData = OBJLoader::Load("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
 	_pMeshIndexBuffer = objMeshData.IndexBuffer;
 	_pMeshVertexBuffer = objMeshData.VertexBuffer;
 }
@@ -775,14 +775,7 @@ void Application::Update()
 	orbitCam->Update();
 
 
-	// Donut
-	XMStoreFloat4x4(&_meshWorld, XMMatrixRotationX(-t) * XMMatrixTranslation(cos(t * -1) * 6, 3, 3));
-	// Pyramid
-	XMStoreFloat4x4(&_pyramidWorld, XMMatrixRotationX(t) * XMMatrixTranslation(cos(t * -1) * 6, 0, 3));
-	// Cube
-	XMStoreFloat4x4(&_cubeWorld, XMMatrixRotationX(t) * XMMatrixTranslation(sin(t) * 6, 0, 3));
-	// Plane
-	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(2.0f, -1.5f, 2.0f));
+	XMStoreFloat4x4(&_meshWorld, XMMatrixTranslation(0, 0, 0));
 }
 
 void Application::Draw()
@@ -834,36 +827,38 @@ void Application::Draw()
 	UINT offset = 0;
 	
 
-	// HACK: Set plane size
-	int xSize = 10, zSize = 10;
-	// Use plane mesh data
-	_pImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
-	_pImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-	// Draw plane
-	planeWorld = XMLoadFloat4x4(&_planeWorld);
-	cb.mWorld = XMMatrixTranspose(planeWorld);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
+#pragma region Other Meshes
+	//// HACK: Set plane size
+	//int xSize = 10, zSize = 10;
+	//// Use plane mesh data
+	//_pImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
+	//_pImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	//// Draw plane
+	//planeWorld = XMLoadFloat4x4(&_planeWorld);
+	//cb.mWorld = XMMatrixTranspose(planeWorld);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
 
 
-	// Use pyramid mesh data
-	_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
-	_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-	// Draw pyramid
-	pyramidWorld = XMLoadFloat4x4(&_pyramidWorld);
-	cb.mWorld = XMMatrixTranspose(pyramidWorld);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
+	//// Use pyramid mesh data
+	//_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
+	//_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	//// Draw pyramid
+	//pyramidWorld = XMLoadFloat4x4(&_pyramidWorld);
+	//cb.mWorld = XMMatrixTranspose(pyramidWorld);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
 
 
-	// Use cube mesh data
-	_pImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
-	_pImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-	// Draw cube
-	cubeworld = XMLoadFloat4x4(&_cubeWorld);
-	cb.mWorld = XMMatrixTranspose(cubeworld);
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	//// Use cube mesh data
+	//_pImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
+	//_pImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	//// Draw cube
+	//cubeworld = XMLoadFloat4x4(&_cubeWorld);
+	//cb.mWorld = XMMatrixTranspose(cubeworld);
+	//_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+#pragma endregion
 
 	
 	// Draw mesh
