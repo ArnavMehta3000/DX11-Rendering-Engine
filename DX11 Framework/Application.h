@@ -28,6 +28,8 @@ private:
 
 	// Game objects
 	GameObject* herculesPlane;
+	GameObject* groundPlane;
+
 
 	ID3D11VertexShader*       _pVertexShader;
 	ID3D11PixelShader*        _pPixelShader;

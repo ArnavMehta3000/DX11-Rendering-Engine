@@ -74,7 +74,7 @@ void Application::InitCamera()
 {
 	// Create camera init data
 	CameraInitData cameraInitData;
-	cameraInitData.position = Vector3(0.0f, 0.0f, -3.0f);
+	cameraInitData.position = Vector3(0.0f, 5.0f, -5.0f);
 	cameraInitData.at = Vector3(0.0f, 0.0f, 0.0f);
 	cameraInitData.up = Vector3(0.0f, 1.0f, 0.0f);
 	cameraInitData.windowWidth = _WindowWidth;
@@ -224,15 +224,27 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
+	GOInitData plane;
+	plane.constantBuffer = _pConstantBuffer;
+	plane.deviceContext = _pImmediateContext;
+	plane.position = Vector3(5.0f, 0.0f, 0.0f);
+	plane.rotation = Vector3();
+	plane.scale = Vector3::One();
 
-	GOInitData goid;
-	goid.constantBuffer = _pConstantBuffer;
-	goid.deviceContext = _pImmediateContext;
-	goid.position = Vector3(0.0f, 0.0f, 0.0f);
-	goid.rotation = Vector3();
-	goid.scale = Vector3::One();
-	herculesPlane = new GameObject(goid);
+	groundPlane = new GameObject(plane);
+	groundPlane->SetMesh("Assets/Models/Blender/Plane.obj", _pd3dDevice, false);
+	groundPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
+
+	GOInitData hercules;
+	hercules.constantBuffer = _pConstantBuffer;
+	hercules.deviceContext = _pImmediateContext;
+	hercules.position = Vector3(0.0f, 0.0f, 0.0f);
+	hercules.rotation = Vector3();
+	hercules.scale = Vector3::One();
+
+	herculesPlane = new GameObject(hercules);
 	herculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+	herculesPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -798,7 +810,7 @@ void Application::Update()
 
 	// Update gameobject
 	herculesPlane->Update();
-
+	groundPlane->Update();
 }
 
 void Application::Draw()
@@ -850,9 +862,15 @@ void Application::Draw()
 	// Default blend state (no blending for opaqque objects
 	_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
 
-	// Draw game object on screen;
+	
+#pragma region Draw GameObjects
 	cb.mWorld = XMMatrixTranspose(herculesPlane->GetTransform().GetWorldMatrixXM());
 	herculesPlane->Draw(&cb);
+
+	cb.mWorld = XMMatrixTranspose(groundPlane->GetTransform().GetWorldMatrixXM());
+	groundPlane->Draw(&cb);
+#pragma endregion
+
 
 	// Set mode to transparency
 	_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);

@@ -35,44 +35,54 @@ public:
 		XMStoreFloat4x4(&worldMat, XMMatrixAffineTransformation(s, p, p, p));
 	}
 
-	XMFLOAT4X4 GetWorldMatrix() { return worldMat; }
-	XMMATRIX   GetWorldMatrixXM() { return XMLoadFloat4x4(&worldMat); }
+	inline XMFLOAT4X4 GetWorldMatrix() { return worldMat; }
+	inline XMMATRIX   GetWorldMatrixXM() { return XMLoadFloat4x4(&worldMat); }
 
-	Vector3    GetPosition() { return TransformData(worldMat).position; }
-	Vector3    GetRotation() { return TransformData(worldMat).rotation; }
-	Vector3    GetScale()    { return TransformData(worldMat).scale; }
+	inline Vector3    GetPosition() { return TransformData(worldMat).position; }
+	inline Vector3    GetRotation() { return TransformData(worldMat).rotation; }
+	inline Vector3    GetScale()    { return TransformData(worldMat).scale; }
 	
 
 	
-	void TranslatePosition(Vector3 vec)
+	inline void TranslatePosition(Vector3 vec)
 	{
 		Vector3 pos = GetPosition();
 		XMMATRIX t = XMMatrixTranslation(pos.x + vec.x, pos.y + vec.y, pos.z + vec.z);
 		XMStoreFloat4x4(&worldMat, t);
 	}
-	void TranslateScale(Vector3 vec)
+	inline void TranslateScale(Vector3 vec)
 	{
 		Vector3 scale = GetScale();
 		XMMATRIX s = XMMatrixScaling(scale.x + vec.x, scale.y + vec.y, scale.z + vec.z);
 		XMStoreFloat4x4(&worldMat, s);
 	}
+	inline void TranslateScale(float vec)
+	{
+		Vector3 scale = GetScale();
+		XMMATRIX s = XMMatrixScaling(scale.x + vec, scale.y + vec, scale.z + vec);
+		XMStoreFloat4x4(&worldMat, s);
+	}
 	
-	void SetPosition(Vector3 pos)
+	inline void SetPosition(Vector3 pos)
 	{
 		XMStoreFloat4x4(&worldMat, XMMatrixTranslation(pos.x, pos.y, pos.z));
 	}
-	void SetRotation(Vector3 axis, float angle)
+	inline void SetRotation(Vector3 axis, float angle)
 	{
 		XMMATRIX r = XMMatrixRotationAxis(Vector3::V3ToXMVECTOR(axis), angle);
 		XMStoreFloat4x4(&worldMat, r);
 	}
-	void SetScale(Vector3 scale)
+	inline void SetScale(Vector3 scale)
 	{
 		XMStoreFloat4x4(&worldMat, XMMatrixScaling(scale.x, scale.y, scale.z));
 	}
+	inline void SetScale(float scale)
+	{
+		XMStoreFloat4x4(&worldMat, XMMatrixScaling(scale, scale, scale));
+	}
 
 
-	void Debug(std::string posMsg = "", std::string rotMsg = "", std::string scaleMsg = "")
+	inline void Debug(std::string posMsg = "", std::string rotMsg = "", std::string scaleMsg = "")
 	{
 		GetPosition().Debug(posMsg);
 		GetRotation().Debug(rotMsg);
