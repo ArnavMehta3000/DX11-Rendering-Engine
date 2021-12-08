@@ -1,7 +1,11 @@
 #include "Application.h"
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
+
 	PAINTSTRUCT ps;
 	HDC hdc;
 
@@ -66,6 +70,14 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 	InitCamera();
 	InitModels();
+
+	// Setup ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(_hWnd);
+	ImGui_ImplDX11_Init(_pd3dDevice,_pImmediateContext);
+	ImGui::StyleColorsDark();
 
 	return S_OK;
 }
@@ -822,10 +834,6 @@ void Application::Draw()
 	// Clear depth stencil 
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	XMMATRIX cubeworld;
-	XMMATRIX pyramidWorld;
-	XMMATRIX planeWorld;
-	XMMATRIX meshWorld;
 
 	// TODO: Change camera here
 	XMMATRIX view = XMLoadFloat4x4(&currentCamera.View);
@@ -873,7 +881,31 @@ void Application::Draw()
 
 
 	// Set mode to transparency
-	_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
+	//_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
+
+
+
+
+
+
+
+
+	// ImGui display
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	// Create test window
+	ImGui::Begin("Debug");
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+
+
+
+
+
 
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);
