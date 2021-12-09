@@ -23,11 +23,14 @@ public:
 	void Draw(ConstantBuffer* cb);
 
 	XMFLOAT4X4 GetWorldMatrix();
-	XMMATRIX GetWorldMatrixXM();
 
 	Vector3 GetPosition();
 	Vector3 GetRotation();
 	Vector3 GetScale();
+
+	void SetPosition(Vector3 pos);
+	void SetRotation(Vector3 rot);
+	void SetScale(Vector3 scale);
 
 
 

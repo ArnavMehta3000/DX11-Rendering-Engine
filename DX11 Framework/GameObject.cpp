@@ -38,22 +38,15 @@ void GameObject::Draw(ConstantBuffer* cb)
 	m_InitData.deviceContext->DrawIndexed(m_Mesh.IndexCount, 0, 0);
 }
 
-XMFLOAT4X4 GameObject::GetWorldMatrix()
-{
-	return m_WorldMatrix;
-}
-
-XMMATRIX GameObject::GetWorldMatrixXM()
-{
-	return XMLoadFloat4x4(&m_WorldMatrix);
-}
+XMFLOAT4X4 GameObject::GetWorldMatrix() { return m_WorldMatrix; }
 
 Vector3 GameObject::GetPosition()
 {
 	XMVECTOR scaling, rotQuat, trans;
 	XMMatrixDecompose(&scaling, &rotQuat, &trans, XMLoadFloat4x4(&m_WorldMatrix));
 
-	return Vector3::XMVECTORToV3(trans);
+	m_Position = Vector3::XMVECTORToV3(trans);
+	return m_Position;
 }
 
 Vector3 GameObject::GetRotation()
@@ -61,7 +54,8 @@ Vector3 GameObject::GetRotation()
 	XMVECTOR scaling, rotQuat, trans;
 	XMMatrixDecompose(&scaling, &rotQuat, &trans, XMLoadFloat4x4(&m_WorldMatrix));
 
-	return Vector3::XMVECTORToV3(rotQuat);
+	m_Rotation = Vector3::XMVECTORToV3(rotQuat);
+	return m_Rotation;
 }
 
 Vector3 GameObject::GetScale()
@@ -69,14 +63,22 @@ Vector3 GameObject::GetScale()
 	XMVECTOR scaling, rotQuat, trans;
 	XMMatrixDecompose(&scaling, &rotQuat, &trans, XMLoadFloat4x4(&m_WorldMatrix));
 
-	return Vector3::XMVECTORToV3(scaling);
+	m_Scale = Vector3::XMVECTORToV3(scaling);
+	return m_Scale;
 }
+
+void GameObject::SetPosition(Vector3 pos) {	m_Position = pos; }
+
+void GameObject::SetRotation(Vector3 rot) { m_Rotation = rot; }
+
+void GameObject::SetScale(Vector3 scale) { m_Scale = scale; }
 
 void GameObject::UpdateWorldMatrix()
 {
+	// Create transformation matrices
 	XMMATRIX position = XMMatrixTranslationFromVector(Vector3::V3ToXMVECTOR(m_Position));
 	XMMATRIX scaling  = XMMatrixScalingFromVector(Vector3::V3ToXMVECTOR(m_Scale));
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(Vector3::V3ToXMVECTOR(m_Rotation));
 
-	XMStoreFloat4x4(&m_WorldMatrix, scaling * position * rotation);
+	XMStoreFloat4x4(&m_WorldMatrix, scaling * rotation * position);
 }

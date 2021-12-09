@@ -819,7 +819,7 @@ void Application::Update()
 
 
 	// Update gameobject
-	herculesPlane->GetScale().Debug();
+	herculesPlane->SetPosition(Vector3(sin(t)));
 	herculesPlane->Update();
 	groundPlane->Update();
 }
