@@ -874,6 +874,7 @@ void Application::Draw()
 
 	// Set mode to transparency
 <<<<<<< HEAD
+<<<<<<< HEAD
 	//_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
 
 
@@ -899,6 +900,9 @@ void Application::Draw()
 
 
 
+=======
+	_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
+>>>>>>> parent of b75cb31 (Added ImGui)
 =======
 	_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
 >>>>>>> parent of b75cb31 (Added ImGui)
