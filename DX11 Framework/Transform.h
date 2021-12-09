@@ -91,71 +91,7 @@ public:
 
 private:
 	XMFLOAT4X4 worldMat;
-
-	Vector3 position, rotation, scale;
 };
-
-
-//class Transform
-//{
-//public:  // Constructors
-//	Transform(Vector3 pos = Vector3(), Vector3 rot = Vector3(), Vector3 scale = Vector3())
-//	{
-//		XMVECTOR p = Vector3::V3ToXMVECTOR(pos);
-//		XMVECTOR r = Vector3::V3ToXMVECTOR(rot);
-//		XMVECTOR s = Vector3::V3ToXMVECTOR(scale);
-//
-//		// Create world matrix
-//		UpdateMatrix(XMMatrixAffineTransformation(s, p, p, p));
-//	}
-//	~Transform() {}
-//
-//public:  // Getter methods
-//	inline Vector3    GetPosition() { return m_Position; }
-//	inline Vector3    GetRotation() { return m_Rotation; }
-//	inline Vector3    GetScale()    { return m_Scale; }
-//	inline XMFLOAT4X4 GetWorldMatrix() { return m_WorldMat; }
-//	inline XMMATRIX   GetWorldMatrixXM() { return XMLoadFloat4x4(&m_WorldMat); }
-//
-//public:  // Setter methods
-//	inline void SetPosition(Vector3 pos)
-//	{
-//		UpdateMatrix(XMMatrixTranslation(pos.x, pos.y, pos.z));
-//	}
-//	inline void SetRotation(Vector3 axis, float angle)
-//	{
-//		XMMATRIX r = XMMatrixRotationAxis(Vector3::V3ToXMVECTOR(axis), angle);
-//		UpdateMatrix(r);
-//	}
-//	inline void SetScale(Vector3 scale)
-//	{
-//		UpdateMatrix(XMMatrixScaling(scale.x, scale.y, scale.y));
-//	}
-//	inline void SetScale(float scale)
-//	{
-//		UpdateMatrix(XMMatrixScaling(scale, scale, scale));
-//	}
-//
-//private:
-//	XMFLOAT4X4 m_WorldMat;
-//	Vector3 m_Position, m_Rotation, m_Scale;
-//
-//
-//	void UpdateMatrix(XMMATRIX newMat)
-//	{
-//		//Update world matrix
-//		XMStoreFloat4x4(&m_WorldMat, newMat);
-//
-//		// Decompose the new matrix
-//		XMVECTOR scaling, rotQuat, trans;
-//		XMMatrixDecompose(&scaling, &rotQuat, &trans, XMLoadFloat4x4(&m_WorldMat));
-//
-//		// Update position / rotation / scale
-//		m_Position = Vector3::XMVECTORToV3(trans);
-//		m_Rotation = Vector3::XMVECTORToV3(rotQuat);
-//		m_Scale = Vector3::XMVECTORToV3(scaling);
-//	}
-//};
 
 #endif // !TRANSFORM_H
 

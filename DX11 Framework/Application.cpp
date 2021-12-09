@@ -217,6 +217,9 @@ void Application::InitTextures()
 	samplerDesc.MaxLOD         = D3D11_FLOAT32_MAX;
 
 	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
+
+	//// Set sampler state
+	//_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 }
 
 void Application::InitModels()
@@ -230,6 +233,7 @@ void Application::InitModels()
 
 	groundPlane = new GameObject(plane);
 	groundPlane->SetMesh("Assets/Models/Blender/Plane.obj", _pd3dDevice, false);
+	groundPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
 
 	GOInitData hercules;
 	hercules.constantBuffer = _pConstantBuffer;
@@ -240,11 +244,12 @@ void Application::InitModels()
 
 	herculesPlane = new GameObject(hercules);
 	herculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+	herculesPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
 }
 
 HRESULT Application::InitVertexBuffer()
 {
-	//HRESULT hr;
+	HRESULT hr;
 //
 //#pragma region Cube
 //	{
@@ -748,9 +753,6 @@ void Application::Update()
 		isWireFrame = !isWireFrame;
 	}
 
-	// Show imgui
-	if (GetAsyncKeyState(VK_OEM_5) & KEYUP)
-		showImGui = !showImGui;
 
 	// Change current camera
 	if (GetAsyncKeyState(0x31) || staticCam->enabled)  // 1: Static camera
@@ -881,21 +883,16 @@ void Application::Draw()
 
 
 
-	if (showImGui)
-	{
-		// ImGui display
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+	// ImGui display
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 
-		// Create test window
-		ImGui::Begin("Debug");
-		ImGui::End();
-		ImGui::Render();
-
-		// Render
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	}
+	// Create test window
+	ImGui::Begin("Debug");
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 
 
