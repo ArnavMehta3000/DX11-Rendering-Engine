@@ -51,6 +51,9 @@ public:
 
 public:
 	static Vector3 One() { return Vector3(1.0f, 1.0f, 1.0f); }
-	static Vector3 MinusOne() { return Vector3(-1.0f, -1.0f, -1.0f); }
+	static Vector3 Zero() { return Vector3(); }
+	static Vector3 GetForward() { return Vector3(0.0f, 0.0f, 1.0f); }
+	static Vector3 Up() { return Vector3(0.0f, 1.0, 0.0f); }
+	static Vector3 Right() { return Vector3(1.0f, 0.0f, 0.0f); }
 };
 #endif
