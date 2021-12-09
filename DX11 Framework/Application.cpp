@@ -230,8 +230,6 @@ void Application::InitTextures()
 
 	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
 
-	//// Set sampler state
-	//_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 }
 
 void Application::InitModels()
@@ -245,7 +243,7 @@ void Application::InitModels()
 
 	groundPlane = new GameObject(plane);
 	groundPlane->SetMesh("Assets/Models/Blender/Plane.obj", _pd3dDevice, false);
-	groundPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
+	//groundPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
 
 	GOInitData hercules;
 	hercules.constantBuffer = _pConstantBuffer;
@@ -256,12 +254,12 @@ void Application::InitModels()
 
 	herculesPlane = new GameObject(hercules);
 	herculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
-	herculesPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
+	//herculesPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
 }
 
 HRESULT Application::InitVertexBuffer()
 {
-	HRESULT hr;
+	//HRESULT hr;
 //
 //#pragma region Cube
 //	{
@@ -367,7 +365,7 @@ HRESULT Application::InitVertexBuffer()
 
 HRESULT Application::InitIndexBuffer()
 {
-	HRESULT hr;
+	//HRESULT hr;
 
 //#pragma region Cube
 //	{
@@ -821,7 +819,7 @@ void Application::Update()
 
 
 	// Update gameobject
-	herculesPlane->GetTransform().Debug();
+	herculesPlane->GetScale().Debug();
 	herculesPlane->Update();
 	groundPlane->Update();
 }
@@ -873,10 +871,10 @@ void Application::Draw()
 
 	
 #pragma region Draw GameObjects
-	cb.mWorld = XMMatrixTranspose(herculesPlane->GetTransform().GetWorldMatrixXM());
+	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&herculesPlane->GetWorldMatrix()));
 	herculesPlane->Draw(&cb);
 
-	cb.mWorld = XMMatrixTranspose(groundPlane->GetTransform().GetWorldMatrixXM());
+	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&groundPlane->GetWorldMatrix()));
 	groundPlane->Draw(&cb);
 #pragma endregion
 

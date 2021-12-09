@@ -418,7 +418,6 @@
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="OrbitCamera.h" />
     <CLInclude Include="resource.h" />
-    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector3.h" />
     <ResourceCompile Include="DX11 Framework.rc" />
   </ItemGroup>

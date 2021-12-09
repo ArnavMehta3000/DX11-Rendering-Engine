@@ -25,7 +25,7 @@
     <ClInclude Include="FirstPersonCamera.h" />
     <ClInclude Include="OrbitCamera.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Transform.h" />
+    <ClInclude Include=".h" />
     <ClInclude Include="imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
