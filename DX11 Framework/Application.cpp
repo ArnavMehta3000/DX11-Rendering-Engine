@@ -821,6 +821,7 @@ void Application::Update()
 
 
 	// Update gameobject
+	herculesPlane->GetTransform().Debug();
 	herculesPlane->Update();
 	groundPlane->Update();
 }

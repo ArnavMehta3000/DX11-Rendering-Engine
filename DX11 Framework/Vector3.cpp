@@ -48,7 +48,7 @@ void Vector3::Debug(std::string msg)
 	if (msg == "")
 		os << "Vector3(" << x << "," << y << "," << z << ")" << std::endl;
 	else
-		os << "[" << msg << "]Vector3(" << x << "," << y << "," << z << ")" << std::endl;
+		os << "[" << msg <<"]Vector3(" << x << "," << y << "," << z << ")" << std::endl;
 
 	OutputDebugStringA(os.str().c_str());
 }

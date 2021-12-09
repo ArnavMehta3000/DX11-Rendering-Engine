@@ -19,6 +19,8 @@ struct TransformData
 		position = Vector3::XMVECTORToV3(trans);
 		rotation = Vector3::XMVECTORToV3(rotQuat);
 		scale = Vector3::XMVECTORToV3(scaling);
+
+		
 	}
 };
 
@@ -95,9 +97,9 @@ public:
 
 	inline void Debug(std::string posMsg = "", std::string rotMsg = "", std::string scaleMsg = "")
 	{
-		GetPosition().Debug(posMsg);
-		GetRotation().Debug(rotMsg);
-		GetScale().Debug(scaleMsg);
+		GetPosition().Debug("POSITION" + posMsg);
+		GetRotation().Debug("ROTATION" + rotMsg);
+		GetScale().Debug("SCALE" + scaleMsg);
 	}
 
 private:
