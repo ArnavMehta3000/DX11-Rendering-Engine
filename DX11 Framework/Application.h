@@ -55,6 +55,8 @@ private:
 	Light::DirectionalLight directionalLight;
 	Light::PointLight       pointLight;
 
+	bool showImGui = true;
+
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 	HRESULT InitDevice();
