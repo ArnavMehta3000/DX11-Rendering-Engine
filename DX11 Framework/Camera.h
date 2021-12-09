@@ -3,7 +3,6 @@
 #define CAMERA_H
 
 #include "Core.h"
-#include "Transform.h"
 
 struct CameraInitData
 {
@@ -73,7 +72,6 @@ public:
 
 
 protected:
-	Transform m_Transform;
 
 	// Camera coordinate relative to world space.
 	Vector3 m_Position; //EYE

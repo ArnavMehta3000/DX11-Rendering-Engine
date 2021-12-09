@@ -24,7 +24,6 @@ Camera::~Camera() {}
 void Camera::Update()
 {
 	if (!enabled) return;
-
 	SetLens();
 }
 

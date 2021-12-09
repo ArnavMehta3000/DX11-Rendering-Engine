@@ -38,9 +38,9 @@ public:
 	inline XMFLOAT4X4 GetWorldMatrix() { return worldMat; }
 	inline XMMATRIX   GetWorldMatrixXM() { return XMLoadFloat4x4(&worldMat); }
 
-	inline Vector3 GetPosition() const { return TransformData(worldMat).position; }
-	inline Vector3 GetRotation() const { return TransformData(worldMat).rotation; }
-	inline Vector3 GetScale()    const { return TransformData(worldMat).scale; }
+	inline Vector3    GetPosition() { return TransformData(worldMat).position; }
+	inline Vector3    GetRotation() { return TransformData(worldMat).rotation; }
+	inline Vector3    GetScale()    { return TransformData(worldMat).scale; }
 	
 
 	
@@ -81,17 +81,6 @@ public:
 		XMStoreFloat4x4(&worldMat, XMMatrixScaling(scale, scale, scale));
 	}
 
-	inline Vector3 GetForward()
-	{
-		Vector3 forward;
-		Vector3 rot = GetRotation();
-
-		forward.x = sin(rot.y) * cos(rot.x);
-		forward.y = sin(-rot.x);
-		forward.z = cos(rot.x) * cos(rot.y);
-
-		return forward;
-	}
 
 	inline void Debug(std::string posMsg = "", std::string rotMsg = "", std::string scaleMsg = "")
 	{
