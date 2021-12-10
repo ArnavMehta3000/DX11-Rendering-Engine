@@ -18,6 +18,28 @@ Vector3 Vector3::Normalize()
 	return Vector3(x / Magnitude(), y / Magnitude(), z / Magnitude());;
 }
 
+Vector3 Vector3::Clamp(Vector3 vec, Vector3 min, Vector3 max)
+{
+	// X axis
+	if (vec.x >= max.x) vec.x = max.x;
+	if (vec.x < min.x)  vec.x = min.x;
+
+	// Y axis
+	if (vec.y >= max.y) vec.y = max.y;
+	if (vec.y < min.y)  vec.y = min.y;
+
+	// Z axis
+	if (vec.z >= max.z) vec.z = max.z;
+	if (vec.z < min.z)  vec.z = min.z;
+
+	return vec;
+}
+
+Vector3 Vector3::Clamp01(Vector3 vec)
+{
+	return Clamp(vec, Vector3::Zero(), Vector3::One());
+}
+
 float Vector3::Square()
 {
 	return ((x * x) + (y * y) + (z * z));
@@ -41,7 +63,7 @@ float Vector3::Magnitude()
 	return (sqrt(Square()));
 }
 
-void Vector3::Debug(std::string msg)
+std::string Vector3::Debug(std::string msg)
 {
 	std::ostringstream os;
 
@@ -50,7 +72,10 @@ void Vector3::Debug(std::string msg)
 	else
 		os << "[" << msg <<"]Vector3(" << x << "," << y << "," << z << ")" << std::endl;
 
-	OutputDebugStringA(os.str().c_str());
+	std::string output = os.str();
+	OutputDebugStringA(output.c_str());
+	
+	return output;
 }
 
 

@@ -34,13 +34,15 @@ public:
 	float Dot(const Vector3& other);
 	Vector3 Cross(const Vector3& other);
 	Vector3 Normalize();
+	static Vector3 Clamp(Vector3 vec, Vector3 min, Vector3 max);
+	static Vector3 Clamp01(Vector3 vec);
 
 	float Square();
 	float Distance(const Vector3& other);
 	float SqrDistance(const Vector3& other);
 	float Magnitude();
 
-	void Debug(std::string msg = "");
+	std::string Debug(std::string msg = "");
 
 	// Static helper functions
 	static DirectX::XMFLOAT3 V3ToXMFLOAT3(const Vector3& vec);

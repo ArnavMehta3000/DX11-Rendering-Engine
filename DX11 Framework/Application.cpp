@@ -96,7 +96,7 @@ void Application::InitCamera()
 
 
 	staticCam = new Camera(cameraInitData);
-	fpsCam = new FirstPersonCamera(cameraInitData);
+	fpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
 	orbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 
 	// Default camerais static camera
@@ -812,16 +812,16 @@ void Application::Update()
 	#pragma endregion
 
 
+	// Update gameobject
+	herculesPlane->SetRotation(Vector3(sin(t)));
+	herculesPlane->Update();
+	groundPlane->Update();
+
+
 	// Update cameras
 	fpsCam->Update();
 	staticCam->Update();
 	orbitCam->Update();
-
-
-	// Update gameobject
-	herculesPlane->SetPosition(Vector3(sin(t)));
-	herculesPlane->Update();
-	groundPlane->Update();
 }
 
 void Application::Draw()
@@ -889,6 +889,7 @@ void Application::Draw()
 
 
 
+	#pragma region ImGui Stuff
 	// ImGui display
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -899,10 +900,7 @@ void Application::Draw()
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-
-
-
+	#pragma endregion
 
 
 

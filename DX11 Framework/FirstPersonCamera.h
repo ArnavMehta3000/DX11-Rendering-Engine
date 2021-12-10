@@ -7,7 +7,7 @@
 class FirstPersonCamera  : public Camera
 {
 public:
-	FirstPersonCamera(CameraInitData cam);
+	FirstPersonCamera(CameraInitData cam, Vector3 lookDirection);
 	~FirstPersonCamera();
 
 	void Update() override;
@@ -19,6 +19,7 @@ public:
 private:
 	float m_MovementSens;
 	float m_LookSens;
+	Vector3 m_LookDirection;
 		
 };
 #endif // !FIRSTPERSONCAMERA_H
