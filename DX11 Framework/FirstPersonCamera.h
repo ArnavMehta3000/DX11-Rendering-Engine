@@ -20,6 +20,8 @@ private:
 	float m_MovementSens;
 	float m_LookSens;
 	Vector3 m_LookDirection;
-		
+	
+	bool flip = false;
+	float angle = 0;
 };
 #endif // !FIRSTPERSONCAMERA_H

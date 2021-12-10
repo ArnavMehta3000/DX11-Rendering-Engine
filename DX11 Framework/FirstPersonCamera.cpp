@@ -17,7 +17,7 @@ void FirstPersonCamera::Update()
 #pragma region Movement
 	// W -> +Z
 	if (GetAsyncKeyState(0x57))
-		TranslatePosition(Vector3(0.0f, 0.0f, m_MovementSens));
+		TranslatePosition(m_LookDirection * m_MovementSens);
 	// S -> -Z
 	if (GetAsyncKeyState(0x53))
 		TranslatePosition(Vector3(0.0f, 0.0f, -m_MovementSens));
@@ -35,15 +35,46 @@ void FirstPersonCamera::Update()
 		TranslatePosition(Vector3(0.0f, -m_MovementSens, 0.0f));
 #pragma endregion
 
+	// Flip look control direction
+	if (GetAsyncKeyState(VK_HOME))
+		flip = !flip;
+
 #pragma region Look
+	if (angle > 360.0f)
+		angle = 0.0f;
+	if (angle < 0.0f)
+		angle = 360.0f;
+
 	if (GetAsyncKeyState(VK_RIGHT))
 	{
-		
-		
-	}
-#pragma endregion
+		angle -= m_LookSens;
+		m_LookDirection.x = cos(angle);
+		m_LookDirection.z = sin(angle);
 
-	// Clamp look direction
+	}
+	if (GetAsyncKeyState(VK_LEFT))
+	{
+		angle += m_LookSens;
+		m_LookDirection.x = cos(angle);
+		m_LookDirection.z = sin(angle);
+	}
+	if (GetAsyncKeyState(VK_UP))
+	{
+		angle += m_LookSens;
+		m_LookDirection.z = sin(angle);
+		m_LookDirection.y = cos(angle);
+	}
+	if (GetAsyncKeyState(VK_DOWN))
+	{
+		angle -= m_LookSens;
+		m_LookDirection.z = sin(angle);
+		m_LookDirection.y = cos(angle);
+	}
+
+#pragma endregion
+	
+
+	// Clamp look direction between -1 and 1
 	m_LookDirection = Vector3::Clamp(m_LookDirection, Vector3(-1.0f, -1.0f, -1.0f), Vector3::One());
 	
 	SetLens();
@@ -51,11 +82,10 @@ void FirstPersonCamera::Update()
 
 void FirstPersonCamera::SetLens()
 { 
-	Vector3 look = m_LookDirection;
 	XMVECTOR Eye = Vector3::V3ToXMVECTOR(m_Position);
-	XMVECTOR Direction = Vector3::V3ToXMVECTOR(look);
+	XMVECTOR Direction = Vector3::V3ToXMVECTOR(m_LookDirection);
 	XMVECTOR Up = Vector3::V3ToXMVECTOR(m_Up);
-	look.Debug();
+	m_LookDirection.Debug();
 	XMStoreFloat4x4(&m_View, XMMatrixLookToLH(Eye, Direction, Up));
 	XMStoreFloat4x4(&m_Proj, XMMatrixPerspectiveFovLH(XM_PIDIV2, m_WindowWidth / (FLOAT)m_WindowHeight, m_NearZ, m_FarZ));
 }
