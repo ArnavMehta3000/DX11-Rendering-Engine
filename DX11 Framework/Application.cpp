@@ -813,10 +813,8 @@ void Application::Update()
 
 
 	// Update gameobject
-	herculesPlane->SetRotation(Vector3(sin(t)));
 	herculesPlane->Update();
 	groundPlane->Update();
-
 
 	// Update cameras
 	fpsCam->Update();

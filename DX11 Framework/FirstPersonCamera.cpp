@@ -36,46 +36,16 @@ void FirstPersonCamera::Update()
 #pragma endregion
 
 #pragma region Look
-	// Up Arrow -> Increase Y
-	//if (GetAsyncKeyState(VK_UP))
-	//	m_LookDirection.y += m_LookSens;
-	//// Down Arrow -> Decrease Y
-	//if (GetAsyncKeyState(VK_DOWN))
-	//	m_LookDirection.y -= m_LookSens;
-	// Right Arrow -> Increase X
 	if (GetAsyncKeyState(VK_RIGHT))
 	{
 		
-		if (m_LookDirection.x >= 0.0f && m_LookDirection.z <= 0.0f)
-		{
-			// Increase X
-			m_LookDirection.x += m_LookSens;
-
-			// Reached X limit decrease Z
-			if (m_LookDirection.x >= 1.0f)
-				m_LookDirection.z -= m_LookSens;
-		}
-		//m_LookDirection.x += m_LookSens;
-
-		//// Reached right limit go back
-		//if (m_LookDirection.x >= 1.0f)
-		//	m_LookDirection.z -= m_LookSens;
-		//
-		//// Reached back limit
-		//if (m_LookDirection.z < -1.0f)
-		//	m_LookDirection.z += m_LookSens;
+		
 	}
-
-	//// Left Arrow -> Decrease X
-	//if (GetAsyncKeyState(VK_LEFT))
-	//{
-	//	m_LookDirection.x -= m_LookSens;
-
-	//}
 #pragma endregion
 
 	// Clamp look direction
 	m_LookDirection = Vector3::Clamp(m_LookDirection, Vector3(-1.0f, -1.0f, -1.0f), Vector3::One());
+	
 	SetLens();
 }
 

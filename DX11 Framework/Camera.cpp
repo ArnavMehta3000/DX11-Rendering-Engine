@@ -54,6 +54,17 @@ void Camera::SetNearZ(float nearZ) { m_NearZ = nearZ; }
 
 void Camera::SetFarZ(float farZ) { m_FarZ = farZ; }
 
+void Camera::SetPos(Vector3 pos)
+{
+	m_Position = pos;
+}
+
+void Camera::SetRot(Vector3 rot)
+{
+	m_Rotation = rot;
+}
+
+
 XMFLOAT4X4 Camera::GetViewProj() const
 {
 	XMMATRIX view = XMLoadFloat4x4(&m_View);

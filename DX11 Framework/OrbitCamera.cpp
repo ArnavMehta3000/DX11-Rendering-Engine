@@ -62,7 +62,8 @@ void OrbitCamera::Update()
 
 	vec = Vector3(x, m_Position.y, z);
 	SetPosition(vec);
-		
+	
+
 	SetLens();
 }
 

@@ -60,7 +60,10 @@ public:
 	void SetNearZ(float nearZ);
 	void SetFarZ(float farZ);
 
-	// Define camera space via LookAt parameters.
+	// World mat
+	void SetPos(Vector3 pos);
+	void SetRot(Vector3 rot);
+
 
 	// Get View/Proj matrices.
 	inline XMFLOAT4X4 GetView()const { return m_View; }
@@ -73,7 +76,7 @@ public:
 
 protected:
 	// Camera coordinate relative to world space.
-	Vector3 m_Position; //EYE
+	Vector3 m_Position, m_Rotation; //EYE
 	Vector3 m_At;
 	Vector3 m_Up;
 
