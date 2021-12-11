@@ -61,6 +61,13 @@
     <ClInclude Include="OrbitCamera.h">
       <Filter>Cameras</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -97,6 +104,10 @@
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Cameras</Filter>
     </ClCompile>
+    <ClCompile Include="PlaneScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

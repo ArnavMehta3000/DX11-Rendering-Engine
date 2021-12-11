@@ -67,7 +67,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
-
+	InitScenes();
 	InitCamera();
 	InitModels();
 
@@ -95,13 +95,26 @@ void Application::InitCamera()
 	cameraInitData.farZ = 100.0f;
 
 
-	staticCam = new Camera(cameraInitData);
-	fpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
-	orbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
+	m_StaticCam = new Camera(cameraInitData);
+	m_FpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
+	m_OrbitCamera = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 
 	// Default camerais static camera
-	currentCamera.View = staticCam->GetView();
-	currentCamera.Projection = staticCam->GetProj();
+	m_CurrentCamera.View = m_StaticCam->GetView();
+	m_CurrentCamera.Projection = m_StaticCam->GetProj();
+}
+
+void Application::InitScenes()
+{
+	SceneInitData sceneInitData = SceneInitData(_pd3dDevice, _pImmediateContext, _pSwapChain, _pConstantBuffer);
+	
+
+	m_PlaneScene = new PlaneScene("PlaneScene");
+	m_PlaneScene->Init(sceneInitData);
+
+	// Add scenes and set current scene
+	SceneManager::GetInstance()->AddScene(m_PlaneScene);
+	SceneManager::GetInstance()->SetScene("PlaneScene");
 }
 
 HRESULT Application::InitShadersAndInputLayout()
@@ -241,9 +254,8 @@ void Application::InitModels()
 	plane.rotation = Vector3();
 	plane.scale = Vector3::One();
 
-	groundPlane = new GameObject(plane);
-	groundPlane->SetMesh("Assets/Models/Blender/Plane.obj", _pd3dDevice, false);
-	//groundPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
+	m_GroundPlane = new GameObject(plane);
+	m_GroundPlane->SetMesh("Assets/Models/Blender/Plane.obj", _pd3dDevice, false);
 
 	GOInitData hercules;
 	hercules.constantBuffer = _pConstantBuffer;
@@ -252,9 +264,8 @@ void Application::InitModels()
 	hercules.rotation = Vector3();
 	hercules.scale = Vector3::One();
 
-	herculesPlane = new GameObject(hercules);
-	herculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
-	//herculesPlane->GetTransform().SetScale(Vector3(15.0f, 15.0f, 15.0f));
+	m_HerculesPlane = new GameObject(hercules);
+	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -765,32 +776,32 @@ void Application::Update()
 
 
 	// Change current camera
-	if (GetAsyncKeyState(0x31) || staticCam->enabled)  // 1: Static camera
+	if (GetAsyncKeyState(0x31) || m_StaticCam->enabled)  // 1: Static camera
 	{
-		currentCamera.View = staticCam->GetView();
-		currentCamera.Projection = staticCam->GetProj();
+		m_CurrentCamera.View = m_StaticCam->GetView();
+		m_CurrentCamera.Projection = m_StaticCam->GetProj();
 
-		staticCam->enabled = true;
-		orbitCam->enabled = false;
-		fpsCam->enabled = false;
+		m_StaticCam->enabled = true;
+		m_OrbitCamera->enabled = false;
+		m_FpsCam->enabled = false;
 	}
-	if (GetAsyncKeyState(0x32) || orbitCam->enabled)  // 2: Orbit camera
+	if (GetAsyncKeyState(0x32) || m_OrbitCamera->enabled)  // 2: Orbit camera
 	{
-		currentCamera.View = orbitCam->GetView();
-		currentCamera.Projection = orbitCam->GetProj();
+		m_CurrentCamera.View = m_OrbitCamera->GetView();
+		m_CurrentCamera.Projection = m_OrbitCamera->GetProj();
 
-		staticCam->enabled = false;
-		orbitCam->enabled = true;
-		fpsCam->enabled = false;
+		m_StaticCam->enabled = false;
+		m_OrbitCamera->enabled = true;
+		m_FpsCam->enabled = false;
 	}
-	if (GetAsyncKeyState(0x33) || fpsCam->enabled)  // 3: FPS camera
+	if (GetAsyncKeyState(0x33) || m_FpsCam->enabled)  // 3: FPS camera
 	{
-		currentCamera.View = fpsCam->GetView();
-		currentCamera.Projection = fpsCam->GetProj();
+		m_CurrentCamera.View = m_FpsCam->GetView();
+		m_CurrentCamera.Projection = m_FpsCam->GetProj();
 
-		staticCam->enabled = false;
-		orbitCam->enabled = false;
-		fpsCam->enabled = true;
+		m_StaticCam->enabled = false;
+		m_OrbitCamera->enabled = false;
+		m_FpsCam->enabled = true;
 	}
 
 	#pragma region Timer
@@ -812,14 +823,16 @@ void Application::Update()
 	#pragma endregion
 
 
+	SceneManager::GetInstance()->UpdateScene();
+
 	// Update gameobject
-	herculesPlane->Update();
-	groundPlane->Update();
+	m_HerculesPlane->Update();
+	m_GroundPlane->Update();
 
 	// Update cameras
-	fpsCam->Update();
-	staticCam->Update();
-	orbitCam->Update();
+	m_FpsCam->Update();
+	m_StaticCam->Update();
+	m_OrbitCamera->Update();
 }
 
 void Application::Draw()
@@ -833,9 +846,9 @@ void Application::Draw()
 
 
 	// TODO: Change camera here
-	XMMATRIX view = XMLoadFloat4x4(&currentCamera.View);
+	XMMATRIX view = XMLoadFloat4x4(&SceneManager::GetInstance()->GetCamera().View);
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&currentCamera.Projection);
+	XMMATRIX projection = XMLoadFloat4x4(&SceneManager::GetInstance()->GetCamera().Projection);
 	XMFLOAT4X4 eye;
 	
 	XMStoreFloat4x4(&eye, view);
@@ -869,11 +882,11 @@ void Application::Draw()
 
 	
 #pragma region Draw GameObjects
-	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&herculesPlane->GetWorldMatrix()));
-	herculesPlane->Draw(&cb);
+	/*cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
+	m_HerculesPlane->Draw(&cb);
 
-	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&groundPlane->GetWorldMatrix()));
-	groundPlane->Draw(&cb);
+	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_GroundPlane->GetWorldMatrix()));
+	m_GroundPlane->Draw(&cb);*/
 #pragma endregion
 
 
@@ -882,7 +895,7 @@ void Application::Draw()
 
 
 
-
+	SceneManager::GetInstance()->RenderScene(&cb);
 
 
 

@@ -10,6 +10,8 @@
 #include "FirstPersonCamera.h"
 #include "OrbitCamera.h"
 #include "GameObject.h"
+#include "PlaneScene.h"
+#include "SceneManager.h"
 
 
 class Application
@@ -24,14 +26,17 @@ private:
 	IDXGISwapChain*           _pSwapChain;
 	ID3D11RenderTargetView*   _pRenderTargetView;
 	// Camera stuff
-	Camera* staticCam;
-	FirstPersonCamera* fpsCam;
-	OrbitCamera* orbitCam;
-	CameraMats currentCamera;
+	Camera*            m_StaticCam;
+	FirstPersonCamera* m_FpsCam;
+	OrbitCamera*       m_OrbitCamera;
+	CameraMats         m_CurrentCamera;
+
+	// Scene Stuff
+	PlaneScene* m_PlaneScene;
 
 	// Game objects
-	GameObject* herculesPlane;
-	GameObject* groundPlane;
+	GameObject* m_HerculesPlane;
+	GameObject* m_GroundPlane;
 
 
 	ID3D11VertexShader*       _pVertexShader;
@@ -45,7 +50,7 @@ private:
 
 	ID3D11RasterizerState*    _wireFrame;
 	ID3D11RasterizerState*    _solid;
-	ID3D11BlendState* _transparency;
+	ID3D11BlendState*		  _transparency;
 
 	ID3D11Texture2D*          _myTexture;
 	ID3D11ShaderResourceView* _pTextureRV = nullptr;
@@ -79,6 +84,8 @@ public:
 	HRESULT Initialise(HINSTANCE hInstance, int nCmdShow);
 
 	void InitCamera();
+	void InitScenes();
+
 
 	void Update();
 	void Draw();
