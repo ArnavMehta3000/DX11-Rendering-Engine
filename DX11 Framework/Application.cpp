@@ -861,8 +861,10 @@ void Application::Draw()
 
 	float blendfactor[] = { 0.75f, 0.75f, 0.75f, 1.0f };
 
-	// Default blend state (no blending for opaqque objects
-	_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
+	if (isTransparent)
+		_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
+	else
+		_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
 
 	
 #pragma region Draw GameObjects
@@ -875,7 +877,6 @@ void Application::Draw()
 
 
 	// Set mode to transparency
-	//_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
 
 
 
@@ -884,9 +885,12 @@ void Application::Draw()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	ImGui::Begin("Debug");
+
+	if (ImGui::Button("Toggle Transparency"))
+		isTransparent = !isTransparent;
 
 	// Create test window
-	ImGui::Begin("Debug");
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

@@ -71,7 +71,7 @@ private:
 	UINT _WindowWidth;
 
 	bool isWireFrame = false;
-
+	bool isTransparent = false;
 public:
 	Application();
 	~Application();
