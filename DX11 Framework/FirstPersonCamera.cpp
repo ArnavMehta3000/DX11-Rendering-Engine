@@ -6,7 +6,6 @@ FirstPersonCamera::FirstPersonCamera(CameraInitData cam, Vector3 lookDirection)
 	m_LookSens = 0.0005f;
 	m_MovementSens = 50.0f;
 	m_LookDirection = lookDirection;
-	m_MoveDirection = m_LookDirection;
 }
 
 FirstPersonCamera::~FirstPersonCamera() {}

@@ -15,6 +15,9 @@
     <Filter Include="Cameras">
       <UniqueIdentifier>{5c67eab8-68cf-4883-9ec9-789d98359ac0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{49ea3f12-0ede-4468-8ec5-6cd28a759072}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
