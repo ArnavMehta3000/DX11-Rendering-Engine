@@ -67,7 +67,6 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
-	InitScenes();
 	InitCamera();
 	InitModels();
 
@@ -102,19 +101,6 @@ void Application::InitCamera()
 	// Default camerais static camera
 	m_CurrentCamera.View = m_StaticCam->GetView();
 	m_CurrentCamera.Projection = m_StaticCam->GetProj();
-}
-
-void Application::InitScenes()
-{
-	SceneInitData sceneInitData = SceneInitData(_pd3dDevice, _pImmediateContext, _pSwapChain, _pConstantBuffer);
-	
-
-	m_PlaneScene = new PlaneScene("PlaneScene");
-	m_PlaneScene->Init(sceneInitData);
-
-	// Add scenes and set current scene
-	SceneManager::GetInstance()->AddScene(m_PlaneScene);
-	SceneManager::GetInstance()->SetScene("PlaneScene");
 }
 
 HRESULT Application::InitShadersAndInputLayout()
@@ -823,8 +809,6 @@ void Application::Update()
 	#pragma endregion
 
 
-	SceneManager::GetInstance()->UpdateScene();
-
 	// Update gameobject
 	m_HerculesPlane->Update();
 	m_GroundPlane->Update();
@@ -846,9 +830,9 @@ void Application::Draw()
 
 
 	// TODO: Change camera here
-	XMMATRIX view = XMLoadFloat4x4(&SceneManager::GetInstance()->GetCamera().View);
+	XMMATRIX view = XMLoadFloat4x4(&m_CurrentCamera.View);
 	XMMATRIX transposeView = XMMatrixTranspose(view);
-	XMMATRIX projection = XMLoadFloat4x4(&SceneManager::GetInstance()->GetCamera().Projection);
+	XMMATRIX projection = XMLoadFloat4x4(&m_CurrentCamera.Projection);
 	XMFLOAT4X4 eye;
 	
 	XMStoreFloat4x4(&eye, view);
@@ -882,21 +866,16 @@ void Application::Draw()
 
 	
 #pragma region Draw GameObjects
-	/*cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
+	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
 	m_HerculesPlane->Draw(&cb);
 
 	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_GroundPlane->GetWorldMatrix()));
-	m_GroundPlane->Draw(&cb);*/
+	m_GroundPlane->Draw(&cb);
 #pragma endregion
 
 
 	// Set mode to transparency
 	//_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
-
-
-
-	SceneManager::GetInstance()->RenderScene(&cb);
-
 
 
 

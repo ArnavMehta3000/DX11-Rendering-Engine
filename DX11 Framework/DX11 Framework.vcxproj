@@ -391,8 +391,6 @@
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="OrbitCamera.cpp" />
-    <ClCompile Include="PlaneScene.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -419,10 +417,7 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="OrbitCamera.h" />
-    <ClInclude Include="PlaneScene.h" />
     <CLInclude Include="resource.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Vector3.h" />
     <ResourceCompile Include="DX11 Framework.rc" />
   </ItemGroup>

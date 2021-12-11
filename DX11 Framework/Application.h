@@ -10,9 +10,6 @@
 #include "FirstPersonCamera.h"
 #include "OrbitCamera.h"
 #include "GameObject.h"
-#include "PlaneScene.h"
-#include "SceneManager.h"
-
 
 class Application
 {
@@ -30,9 +27,6 @@ private:
 	FirstPersonCamera* m_FpsCam;
 	OrbitCamera*       m_OrbitCamera;
 	CameraMats         m_CurrentCamera;
-
-	// Scene Stuff
-	PlaneScene* m_PlaneScene;
 
 	// Game objects
 	GameObject* m_HerculesPlane;
@@ -67,6 +61,7 @@ private:
 	HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut);
 	HRESULT InitShadersAndInputLayout();
 	void InitLights();
+	void InitCamera();
 	void InitTextures();
 	void InitModels();
 	HRESULT InitVertexBuffer();
@@ -82,10 +77,6 @@ public:
 	~Application();
 
 	HRESULT Initialise(HINSTANCE hInstance, int nCmdShow);
-
-	void InitCamera();
-	void InitScenes();
-
 
 	void Update();
 	void Draw();
