@@ -275,7 +275,7 @@
 ////  SAMPLE PROGRAMS
 ////
 //
-//  Incomplete text-in-3d-api example, which draws quads properly aligned to be lossless
+//  Incomplete text-in-3dD-api example, which draws quads properly aligned to be lossless
 //
 #if 0
 #define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
@@ -4389,7 +4389,7 @@ static int stbtt__solve_cubic(float a, float b, float c, float* r)
 		return 1;
 	} else {
 	   float u = (float) STBTT_sqrt(-p/3);
-	   float v = (float) STBTT_acos(-STBTT_sqrt(-27/p3) * q / 2) / 3; // p3 must be negative, since d is negative
+	   float v = (float) STBTT_acos(-STBTT_sqrt(-27/p3) * q / 2) / 3; // p3 must be negative, since dD is negative
 	   float m = (float) STBTT_cos(v);
       float n = (float) STBTT_cos(v-3.141592/2)*1.732050808f;
 	   r[0] = s + u * 2 * m;

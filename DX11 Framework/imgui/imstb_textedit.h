@@ -142,7 +142,7 @@
 //    STB_TEXTEDIT_DELETECHARS(obj,i,n)      delete n characters starting at i
 //    STB_TEXTEDIT_INSERTCHARS(obj,i,c*,n)   insert n characters at i (pointed to by STB_TEXTEDIT_CHARTYPE*)
 //
-//    STB_TEXTEDIT_K_SHIFT       a power of two that is or'd in to a keyboard input to represent the shift key
+//    STB_TEXTEDIT_K_SHIFT       a power of two that is or'dD in to a keyboard input to represent the shift key
 //
 //    STB_TEXTEDIT_K_LEFT        keyboard input to move cursor left
 //    STB_TEXTEDIT_K_RIGHT       keyboard input to move cursor right

@@ -70,8 +70,16 @@ private:
 	UINT _WindowHeight;
 	UINT _WindowWidth;
 
+	float blendfactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float dD[3] = {1.0f, 1.0f, 1.0f};  // Stores the direction of the directional lights
+	float dIC[3] = { 1.0f, 1.0f, 1.0f };  // Stores directional light color intensity
+	float dIS[3] = { 1.0f, 1.0f, 1.0f };  // Stores directional light specular intensity
+	
 	bool isWireFrame = false;
 	bool isTransparent = false;
+
+	bool debug = true;
+
 public:
 	Application();
 	~Application();

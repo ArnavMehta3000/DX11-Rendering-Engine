@@ -175,13 +175,13 @@ HRESULT Application::InitShadersAndInputLayout()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient           = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	directionalLight.Intensity.Ambient           = XMFLOAT4(dIC[0], dIC[1], dIC[2], 1.0f);
 	directionalLight.Intensity.Diffuse           = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Intensity.Specular          = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Material.ambient            = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Material.diffuse            = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.specular           = XMFLOAT4(0.2f, 0.2f, 1.0f, 1.0f);
-	directionalLight.Direction                   = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular           = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Direction                   = XMFLOAT3(dD[0], dD[1], dD[2]);
 	directionalLight.SpecularPower               = 0.8f;
 
 	// Directional Light colors
@@ -760,6 +760,8 @@ void Application::Update()
 		isWireFrame = !isWireFrame;
 	}
 
+	if (GetAsyncKeyState(VK_OEM_5) & KEYUP)
+		debug = !debug;
 
 	// Change current camera
 	if (GetAsyncKeyState(0x31) || m_StaticCam->enabled)  // 1: Static camera
@@ -859,10 +861,8 @@ void Application::Draw()
 	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 
 
-	float blendfactor[] = { 0.75f, 0.75f, 0.75f, 1.0f };
-
 	if (isTransparent)
-		_pImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
+		_pImmediateContext->OMSetBlendState(_transparency, blendfactor , 0xffffffff);
 	else
 		_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
 
@@ -876,24 +876,57 @@ void Application::Draw()
 #pragma endregion
 
 
-	// Set mode to transparency
-
 
 
 	#pragma region ImGui Stuff
 	// ImGui display
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui::Begin("Debug");
+	if (debug)
+	{
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		{
+			ImGui::Begin("Debug Menu");
 
-	if (ImGui::Button("Toggle Transparency"))
-		isTransparent = !isTransparent;
+			if (ImGui::CollapsingHeader("Transparency"))
+			{
+				ImGui::Checkbox("Is Transparent?", &isTransparent);
+				if (isTransparent)
+					ImGui::ColorEdit4("Transparency Color", blendfactor);
+			}
 
-	// Create test window
-	ImGui::End();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			if (ImGui::CollapsingHeader("Directional Light"))
+			{
+				ImGui::Text("Direction");
+				ImGui::SliderFloat3("##direction", dD, -1.0f, 1.0f);
+
+				ImGui::Text("Light I Color"); 
+				ImGui::ColorEdit3("##direc light inten color", dIC);
+
+				ImGui::Text("Light S Color"); 
+				ImGui::ColorEdit3("##direc light spec color", dIS);
+			}
+		}
+
+
+		// Update info
+		directionalLight.Direction.x = dD[0];
+		directionalLight.Direction.y = dD[1];
+		directionalLight.Direction.z = dD[2];
+
+		directionalLight.Intensity.Diffuse.x = dIC[0];
+		directionalLight.Intensity.Diffuse.y = dIC[1];
+		directionalLight.Intensity.Diffuse.z = dIC[2];
+
+		directionalLight.Intensity.Specular.x = dIS[0];
+		directionalLight.Intensity.Specular.y = dIS[1];
+		directionalLight.Intensity.Specular.z = dIS[2];
+
+		// Create test window
+		ImGui::End();
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
 	#pragma endregion
 
 
