@@ -41,6 +41,7 @@ public:
 
 	// Get/Set world camera position
 	inline Vector3  GetPosition() const { return m_Position; }
+	inline Vector3 GetLookAt() const { return m_At; }
 	void SetPosition(float x, float y, float z);
 	void SetPosition(const Vector3& pos);
 	void SetLookAt(float x, float y, float z);
@@ -59,10 +60,6 @@ public:
 	inline float GetFarZ()const { return m_FarZ; }
 	void SetNearZ(float nearZ);
 	void SetFarZ(float farZ);
-
-	// World mat
-	void SetPos(Vector3 pos);
-	void SetRot(Vector3 rot);
 
 
 	// Get View/Proj matrices.

@@ -74,6 +74,9 @@ void OrbitCamera::SetLens()
 
 void OrbitCamera::SetSpeed(float speed) { m_OrbitSpeed = speed; }
 
-void OrbitCamera::SetOrbitMode(OrbitMode mode) { m_OrbitMode = mode; }
+void OrbitCamera::SetRadius(float rad)
+{
+	m_Radius = rad;
+}
 
-void OrbitCamera::SetOrbitPoint(Vector3 point) { m_At = point; }
+void OrbitCamera::SetOrbitMode(OrbitMode mode) { m_OrbitMode = mode; }

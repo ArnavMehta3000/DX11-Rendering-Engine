@@ -21,9 +21,11 @@ public:
 	void SetLens() override;
 
 	void SetSpeed(float speed);
+	void SetRadius(float rad);
 	void SetOrbitMode(OrbitMode mode);
 
-	void SetOrbitPoint(Vector3 point);
+	inline float GetSpeed() { return m_OrbitSpeed; }
+	inline float GetRadius() { return m_Radius; }
 
 private:
 	OrbitMode m_OrbitMode;

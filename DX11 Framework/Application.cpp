@@ -96,7 +96,7 @@ void Application::InitCamera()
 
 	m_StaticCam = new Camera(cameraInitData);
 	m_FpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
-	m_OrbitCamera = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
+	m_OrbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 
 	// Default camerais static camera
 	m_CurrentCamera.View = m_StaticCam->GetView();
@@ -757,33 +757,36 @@ void Application::Update()
 	if (GetAsyncKeyState(VK_OEM_5) & KEYUP)
 		debug = !debug;
 
-	// Change current camera
-	if (GetAsyncKeyState(0x31) || m_StaticCam->enabled)  // 1: Static camera
+	// Change current camera if not in debug state
+	if (!debug)
 	{
-		m_CurrentCamera.View = m_StaticCam->GetView();
-		m_CurrentCamera.Projection = m_StaticCam->GetProj();
+		if (GetAsyncKeyState(0x31) || m_StaticCam->enabled)  // 1: Static camera
+		{
+			m_CurrentCamera.View = m_StaticCam->GetView();
+			m_CurrentCamera.Projection = m_StaticCam->GetProj();
 
-		m_StaticCam->enabled = true;
-		m_OrbitCamera->enabled = false;
-		m_FpsCam->enabled = false;
-	}
-	if (GetAsyncKeyState(0x32) || m_OrbitCamera->enabled)  // 2: Orbit camera
-	{
-		m_CurrentCamera.View = m_OrbitCamera->GetView();
-		m_CurrentCamera.Projection = m_OrbitCamera->GetProj();
+			m_StaticCam->enabled = true;
+			m_OrbitCam->enabled = false;
+			m_FpsCam->enabled = false;
+		}
+		if (GetAsyncKeyState(0x32) || m_OrbitCam->enabled)  // 2: Orbit camera
+		{
+			m_CurrentCamera.View = m_OrbitCam->GetView();
+			m_CurrentCamera.Projection = m_OrbitCam->GetProj();
 
-		m_StaticCam->enabled = false;
-		m_OrbitCamera->enabled = true;
-		m_FpsCam->enabled = false;
-	}
-	if (GetAsyncKeyState(0x33) || m_FpsCam->enabled)  // 3: FPS camera
-	{
-		m_CurrentCamera.View = m_FpsCam->GetView();
-		m_CurrentCamera.Projection = m_FpsCam->GetProj();
+			m_StaticCam->enabled = false;
+			m_OrbitCam->enabled = true;
+			m_FpsCam->enabled = false;
+		}
+		if (GetAsyncKeyState(0x33) || m_FpsCam->enabled)  // 3: FPS camera
+		{
+			m_CurrentCamera.View = m_FpsCam->GetView();
+			m_CurrentCamera.Projection = m_FpsCam->GetProj();
 
-		m_StaticCam->enabled = false;
-		m_OrbitCamera->enabled = false;
-		m_FpsCam->enabled = true;
+			m_StaticCam->enabled = false;
+			m_OrbitCam->enabled = false;
+			m_FpsCam->enabled = true;
+		}
 	}
 
 	#pragma region Timer
@@ -812,7 +815,7 @@ void Application::Update()
 	// Update cameras
 	m_FpsCam->Update();
 	m_StaticCam->Update();
-	m_OrbitCamera->Update();
+	m_OrbitCam->Update();
 }
 
 void Application::Draw()
@@ -889,7 +892,7 @@ void Application::Draw()
 				
 				NewLine();
 
-				if (CollapsingHeader("Transparency"))
+				if (CollapsingHeader("Transparency", ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					Checkbox("Is Transparent?", &isTransparent);
 					if (isTransparent)
@@ -933,6 +936,86 @@ void Application::Draw()
 
 					TreePop();
 				}
+				EndTabItem();
+			}
+
+			if (BeginTabItem("Cameras"))
+			{
+				Text("Set Camera");
+
+				if (Button("Static Camera") || m_StaticCam->enabled)
+				{
+					SameLine();
+					Checkbox("Show Options##Static", &staticCamOpt);
+					if (staticCamOpt)
+					{
+						Vector3 pos = m_StaticCam->GetPosition();
+						Vector3 look = m_StaticCam->GetLookAt();
+						
+						DragFloat3("Position##Static", &pos.x); SameLine();
+						if (Button("Reset##SPos"))
+							m_StaticCam->SetPosition(Vector3(0.0f, 5.0f, -5.0f));
+						else
+							m_StaticCam->SetPosition(pos);
+
+
+						DragFloat3("Look At##Static", &look.x); SameLine();
+						if (Button("Reset##SLook"))
+							m_StaticCam->SetLookAt(Vector3::Zero());
+						else
+							m_StaticCam->SetLookAt(look);
+					}
+
+					m_CurrentCamera.View = m_StaticCam->GetView();
+					m_CurrentCamera.Projection = m_StaticCam->GetProj();
+
+					m_StaticCam->enabled = true;
+					m_OrbitCam->enabled = false;
+					m_FpsCam->enabled = false;
+				}
+				
+				if (Button("Orbit Camera") || m_OrbitCam->enabled)
+				{
+					SameLine();
+					Checkbox("Show Options##Orbit", &orbitCamOpt);
+					if (orbitCamOpt)
+					{
+						float radius = m_OrbitCam->GetRadius();
+						float speed = m_OrbitCam->GetSpeed();
+
+						DragFloat("Radius##Orbit", &radius, 0.5f, 1.0f, 100.0f);
+						SliderFloat("Speed##Orbit", &speed, -0.1f, 0.1f);
+						
+						m_OrbitCam->SetRadius(radius);
+						m_OrbitCam->SetSpeed(speed);
+					}
+
+					m_CurrentCamera.View = m_OrbitCam->GetView();
+					m_CurrentCamera.Projection = m_OrbitCam->GetProj();
+
+					m_StaticCam->enabled = false;
+					m_OrbitCam->enabled = true;
+					m_FpsCam->enabled = false;
+				}
+				
+				if (Button("FPS Camera") || m_FpsCam->enabled)
+				{
+
+					SameLine();
+					Checkbox("Show Options##FPS", &fpsCamOpt);
+					if (fpsCamOpt)
+					{
+						Text("WS to move\nArrow keys to rotate");
+
+					}
+					m_CurrentCamera.View = m_FpsCam->GetView();
+					m_CurrentCamera.Projection = m_FpsCam->GetProj();
+
+					m_StaticCam->enabled = false;
+					m_OrbitCam->enabled = false;
+					m_FpsCam->enabled = true;
+				}
+
 				EndTabItem();
 			}
 

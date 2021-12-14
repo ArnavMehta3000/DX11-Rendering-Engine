@@ -25,7 +25,7 @@ private:
 	// Camera stuff
 	Camera*            m_StaticCam;
 	FirstPersonCamera* m_FpsCam;
-	OrbitCamera*       m_OrbitCamera;
+	OrbitCamera*       m_OrbitCam;
 	CameraMats         m_CurrentCamera;
 
 	// Game objects
@@ -77,6 +77,7 @@ private:
 	bool isTransparent = false;
 
 	bool debug = true;
+	bool staticCamOpt = false, orbitCamOpt = false, fpsCamOpt = false;
 
 public:
 	Application();
