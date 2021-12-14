@@ -882,22 +882,25 @@ void Application::Draw()
 		{
 			Begin("Debug Menu");
 
-
-			if (CollapsingHeader("World"))
+			BeginTabBar("Settings");
+			if (BeginTabItem("World"))
 			{
 				ColorEdit3("Background Color", ClearColor);
+				
+				NewLine();
+
+				if (CollapsingHeader("Transparency"))
+				{
+					Checkbox("Is Transparent?", &isTransparent);
+					if (isTransparent)
+						ColorEdit4("Transparency Color", blendfactor);
+				}
+
+
+				EndTabItem();
 			}
 
-
-			if (CollapsingHeader("Transparency"))
-			{
-				Checkbox("Is Transparent?", &isTransparent);
-				if (isTransparent)
-					ColorEdit4("Transparency Color", blendfactor);
-			}
-
-
-			if (CollapsingHeader("Lights"))
+			if (BeginTabItem("Lights"))
 			{
 				if (TreeNode("Directional Light"))
 				{
@@ -915,6 +918,8 @@ void Application::Draw()
 						TreePop();
 					}
 
+					NewLine();
+
 					if (TreeNode("Material"))
 					{
 						ColorEdit3("Ambient##M", &directionalLight.Material.ambient.x);
@@ -928,7 +933,10 @@ void Application::Draw()
 
 					TreePop();
 				}
+				EndTabItem();
 			}
+
+			EndTabBar();
 		}
 
 
