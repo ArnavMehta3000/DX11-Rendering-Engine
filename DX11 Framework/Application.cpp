@@ -175,20 +175,14 @@ HRESULT Application::InitShadersAndInputLayout()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient           = XMFLOAT4(dIC[0], dIC[1], dIC[2], 1.0f);
-	directionalLight.Intensity.Diffuse           = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Specular          = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.ambient            = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.diffuse            = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.specular           = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Direction                   = XMFLOAT3(dD[0], dD[1], dD[2]);
-	directionalLight.SpecularPower               = 0.8f;
-
-	// Directional Light colors
-	// Ambient: White
-	// Specular: Green
-	// Diffuse: Blue
-
+	directionalLight.Intensity.Ambient  = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	directionalLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Material.ambient   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Material.diffuse   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Material.specular  = XMFLOAT4(0.2f, 0.2f, 1.0f, 1.0f);
+	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight.SpecularPower      = 0.8f;
 
 	//Point lights (WIP)
 	pointLight.Intensity.Ambient  = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -824,7 +818,6 @@ void Application::Update()
 void Application::Draw()
 {
 	// Clear the back buffer
-	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red,green,blue,alpha
 	_pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
 	// Clear depth stencil 
@@ -882,50 +875,67 @@ void Application::Draw()
 	// ImGui display
 	if (debug)
 	{
+		using namespace ImGui;
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+		NewFrame();
 		{
-			ImGui::Begin("Debug Menu");
+			Begin("Debug Menu");
 
-			if (ImGui::CollapsingHeader("Transparency"))
+
+			if (CollapsingHeader("World"))
 			{
-				ImGui::Checkbox("Is Transparent?", &isTransparent);
-				if (isTransparent)
-					ImGui::ColorEdit4("Transparency Color", blendfactor);
+				ColorEdit3("Background Color", ClearColor);
 			}
 
-			if (ImGui::CollapsingHeader("Directional Light"))
+
+			if (CollapsingHeader("Transparency"))
 			{
-				ImGui::Text("Direction");
-				ImGui::SliderFloat3("##direction", dD, -1.0f, 1.0f);
+				Checkbox("Is Transparent?", &isTransparent);
+				if (isTransparent)
+					ColorEdit4("Transparency Color", blendfactor);
+			}
 
-				ImGui::Text("Light I Color"); 
-				ImGui::ColorEdit3("##direc light inten color", dIC);
 
-				ImGui::Text("Light S Color"); 
-				ImGui::ColorEdit3("##direc light spec color", dIS);
+			if (CollapsingHeader("Lights"))
+			{
+				if (TreeNode("Directional Light"))
+				{
+					Text("Direction");
+					SliderFloat3("##direction", &directionalLight.Direction.x, -1.0f, 1.0f);
+
+					NewLine();
+
+					if (TreeNode("Intensity"))
+					{
+						ColorEdit3("Ambient##I", &directionalLight.Intensity.Ambient.x);
+						ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
+						ColorEdit3("Specular##I", &directionalLight.Intensity.Specular.x);
+
+						TreePop();
+					}
+
+					if (TreeNode("Material"))
+					{
+						ColorEdit3("Ambient##M", &directionalLight.Material.ambient.x);
+						ColorEdit3("Diffuse##M", &directionalLight.Material.diffuse.x);
+						ColorEdit3("Specular##M", &directionalLight.Material.specular.x);
+
+						TreePop();
+					}
+
+					SliderFloat("Specular Power", &directionalLight.SpecularPower, 0.001f, 2.0f);
+
+					TreePop();
+				}
 			}
 		}
 
 
-		// Update info
-		directionalLight.Direction.x = dD[0];
-		directionalLight.Direction.y = dD[1];
-		directionalLight.Direction.z = dD[2];
-
-		directionalLight.Intensity.Diffuse.x = dIC[0];
-		directionalLight.Intensity.Diffuse.y = dIC[1];
-		directionalLight.Intensity.Diffuse.z = dIC[2];
-
-		directionalLight.Intensity.Specular.x = dIS[0];
-		directionalLight.Intensity.Specular.y = dIS[1];
-		directionalLight.Intensity.Specular.z = dIS[2];
-
 		// Create test window
-		ImGui::End();
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		End();
+		Render();
+		ImGui_ImplDX11_RenderDrawData(GetDrawData());
 	}
 	#pragma endregion
 
