@@ -70,6 +70,9 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	InitCamera();
 	InitModels();
 
+	XMStoreFloat4x4(&_cubeWorld, XMMatrixIdentity());
+	XMStoreFloat4x4(&_pyramidWorld, XMMatrixIdentity());
+
 	// Setup ImGui
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -227,16 +230,6 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
-	GOInitData plane;
-	plane.constantBuffer = _pConstantBuffer;
-	plane.deviceContext = _pImmediateContext;
-	plane.position = Vector3(5.0f, 0.0f, 0.0f);
-	plane.rotation = Vector3();
-	plane.scale = Vector3::One();
-
-	m_GroundPlane = new GameObject(plane);
-	m_GroundPlane->SetMesh("Assets/Models/Blender/Plane.obj", _pd3dDevice, false);
-
 	GOInitData hercules;
 	hercules.constantBuffer = _pConstantBuffer;
 	hercules.deviceContext = _pImmediateContext;
@@ -250,231 +243,231 @@ void Application::InitModels()
 
 HRESULT Application::InitVertexBuffer()
 {
-	//HRESULT hr;
-//
-//#pragma region Cube
-//	{
-//		SimpleVertex cubeVertices[] =
-//		{
-//			{ XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f),   XMFLOAT2(1.0f, 0.0f) } ,
-//			{ XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f)  },
-//			{ XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f),  XMFLOAT2(1.0f, 1.0f)  },
-//			{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f) },
-//			{ XMFLOAT3(1.0f,-1.0f,-1.0f),  XMFLOAT3(0.5773f, -0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f) },
-//			{ XMFLOAT3(1.0f,-1.0f, 1.0f),  XMFLOAT3(0.5773f, 0.5773f, 0.5773f),    XMFLOAT2(1.0f, 0.0f) },
-//			{ XMFLOAT3(1.0f, 1.0f,-1.0f),  XMFLOAT3(0.5773f, 0.5773f, -0.5773f),   XMFLOAT2(0.0f, 1.0f) },
-//			{ XMFLOAT3(1.0f, 1.0f, 1.0f),  XMFLOAT3(0.5773f, -0.5773f, 0.5773f),   XMFLOAT2(1.0f, 1.0f) }
-//		};
-//
-//		D3D11_BUFFER_DESC cubeBd;
-//		ZeroMemory(&cubeBd, sizeof(cubeBd));
-//		cubeBd.Usage = D3D11_USAGE_DEFAULT;
-//		cubeBd.ByteWidth = sizeof(SimpleVertex) * 8;
-//		cubeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-//		cubeBd.CPUAccessFlags = 0;
-//
-//		D3D11_SUBRESOURCE_DATA CubeInitData;
-//		ZeroMemory(&CubeInitData, sizeof(CubeInitData));
-//		CubeInitData.pSysMem = cubeVertices;
-//
-//		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeVertexBuffer);
-//	}
-//#pragma endregion
-//
-//#pragma region Pyramid
-//	{
-//		SimpleVertex pyramidVertices[] =
-//		{
-//			// Base
-//			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(-0.6626f * -1, -0.3490f * -1, -0.6626f * -1) },
-//			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(0.6626f * -1, -0.3490f * -1, 0.6626f * -1) },
-//			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.6626f * -1, -0.3490f * -1, 0.6626f * -1) },
-//			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.6626f * -1, -0.3490f * -1, -0.6626f * -1) },
-//			// Tip
-//			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
-//		};
-//
-//		D3D11_BUFFER_DESC pyramidBd;
-//		ZeroMemory(&pyramidBd, sizeof(pyramidBd));
-//		pyramidBd.Usage = D3D11_USAGE_DEFAULT;
-//		pyramidBd.ByteWidth = sizeof(SimpleVertex) * 5;
-//		pyramidBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-//		pyramidBd.CPUAccessFlags = 0;
-//
-//		D3D11_SUBRESOURCE_DATA PyramidInitData;
-//		ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
-//		PyramidInitData.pSysMem = pyramidVertices;
-//
-//		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
-//	}
-//#pragma endregion
-//
-//#pragma region Plane
-//	{
-//		// Define plane size
-//		int offset = 5;
-//		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the index buffer
-//		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
-//
-//		// Populate the plane vertex buffer
-//		for (int i = 0, z = 0; z <= zSize; z++)
-//		{
-//			for (int x = 0; x <= xSize; x++)
-//			{
-//				planeVertices[i] = { XMFLOAT3(x - offset, 0.0f, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f) };
-//				i++;
-//			}
-//		}
-//
-//		// Set buffer description
-//		D3D11_BUFFER_DESC planeBd;
-//		ZeroMemory(&planeBd, sizeof(planeBd));
-//		planeBd.Usage = D3D11_USAGE_DEFAULT;
-//		planeBd.ByteWidth = sizeof(SimpleVertex) * (xSize + 1) * (zSize + 1);
-//		planeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-//		planeBd.CPUAccessFlags = 0;
-//
-//		D3D11_SUBRESOURCE_DATA PlaneInitData;
-//		ZeroMemory(&PlaneInitData, sizeof(PlaneInitData));
-//		PlaneInitData.pSysMem = planeVertices;
-//
-//		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
-//	}
-//#pragma endregion
-//
-//
-//
-//
-//
-//
-//
-//	if (FAILED(hr))
-//		return hr;
+	HRESULT hr;
+
+#pragma region Cube
+	{
+		SimpleVertex cubeVertices[] =
+		{
+			{ XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f),   XMFLOAT2(1.0f, 0.0f) } ,
+			{ XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f)  },
+			{ XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f),  XMFLOAT2(1.0f, 1.0f)  },
+			{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f) },
+			{ XMFLOAT3(1.0f,-1.0f,-1.0f),  XMFLOAT3(0.5773f, -0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f) },
+			{ XMFLOAT3(1.0f,-1.0f, 1.0f),  XMFLOAT3(0.5773f, 0.5773f, 0.5773f),    XMFLOAT2(1.0f, 0.0f) },
+			{ XMFLOAT3(1.0f, 1.0f,-1.0f),  XMFLOAT3(0.5773f, 0.5773f, -0.5773f),   XMFLOAT2(0.0f, 1.0f) },
+			{ XMFLOAT3(1.0f, 1.0f, 1.0f),  XMFLOAT3(0.5773f, -0.5773f, 0.5773f),   XMFLOAT2(1.0f, 1.0f) }
+		};
+
+		D3D11_BUFFER_DESC cubeBd;
+		ZeroMemory(&cubeBd, sizeof(cubeBd));
+		cubeBd.Usage = D3D11_USAGE_DEFAULT;
+		cubeBd.ByteWidth = sizeof(SimpleVertex) * 8;
+		cubeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		cubeBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA CubeInitData;
+		ZeroMemory(&CubeInitData, sizeof(CubeInitData));
+		CubeInitData.pSysMem = cubeVertices;
+
+		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeVertexBuffer);
+	}
+#pragma endregion
+
+#pragma region Pyramid
+	{
+		SimpleVertex pyramidVertices[] =
+		{
+			// Base
+			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(-0.6626f * -1, -0.3490f * -1, -0.6626f * -1) },
+			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(0.6626f * -1, -0.3490f * -1, 0.6626f * -1) },
+			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.6626f * -1, -0.3490f * -1, 0.6626f * -1) },
+			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.6626f * -1, -0.3490f * -1, -0.6626f * -1) },
+			// Tip
+			{ XMFLOAT3(0.0f,  1.0f,  0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
+		};
+
+		D3D11_BUFFER_DESC pyramidBd;
+		ZeroMemory(&pyramidBd, sizeof(pyramidBd));
+		pyramidBd.Usage = D3D11_USAGE_DEFAULT;
+		pyramidBd.ByteWidth = sizeof(SimpleVertex) * 5;
+		pyramidBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		pyramidBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA PyramidInitData;
+		ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
+		PyramidInitData.pSysMem = pyramidVertices;
+
+		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
+	}
+#pragma endregion
+
+#pragma region Plane
+	{
+		// Define plane size
+		int offset = 5;
+		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the index buffer
+		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
+
+		// Populate the plane vertex buffer
+		for (int i = 0, z = 0; z <= zSize; z++)
+		{
+			for (int x = 0; x <= xSize; x++)
+			{
+				planeVertices[i] = { XMFLOAT3(x - offset, 0.0f, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f) };
+				i++;
+			}
+		}
+
+		// Set buffer description
+		D3D11_BUFFER_DESC planeBd;
+		ZeroMemory(&planeBd, sizeof(planeBd));
+		planeBd.Usage = D3D11_USAGE_DEFAULT;
+		planeBd.ByteWidth = sizeof(SimpleVertex) * (xSize + 1) * (zSize + 1);
+		planeBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		planeBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA PlaneInitData;
+		ZeroMemory(&PlaneInitData, sizeof(PlaneInitData));
+		PlaneInitData.pSysMem = planeVertices;
+
+		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
+	}
+#pragma endregion
+
+
+
+
+
+
+
+	if (FAILED(hr))
+		return hr;
 
 	return S_OK;
 }
 
 HRESULT Application::InitIndexBuffer()
 {
-	//HRESULT hr;
+	HRESULT hr;
 
-//#pragma region Cube
-//	{
-//		 Index buffer for cube
-//		WORD cubeIndices[] =
-//		{
-//			 Face 1
-//			0,1,2, // -x
-//			1,3,2,
-//
-//			 Face 2
-//			4,6,5, // +x
-//			5,6,7,
-//
-//			 Face 3
-//			0,5,1, // -y
-//			0,4,5,
-//
-//			 Face 4
-//			2,7,6, // +y
-//			2,3,7,
-//
-//			 Face 5
-//			0,6,4, // -z
-//			0,2,6,
-//
-//			 Face 6
-//			1,7,3, // +z
-//			1,5,7,
-//		};
-//
-//		 Buffer description for cube
-//		D3D11_BUFFER_DESC cubeBd;
-//		ZeroMemory(&cubeBd, sizeof(cubeBd));
-//
-//		cubeBd.Usage = D3D11_USAGE_DEFAULT;
-//		cubeBd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
-//		cubeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-//		cubeBd.CPUAccessFlags = 0;
-//
-//		D3D11_SUBRESOURCE_DATA CubeInitData;
-//		ZeroMemory(&CubeInitData, sizeof(CubeInitData));
-//		CubeInitData.pSysMem = cubeIndices;
-//		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeIndexBuffer);
-//	}
-//#pragma endregion
-//
-//
-//#pragma region Pyramid
-//	{
-//		WORD pyramidIndices[] =
-//		{
-//			0, 2, 1,
-//			1, 2, 3,
-//			0, 1, 4,
-//			1, 3, 4,
-//			3, 2, 4,
-//			2, 0, 4
-//		};
-//
-//		D3D11_BUFFER_DESC pyramidBd;
-//		ZeroMemory(&pyramidBd, sizeof(pyramidBd));
-//
-//		pyramidBd.Usage = D3D11_USAGE_DEFAULT;
-//		pyramidBd.ByteWidth = sizeof(WORD) * 3 * 6;
-//		pyramidBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-//		pyramidBd.CPUAccessFlags = 0;
-//
-//		D3D11_SUBRESOURCE_DATA PyramidInitData;
-//		ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
-//		PyramidInitData.pSysMem = pyramidIndices;
-//		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
-//	}
-//#pragma endregion
-//
-//#pragma region Plane
-//	{
-//		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the vertex buffer
-//		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
-//
-//		int vert = 0, tris = 0;
-//		for (int z = 0; z < zSize; z++)
-//		{
-//			for (int x = 0; x < xSize; x++)
-//			{
-//				planeIndices[tris + 0] = vert + 0;
-//				planeIndices[tris + 1] = vert + xSize + 1;
-//				planeIndices[tris + 2] = vert + 1;
-//				planeIndices[tris + 3] = vert + 1;
-//				planeIndices[tris + 4] = vert + xSize + 1;
-//				planeIndices[tris + 5] = vert + xSize + 2;
-//
-//				vert++;
-//				tris += 6;
-//			}
-//			vert++;
-//		}
-//
-//		  Create buffer description
-//		D3D11_BUFFER_DESC planeBd;
-//		ZeroMemory(&planeBd, sizeof(planeBd));
-//
-//		planeBd.Usage = D3D11_USAGE_DEFAULT;
-//		planeBd.ByteWidth = sizeof(WORD) * xSize * zSize * 6;
-//		planeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-//		planeBd.CPUAccessFlags = 0;
-//
-//		D3D11_SUBRESOURCE_DATA PlaneInitData;
-//		ZeroMemory(&PlaneInitData, sizeof(PlaneInitData));
-//		PlaneInitData.pSysMem = planeIndices;
-//		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneIndexBuffer);
-//	}
-//#pragma endregion
-//
-//
-//
-//	if (FAILED(hr))
-//		return hr;
+#pragma region Cube
+	{
+		// Index buffer for cube
+		WORD cubeIndices[] =
+		{
+			// Face 1
+			0,1,2, // -x
+			1,3,2,
+
+			// Face 2
+			4,6,5, // +x
+			5,6,7,
+
+			// Face 3
+			0,5,1, // -y
+			0,4,5,
+
+			// Face 4
+			2,7,6, // +y
+			2,3,7,
+
+			// Face 5
+			0,6,4, // -z
+			0,2,6,
+
+			// Face 6
+			1,7,3, // +z
+			1,5,7,
+		};
+
+		// Buffer description for cube
+		D3D11_BUFFER_DESC cubeBd;
+		ZeroMemory(&cubeBd, sizeof(cubeBd));
+
+		cubeBd.Usage = D3D11_USAGE_DEFAULT;
+		cubeBd.ByteWidth = sizeof(WORD) * 3 * 2 * 6;  // 3 verts per triangle | 2 triangles per face | 6 faces
+		cubeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		cubeBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA CubeInitData;
+		ZeroMemory(&CubeInitData, sizeof(CubeInitData));
+		CubeInitData.pSysMem = cubeIndices;
+		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeIndexBuffer);
+	}
+#pragma endregion
+
+
+#pragma region Pyramid
+	{
+		WORD pyramidIndices[] =
+		{
+			0, 2, 1,
+			1, 2, 3,
+			0, 1, 4,
+			1, 3, 4,
+			3, 2, 4,
+			2, 0, 4
+		};
+
+		D3D11_BUFFER_DESC pyramidBd;
+		ZeroMemory(&pyramidBd, sizeof(pyramidBd));
+
+		pyramidBd.Usage = D3D11_USAGE_DEFAULT;
+		pyramidBd.ByteWidth = sizeof(WORD) * 3 * 6;
+		pyramidBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		pyramidBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA PyramidInitData;
+		ZeroMemory(&PyramidInitData, sizeof(PyramidInitData));
+		PyramidInitData.pSysMem = pyramidIndices;
+		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
+	}
+#pragma endregion
+
+#pragma region Plane
+	{
+		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the vertex buffer
+		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
+
+		int vert = 0, tris = 0;
+		for (int z = 0; z < zSize; z++)
+		{
+			for (int x = 0; x < xSize; x++)
+			{
+				planeIndices[tris + 0] = vert + 0;
+				planeIndices[tris + 1] = vert + xSize + 1;
+				planeIndices[tris + 2] = vert + 1;
+				planeIndices[tris + 3] = vert + 1;
+				planeIndices[tris + 4] = vert + xSize + 1;
+				planeIndices[tris + 5] = vert + xSize + 2;
+
+				vert++;
+				tris += 6;
+			}
+			vert++;
+		}
+
+		//  Create buffer description
+		D3D11_BUFFER_DESC planeBd;
+		ZeroMemory(&planeBd, sizeof(planeBd));
+
+		planeBd.Usage = D3D11_USAGE_DEFAULT;
+		planeBd.ByteWidth = sizeof(WORD) * xSize * zSize * 6;
+		planeBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		planeBd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA PlaneInitData;
+		ZeroMemory(&PlaneInitData, sizeof(PlaneInitData));
+		PlaneInitData.pSysMem = planeIndices;
+		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneIndexBuffer);
+	}
+#pragma endregion
+
+
+
+	if (FAILED(hr))
+		return hr;
 
 	return S_OK;
 }
@@ -502,7 +495,7 @@ HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 
 	// Create window
 	_hInst = hInstance;
-	RECT rc = { 0, 0, 640, 480 };
+	RECT rc = { 0, 0, 1280, 960 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	_hWnd = CreateWindow(L"TutorialWindowClass", L"DX11 Framework", WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
@@ -810,7 +803,14 @@ void Application::Update()
 
 	// Update gameobject
 	m_HerculesPlane->Update();
-	m_GroundPlane->Update();
+
+	
+	if (showScene2)
+	{
+		XMStoreFloat4x4(&_cubeWorld, XMMatrixTranslation(sin(t * 2) * 6, 0.0f, 0.0f));
+		XMStoreFloat4x4(&_pyramidWorld, XMMatrixTranslation(0.0f, 0.0f, cos(t * 2) * 6));
+	}
+
 
 	// Update cameras
 	m_FpsCam->Update();
@@ -832,6 +832,8 @@ void Application::Draw()
 	XMMATRIX transposeView = XMMatrixTranspose(view);
 	XMMATRIX projection = XMLoadFloat4x4(&m_CurrentCamera.Projection);
 	XMFLOAT4X4 eye;
+
+	XMMATRIX meshWorld;
 	
 	XMStoreFloat4x4(&eye, view);
 
@@ -862,14 +864,40 @@ void Application::Draw()
 	else
 		_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
 
-	
-#pragma region Draw GameObjects
-	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
-	m_HerculesPlane->Draw(&cb);
+	UINT stride = sizeof(SimpleVertex);
+	UINT offset = 0;
 
-	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_GroundPlane->GetWorldMatrix()));
-	m_GroundPlane->Draw(&cb);
-#pragma endregion
+	#pragma region Draw GameObjects
+		if (showScene1)  // Plane scene
+		{
+			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
+			m_HerculesPlane->Draw(&cb);
+		}
+
+		if (showScene2)  // Hard coded meshes scene
+		{
+			// Pyramid
+			_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
+			_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+			meshWorld = XMLoadFloat4x4(&_pyramidWorld);
+			cb.mWorld = XMMatrixTranspose(meshWorld);
+			_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+			_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
+
+			// Cube
+			_pImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
+			_pImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+			meshWorld = XMLoadFloat4x4(&_cubeWorld);
+			cb.mWorld = XMMatrixTranspose(meshWorld);
+			_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+			_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+		}
+
+		if (showScene3)  // Terrain scene
+		{
+
+		}
+	#pragma endregion
 
 
 
@@ -883,7 +911,7 @@ void Application::Draw()
 		ImGui_ImplWin32_NewFrame();
 		NewFrame();
 		{
-			Begin("Debug Menu");
+			Begin("Debug Menu", 0, ImGuiWindowFlags_AlwaysAutoResize);
 
 			BeginTabBar("Settings");
 			if (BeginTabItem("World"))
@@ -910,8 +938,6 @@ void Application::Draw()
 					Text("Direction");
 					SliderFloat3("##direction", &directionalLight.Direction.x, -1.0f, 1.0f);
 
-					NewLine();
-
 					if (TreeNode("Intensity"))
 					{
 						ColorEdit3("Ambient##I", &directionalLight.Intensity.Ambient.x);
@@ -921,7 +947,6 @@ void Application::Draw()
 						TreePop();
 					}
 
-					NewLine();
 
 					if (TreeNode("Material"))
 					{
@@ -931,6 +956,8 @@ void Application::Draw()
 
 						TreePop();
 					}
+
+					NewLine();
 
 					SliderFloat("Specular Power", &directionalLight.SpecularPower, 0.001f, 2.0f);
 
@@ -945,8 +972,12 @@ void Application::Draw()
 
 				if (Button("Static Camera") || m_StaticCam->enabled)
 				{
-					SameLine();
-					Checkbox("Show Options##Static", &staticCamOpt);
+					m_StaticCam->enabled = true;
+					m_OrbitCam->enabled = false;
+					m_FpsCam->enabled = false;
+
+					
+					SameLine(); Checkbox("Show Options##Static", &staticCamOpt);
 					if (staticCamOpt)
 					{
 						Vector3 pos = m_StaticCam->GetPosition();
@@ -968,18 +999,19 @@ void Application::Draw()
 
 					m_CurrentCamera.View = m_StaticCam->GetView();
 					m_CurrentCamera.Projection = m_StaticCam->GetProj();
-
-					m_StaticCam->enabled = true;
-					m_OrbitCam->enabled = false;
-					m_FpsCam->enabled = false;
 				}
 				
 				if (Button("Orbit Camera") || m_OrbitCam->enabled)
 				{
-					SameLine();
-					Checkbox("Show Options##Orbit", &orbitCamOpt);
+					m_StaticCam->enabled = false;
+					m_OrbitCam->enabled = true;
+					m_FpsCam->enabled = false;
+					
+					SameLine(); Checkbox("Show Options##Orbit", &orbitCamOpt);
 					if (orbitCamOpt)
 					{
+						Text("Q/E to chnage camera height");
+
 						float radius = m_OrbitCam->GetRadius();
 						float speed = m_OrbitCam->GetSpeed();
 
@@ -992,28 +1024,41 @@ void Application::Draw()
 
 					m_CurrentCamera.View = m_OrbitCam->GetView();
 					m_CurrentCamera.Projection = m_OrbitCam->GetProj();
-
-					m_StaticCam->enabled = false;
-					m_OrbitCam->enabled = true;
-					m_FpsCam->enabled = false;
 				}
 				
 				if (Button("FPS Camera") || m_FpsCam->enabled)
 				{
+					m_StaticCam->enabled = false;
+					m_OrbitCam->enabled = false;
+					m_FpsCam->enabled = true;
 
 					SameLine();
 					Checkbox("Show Options##FPS", &fpsCamOpt);
 					if (fpsCamOpt)
 					{
-						Text("WS to move\nArrow keys to rotate");
+						Text("W/S to move\nArrow keys to rotate");
 
 					}
+
 					m_CurrentCamera.View = m_FpsCam->GetView();
 					m_CurrentCamera.Projection = m_FpsCam->GetProj();
+				}
 
-					m_StaticCam->enabled = false;
-					m_OrbitCam->enabled = false;
-					m_FpsCam->enabled = true;
+				EndTabItem();
+			}
+
+			if (BeginTabItem("Scenes"))
+			{
+				if (Button(" Show Scene 1"))
+				{
+					showScene1 = true;
+					showScene2 = false;
+				}
+
+				if (Button(" Show Scene 2"))
+				{
+					showScene2 = true;
+					showScene1 = false;
 				}
 
 				EndTabItem();
@@ -1021,7 +1066,6 @@ void Application::Draw()
 
 			EndTabBar();
 		}
-
 
 		// Create test window
 		End();

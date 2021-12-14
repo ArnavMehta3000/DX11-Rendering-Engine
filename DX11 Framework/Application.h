@@ -22,15 +22,29 @@ private:
 	ID3D11DeviceContext*      _pImmediateContext;
 	IDXGISwapChain*           _pSwapChain;
 	ID3D11RenderTargetView*   _pRenderTargetView;
+
 	// Camera stuff
-	Camera*            m_StaticCam;
-	FirstPersonCamera* m_FpsCam;
-	OrbitCamera*       m_OrbitCam;
-	CameraMats         m_CurrentCamera;
+	Camera*                   m_StaticCam;
+	FirstPersonCamera*        m_FpsCam;
+	OrbitCamera*              m_OrbitCam;
+	CameraMats                m_CurrentCamera;
 
 	// Game objects
-	GameObject* m_HerculesPlane;
-	GameObject* m_GroundPlane;
+	GameObject*               m_HerculesPlane;
+
+
+	// Hard coded mesh data
+	ID3D11Buffer*             _pCubeVertexBuffer;
+	ID3D11Buffer*             _pPyramidVertexBuffer;
+	ID3D11Buffer*             _pPlaneVertexBuffer;
+				              
+	ID3D11Buffer*             _pCubeIndexBuffer;
+	ID3D11Buffer*             _pPyramidIndexBuffer;
+	ID3D11Buffer*             _pPlaneIndexBuffer;
+
+	XMFLOAT4X4                _cubeWorld;
+	XMFLOAT4X4                _pyramidWorld;
+	XMFLOAT4X4                _planeWorld;
 
 
 	ID3D11VertexShader*       _pVertexShader;
@@ -78,6 +92,10 @@ private:
 
 	bool debug = true;
 	bool staticCamOpt = false, orbitCamOpt = false, fpsCamOpt = false;
+
+	bool showScene1 = true;  // Plane scene
+	bool showScene2 = false; // Hard coded meshes
+	bool showScene3 = false;
 
 public:
 	Application();
