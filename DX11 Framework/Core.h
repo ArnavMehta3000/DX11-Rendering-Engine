@@ -8,6 +8,7 @@
 #include <directxmath.h>
 #include <DirectXMath.h>
 #include <directxcolors.h>
+#include <DirectXCollision.h>
 #include "resource.h"
 #include "DDSTextureLoader.h"
 #include "Vector3.h"

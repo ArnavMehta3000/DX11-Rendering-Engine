@@ -6,6 +6,7 @@ FirstPersonCamera::FirstPersonCamera(CameraInitData cam, Vector3 lookDirection)
 	m_LookSens = 0.0005f;
 	m_MovementSens = 50.0f;
 	m_LookDirection = lookDirection;
+	eulerLook = Vector3();
 }
 
 FirstPersonCamera::~FirstPersonCamera() {}
@@ -65,6 +66,7 @@ void FirstPersonCamera::Update()
 #pragma endregion
 
 	// Clamp look direction between -1 and 1
+	XMQuaternionRotationRollPitchYaw
 	m_LookDirection = Vector3::Clamp(m_LookDirection, Vector3(-1.0f, -1.0f, -1.0f), Vector3::One());
 
 	SetLens();

@@ -183,7 +183,7 @@ void Application::InitLights()
 	directionalLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Material.ambient   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Material.diffuse   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.specular  = XMFLOAT4(0.2f, 0.2f, 1.0f, 1.0f);
+	directionalLight.Material.specular  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	directionalLight.SpecularPower      = 0.8f;
 
@@ -858,7 +858,7 @@ void Application::Draw()
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 
-
+	// Global transparency
 	if (isTransparent)
 		_pImmediateContext->OMSetBlendState(_transparency, blendfactor , 0xffffffff);
 	else
@@ -963,6 +963,37 @@ void Application::Draw()
 
 					TreePop();
 				}
+
+				if (TreeNode("Point Light"))
+				{
+					Text("Direction");
+					SliderFloat3("##direction", &directionalLight.Direction.x, -1.0f, 1.0f);
+
+					if (TreeNode("Intensity"))
+					{
+						ColorEdit3("Ambient##I", &directionalLight.Intensity.Ambient.x);
+						ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
+						ColorEdit3("Specular##I", &directionalLight.Intensity.Specular.x);
+
+						TreePop();
+					}
+
+
+					if (TreeNode("Material"))
+					{
+						ColorEdit3("Ambient##M", &directionalLight.Material.ambient.x);
+						ColorEdit3("Diffuse##M", &directionalLight.Material.diffuse.x);
+						ColorEdit3("Specular##M", &directionalLight.Material.specular.x);
+
+						TreePop();
+					}
+
+					NewLine();
+
+					SliderFloat("Specular Power", &directionalLight.SpecularPower, 0.001f, 2.0f);
+
+					TreePop();
+				}
 				EndTabItem();
 			}
 
@@ -1010,7 +1041,7 @@ void Application::Draw()
 					SameLine(); Checkbox("Show Options##Orbit", &orbitCamOpt);
 					if (orbitCamOpt)
 					{
-						Text("Q/E to chnage camera height");
+						Text("Q/E to change camera height");
 
 						float radius = m_OrbitCam->GetRadius();
 						float speed = m_OrbitCam->GetSpeed();
