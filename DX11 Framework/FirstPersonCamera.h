@@ -20,7 +20,8 @@ private:
 	float m_MovementSens;
 	float m_LookSens;
 	Vector3 m_LookDirection;
-	Vector3 eulerLook;
 	float angle = 0;
+
+
 };
 #endif // !FIRSTPERSONCAMERA_H
