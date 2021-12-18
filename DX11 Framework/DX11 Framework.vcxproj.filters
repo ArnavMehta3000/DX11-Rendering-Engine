@@ -61,6 +61,7 @@
     <ClInclude Include="OrbitCamera.h">
       <Filter>Cameras</Filter>
     </ClInclude>
+    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Cameras</Filter>
     </ClCompile>
+    <ClCompile Include="Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

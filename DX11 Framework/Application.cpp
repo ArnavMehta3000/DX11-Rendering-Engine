@@ -239,6 +239,11 @@ void Application::InitModels()
 
 	m_HerculesPlane = new GameObject(hercules);
 	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+
+
+	
+	m_Terrain = new Terrain(_pd3dDevice);
+	m_Terrain->GenerateGrid(5, 5, 5, 5);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -250,8 +255,8 @@ HRESULT Application::InitVertexBuffer()
 		SimpleVertex cubeVertices[] =
 		{
 			{ XMFLOAT3(-1.0f,-1.0f,-1.0f), XMFLOAT3(-0.5773f, 0.5773f, 0.5773f),   XMFLOAT2(1.0f, 0.0f) } ,
-			{ XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f)  },
-			{ XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f),  XMFLOAT2(1.0f, 1.0f)  },
+			{ XMFLOAT3(-1.0f,-1.0f, 1.0f), XMFLOAT3(-0.5773f, 0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f) },
+			{ XMFLOAT3(-1.0f, 1.0f,-1.0f), XMFLOAT3(-0.5773f, -0.5773f, 0.5773f),  XMFLOAT2(1.0f, 1.0f) },
 			{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.5773f, -0.5773f, -0.5773f), XMFLOAT2(0.0f, 1.0f) },
 			{ XMFLOAT3(1.0f,-1.0f,-1.0f),  XMFLOAT3(0.5773f, -0.5773f, -0.5773f),  XMFLOAT2(0.0f, 0.0f) },
 			{ XMFLOAT3(1.0f,-1.0f, 1.0f),  XMFLOAT3(0.5773f, 0.5773f, 0.5773f),    XMFLOAT2(1.0f, 0.0f) },
@@ -735,53 +740,6 @@ void Application::Cleanup()
 
 void Application::Update()
 {
-	// Change draw type
-	constexpr char KEYUP = 0x1;
-	if (GetAsyncKeyState(VK_RCONTROL) & KEYUP) // Set wire frame
-	{
-		if (!isWireFrame)  // Is solid, set wire frame
-			_pImmediateContext->RSSetState(_wireFrame);
-		if (isWireFrame)  // Is wire frame, set solid
-			_pImmediateContext->RSSetState(_solid);
-
-		isWireFrame = !isWireFrame;
-	}
-
-	if (GetAsyncKeyState(VK_OEM_5) & KEYUP)
-		debug = !debug;
-
-	// Change current camera if not in debug state
-	if (!debug)
-	{
-		if (GetAsyncKeyState(0x31) || m_StaticCam->enabled)  // 1: Static camera
-		{
-			m_CurrentCamera.View = m_StaticCam->GetView();
-			m_CurrentCamera.Projection = m_StaticCam->GetProj();
-
-			m_StaticCam->enabled = true;
-			m_OrbitCam->enabled = false;
-			m_FpsCam->enabled = false;
-		}
-		if (GetAsyncKeyState(0x32) || m_OrbitCam->enabled)  // 2: Orbit camera
-		{
-			m_CurrentCamera.View = m_OrbitCam->GetView();
-			m_CurrentCamera.Projection = m_OrbitCam->GetProj();
-
-			m_StaticCam->enabled = false;
-			m_OrbitCam->enabled = true;
-			m_FpsCam->enabled = false;
-		}
-		if (GetAsyncKeyState(0x33) || m_FpsCam->enabled)  // 3: FPS camera
-		{
-			m_CurrentCamera.View = m_FpsCam->GetView();
-			m_CurrentCamera.Projection = m_FpsCam->GetProj();
-
-			m_StaticCam->enabled = false;
-			m_OrbitCam->enabled = false;
-			m_FpsCam->enabled = true;
-		}
-	}
-
 	#pragma region Timer
 	static float t = 0.0f;
 	if (_driverType == D3D_DRIVER_TYPE_REFERENCE)
@@ -895,7 +853,13 @@ void Application::Draw()
 
 		if (showScene3)  // Terrain scene
 		{
-
+			// Pyramid
+			_pImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_TerrainVertexBuffer, &stride, &offset);
+			_pImmediateContext->IASetIndexBuffer(m_Terrain->m_TerrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+			meshWorld = XMLoadFloat4x4(&m_Terrain->m_WorldMatrix);
+			cb.mWorld = XMMatrixTranspose(meshWorld);
+			_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+			_pImmediateContext->DrawIndexed(m_Terrain->m_TerrainGrid.Indices.size() , 0, 0);
 		}
 	#pragma endregion
 
@@ -917,7 +881,14 @@ void Application::Draw()
 			if (BeginTabItem("World"))
 			{
 				ColorEdit3("Background Color", ClearColor);
-				
+				if (Checkbox("Wireframe", &isWireFrame))
+				{
+					if (isWireFrame)  // Is solid, set wire frame
+						_pImmediateContext->RSSetState(_wireFrame);
+					if (!isWireFrame)  // Is wire frame, set solid
+						_pImmediateContext->RSSetState(_solid);
+				}
+
 				NewLine();
 
 				if (CollapsingHeader("Transparency", ImGuiTreeNodeFlags_DefaultOpen))
@@ -1084,12 +1055,21 @@ void Application::Draw()
 				{
 					showScene1 = true;
 					showScene2 = false;
+					showScene3 = false;
 				}
 
 				if (Button(" Show Scene 2"))
 				{
-					showScene2 = true;
 					showScene1 = false;
+					showScene2 = true;
+					showScene3 = false;
+				}
+
+				if (Button(" Show Scene 3"))
+				{
+					showScene1 = false;
+					showScene2 = false;
+					showScene3 = true;
 				}
 
 				EndTabItem();

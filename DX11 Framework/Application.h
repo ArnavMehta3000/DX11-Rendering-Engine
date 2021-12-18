@@ -10,6 +10,7 @@
 #include "FirstPersonCamera.h"
 #include "OrbitCamera.h"
 #include "GameObject.h"
+#include "Terrain.h"
 
 class Application
 {
@@ -31,6 +32,7 @@ private:
 
 	// Game objects
 	GameObject*               m_HerculesPlane;
+	Terrain*				  m_Terrain;
 
 
 	// Hard coded mesh data
