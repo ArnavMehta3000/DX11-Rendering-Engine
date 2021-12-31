@@ -5,11 +5,16 @@ Terrain::Terrain(ID3D11Device* device)
 	m_Device = device;
 	m_GridCreated = false;
 
+	m_TerrainVertexBuffer = 0;
+	m_TerrainIndexBuffer = 0;
+
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
 }
 
 Terrain::~Terrain()
 {
+	m_TerrainVertexBuffer->Release();
+	m_TerrainIndexBuffer->Release();
 }
 
 void Terrain::LoadHeightMap(const char* fileName, int sizeX, int sizeZ)
