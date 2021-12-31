@@ -62,8 +62,8 @@ private:
 	ID3D11RasterizerState*    _solid;
 	ID3D11BlendState*		  _transparency;
 
-	ID3D11Texture2D*          _myTexture;
-	ID3D11ShaderResourceView* _pTextureRV = nullptr;
+	ID3D11ShaderResourceView* m_HerculesTexRV = nullptr;
+	ID3D11ShaderResourceView* m_CubeTexRV = nullptr;
 	ID3D11SamplerState*       _pSamplerLinear = nullptr;
 
 	// Lights

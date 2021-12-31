@@ -1,5 +1,5 @@
 // Texturing
-Texture2D txDiffuse : TEXTURE : register(t0);
+Texture2D diffuseTex : TEXTURE : register(t0);
 SamplerState samLinear : SAMPLER : register(s0);
 
 // Material struct
@@ -177,7 +177,7 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
     float4 directionalLights = DirectionalLights(normalW, toEyeNormalized);
 
 	// Texturing
-    float4 textureColor = txDiffuse.Sample(samLinear, vsInput.Tex);
+    float4 textureColor = diffuseTex.Sample(samLinear, vsInput.Tex);
 
     //discard;
 	

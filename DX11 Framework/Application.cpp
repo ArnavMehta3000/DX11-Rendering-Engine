@@ -203,16 +203,14 @@ void Application::InitLights()
 void Application::InitTextures()
 {
 	// Load texture
-	HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds", nullptr, &_pTextureRV);
+	HRESULT hr;
+	hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds", nullptr, &m_HerculesTexRV);
+	hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &m_CubeTexRV);
 
 	if (FAILED(hr))
 	{
 		return;
 	}
-
-	// Tell shader to use the texture
-	_pImmediateContext->PSSetShaderResources(0, 1, &_pTextureRV);
-
 	// Define and create sampler state
 	D3D11_SAMPLER_DESC samplerDesc;
 	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
@@ -828,12 +826,15 @@ void Application::Draw()
 	#pragma region Draw GameObjects
 		if (showScene1)  // Plane scene
 		{
+			_pImmediateContext->PSSetShaderResources(0, 1, &m_HerculesTexRV);
 			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
 			m_HerculesPlane->Draw(&cb);
 		}
 
 		if (showScene2)  // Hard coded meshes scene
 		{
+			_pImmediateContext->PSSetShaderResources(0, 1, &m_CubeTexRV);
+
 			// Pyramid
 			_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
 			_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
