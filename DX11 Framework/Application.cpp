@@ -67,6 +67,11 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 		return E_FAIL;
 	}
 
+	// Initialize other things
+	InitVertexBuffer();
+	InitIndexBuffer();
+	InitLights();
+	InitTextures();
 	InitCamera();
 	InitModels();
 
@@ -153,6 +158,7 @@ HRESULT Application::InitShadersAndInputLayout()
 	hr = CompileShaderFromFile(L"DX11 Framework.hlsl", "PS_SKY", "ps_4_0", &pSkyPSBlob);
 	if (FAILED(hr))
 	{
+		pSkyPSBlob->Release();
 		MessageBox(nullptr,
 				   L"Sky Pixel Shader failed to compile.", L"Pixel Shader Error", MB_OK);
 		return hr;
@@ -239,27 +245,28 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
-	GOInitData hercules;
-	hercules.constantBuffer = m_ConstantBuffer;
-	hercules.deviceContext = m_ImmediateContext;
-	hercules.position = Vector3(0.0f, 0.0f, 0.0f);
-	hercules.rotation = Vector3();
-	hercules.scale = Vector3::One();
+	GOInitData herculesGo;
+	herculesGo.constantBuffer = m_ConstantBuffer;
+	herculesGo.deviceContext  = m_ImmediateContext;
+	herculesGo.position       = Vector3(0.0f, 0.0f, 0.0f);
+	herculesGo.rotation       = Vector3();
+	herculesGo.scale          = Vector3::One();
 
-	m_HerculesPlane = new GameObject(hercules);
+	m_HerculesPlane = new GameObject(herculesGo);
 	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
 	m_HerculesPlane->LoadTexture(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds");
 
-	GOInitData skysphere;
-	skysphere.constantBuffer = m_ConstantBuffer;
-	skysphere.deviceContext = m_ImmediateContext;
-	skysphere.position = Vector3(0.0f, 3.0f, 0.0f);
-	skysphere.rotation = Vector3();
-	skysphere.scale = Vector3(200, 200, 200);
+	GOInitData sSGo;
+	sSGo.constantBuffer = m_ConstantBuffer;
+	sSGo.deviceContext = m_ImmediateContext;
+	sSGo.position = Vector3(0.0f, 3.0f, 0.0f);
+	sSGo.rotation = Vector3();
+	sSGo.scale = Vector3(200, 200, 200);
 
-	m_SkySphere = new GameObject(skysphere);
+	m_SkySphere = new GameObject(sSGo);
 	m_SkySphere->SetMesh("Assets/Models/Blender/sphere.obj", _pd3dDevice, false);
 	m_SkySphere->LoadTexture(_pd3dDevice, L"Assets/HDRI.dds");
+
 
 	m_Terrain = new Terrain(_pd3dDevice);
 	m_Terrain->GenerateGrid(5, 5, 5, 5);
@@ -669,15 +676,7 @@ HRESULT Application::InitDevice()
 		return hr;
 	}
 
-	InitVertexBuffer();
-
-	InitIndexBuffer();
-
-	// Initialize lighting
-	InitLights();
-
-	// Initialize textures
-	InitTextures();
+	
 
 	// Set primitive topology
 	m_ImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -747,19 +746,50 @@ void Application::Cleanup()
 {
 	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
 
-	if (_wireFrame)			 _wireFrame->Release();
-	if (_solidCullBack)				 _solidCullBack->Release();
-	if (_transparency)		 _transparency->Release();
-	if (m_ConstantBuffer)	 m_ConstantBuffer->Release();
-	if (_depthStencilView)	 _depthStencilView->Release();
-	if (_depthStencilBuffer) _depthStencilBuffer->Release();
-	if (_pVertexLayout)		 _pVertexLayout->Release();
-	if (_pVertexShader)      _pVertexShader->Release();
-	if (_pPixelShader)		 _pPixelShader->Release();
-	if (_pRenderTargetView)  _pRenderTargetView->Release();
-	if (_pSwapChain)		 _pSwapChain->Release();
-	if (m_ImmediateContext)  m_ImmediateContext->Release();
-	if (_pd3dDevice)		 _pd3dDevice->Release();
+	if ( _wireFrame)
+		_wireFrame->Release();
+
+	if ( _solidCullBack)
+		_solidCullBack->Release();
+
+	if ( _solidCullFront)
+		_solidCullFront->Release();
+
+	if ( _transparency)
+		_transparency->Release();
+
+	if (m_ConstantBuffer)
+		m_ConstantBuffer->Release();
+
+	if ( _depthStencilView)
+		_depthStencilView->Release();
+
+	if ( _depthStencilBuffer)
+		_depthStencilBuffer->Release();
+
+	if ( _pVertexLayout)
+		_pVertexLayout->Release();
+
+	if ( _pVertexShader)
+		_pVertexShader->Release();
+
+	if ( _pPixelShader)
+		_pPixelShader->Release();
+
+	if (_pSkyPixelShader)
+		_pSkyPixelShader->Release();
+
+	if ( _pRenderTargetView)
+		_pRenderTargetView->Release();
+
+	if ( _pSwapChain)
+		_pSwapChain->Release();
+
+	if (m_ImmediateContext)
+		m_ImmediateContext->Release();
+
+	if ( _pd3dDevice)
+		_pd3dDevice->Release();
 }
 
 
@@ -855,11 +885,13 @@ void Application::Draw()
 	// DrawTextured sky sphere
 	m_ImmediateContext->RSSetState(_solidCullFront);
 	m_ImmediateContext->PSSetShader(_pSkyPixelShader, nullptr, 0);
+
 	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
 	m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
-	
+
 	m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	m_ImmediateContext->RSSetState(_solidCullBack);
+
 
 
 	if (showScene1)  // Plane scene

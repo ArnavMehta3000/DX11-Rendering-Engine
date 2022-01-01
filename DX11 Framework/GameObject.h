@@ -21,9 +21,9 @@ public:
 
 	void SetMesh(char* file, ID3D11Device* device, bool invertTexCoords = false);
 	void LoadTexture(ID3D11Device* device, const wchar_t* file);
-	void Update();
-	void Draw(ConstantBuffer* cb);
-	void DrawTextured(ConstantBuffer* cb, ID3D11DeviceContext* ctx, int slot = 0);
+	virtual void Update();
+	virtual void Draw(ConstantBuffer* cb);
+	virtual void DrawTextured(ConstantBuffer* cb, ID3D11DeviceContext* ctx, int slot = 0);
 
 	XMFLOAT4X4 GetWorldMatrix();
 
