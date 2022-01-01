@@ -52,6 +52,7 @@ private:
 
 	ID3D11VertexShader*       _pVertexShader;
 	ID3D11PixelShader*        _pPixelShader;
+	ID3D11PixelShader*        _pSkyPixelShader;
 	ID3D11InputLayout*        _pVertexLayout;
 
 	ID3D11Buffer*             m_ConstantBuffer;
@@ -60,7 +61,8 @@ private:
 	ID3D11Texture2D*          _depthStencilBuffer = nullptr;
 
 	ID3D11RasterizerState*    _wireFrame;
-	ID3D11RasterizerState*    _solid;
+	ID3D11RasterizerState*    _solidCullBack;
+	ID3D11RasterizerState*    _solidCullFront;
 	ID3D11BlendState*		  _transparency;
 
 	ID3D11ShaderResourceView* m_HerculesTexRV = nullptr;

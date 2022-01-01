@@ -179,7 +179,7 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
     float4 directionalLights = DirectionalLights(normalW, toEyeNormalized);
 
 	// Texturing
-    float4 textureColor = skybox.Sample(samLinear, vsInput.Tex);
+    float4 textureColor = diffuseTex.Sample(samLinear, vsInput.Tex);
 
     //discard;
 	
@@ -187,4 +187,11 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
     psOutput.a = dirLight.Material.Diffuse.a;
 	
     return psOutput;
+}
+
+// Pixel shader 
+float4 PS_SKY(VS_OUTPUT vsInput) : SV_TARGET
+{
+    float4 output = skybox.Sample(samLinear, 1.0f - vsInput.Tex);
+    return output ;
 }

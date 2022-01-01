@@ -117,7 +117,7 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
-			L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+			L"Default vertex shader failed to compile.", L"Vertex Shader Error", MB_OK);
 		return hr;
 	}
 
@@ -137,19 +137,31 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
-			L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+			L"Defaut pixel sahder failed to compile.", L"Pixel Shader Error", MB_OK);
 		return hr;
 	}
 
 	// Create the pixel shader
 	hr = _pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &_pPixelShader);
 	pPSBlob->Release();
-
+	
 	if (FAILED(hr))
 		return hr;
 
-
+	// Compile the sky pixel shader
+	ID3DBlob* pSkyPSBlob = nullptr;
+	hr = CompileShaderFromFile(L"DX11 Framework.hlsl", "PS_SKY", "ps_4_0", &pSkyPSBlob);
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr,
+				   L"Sky Pixel Shader failed to compile.", L"Pixel Shader Error", MB_OK);
+		return hr;
+	}
 	
+	//Create the sky pixel shader
+	hr = _pd3dDevice->CreatePixelShader(pSkyPSBlob->GetBufferPointer(), pSkyPSBlob->GetBufferSize(), nullptr, &_pSkyPixelShader);
+	if (FAILED(hr))
+		return hr;
 
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -163,7 +175,7 @@ HRESULT Application::InitShadersAndInputLayout()
 
 	// Create the input layout
 	hr = _pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(),
-		pVSBlob->GetBufferSize(), &_pVertexLayout);
+										pVSBlob->GetBufferSize(), &_pVertexLayout);
 	pVSBlob->Release();
 
 	if (FAILED(hr))
@@ -241,9 +253,9 @@ void Application::InitModels()
 	GOInitData skysphere;
 	skysphere.constantBuffer = m_ConstantBuffer;
 	skysphere.deviceContext = m_ImmediateContext;
-	skysphere.position = Vector3(0.0f, 0.0f, 0.0f);
+	skysphere.position = Vector3(0.0f, 3.0f, 0.0f);
 	skysphere.rotation = Vector3();
-	skysphere.scale = Vector3::One();
+	skysphere.scale = Vector3(100.0f, 100.0f, 100.0f);
 
 	m_SkySphere = new GameObject(skysphere);
 	m_SkySphere->SetMesh("Assets/Models/Blender/sphere.obj", _pd3dDevice, false);
@@ -688,12 +700,19 @@ HRESULT Application::InitDevice()
 	wfdesc.DepthClipEnable = true;  // Enable clipping
 	hr = _pd3dDevice->CreateRasterizerState(&wfdesc, &_wireFrame);
 
-	// Define rasterizer state - Solid
+
+
+
+	// Define rasterizer state - Solid Cull Back
 	D3D11_RASTERIZER_DESC solidDesc;
 	ZeroMemory(&solidDesc, sizeof(D3D11_RASTERIZER_DESC));  // Clear memory
 	solidDesc.FillMode = D3D11_FILL_SOLID;
 	solidDesc.CullMode = D3D11_CULL_BACK;
-	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solid);
+	solidDesc.DepthClipEnable = true;
+	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solidCullBack);
+
+	solidDesc.CullMode = D3D11_CULL_FRONT;
+	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solidCullFront);
 
 
 	// Define blend state
@@ -729,7 +748,7 @@ void Application::Cleanup()
 	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
 
 	if (_wireFrame)			 _wireFrame->Release();
-	if (_solid)				 _solid->Release();
+	if (_solidCullBack)				 _solidCullBack->Release();
 	if (_transparency)		 _transparency->Release();
 	if (m_ConstantBuffer)	 m_ConstantBuffer->Release();
 	if (_depthStencilView)	 _depthStencilView->Release();
@@ -768,7 +787,6 @@ void Application::Update()
 
 	// Update gameobject
 	m_SkySphere->Update();
-	m_SkySphere->SetPosition(Vector3(0, sin(t) * 5, 0));
 	m_HerculesPlane->Update();
 
 	
@@ -822,7 +840,6 @@ void Application::Draw()
 	m_ImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
 	m_ImmediateContext->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
 	m_ImmediateContext->PSSetConstantBuffers(0, 1, &m_ConstantBuffer);
-	m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	m_ImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 
 	// Global transparency
@@ -835,49 +852,55 @@ void Application::Draw()
 	UINT offset = 0;
 
 	#pragma region Draw GameObjects
-		// DrawTextured sky sphere
+	// DrawTextured sky sphere
+	m_ImmediateContext->RSSetState(_solidCullFront);
+	m_ImmediateContext->PSSetShader(_pSkyPixelShader, nullptr, 0);
+	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
+	m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
+	
+	m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
+	m_ImmediateContext->RSSetState(_solidCullBack);
+
+
+	if (showScene1)  // Plane scene
+	{			
+		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
+		m_HerculesPlane->DrawTextured(&cb, m_ImmediateContext, 1);
+	}
+
+	if (showScene2)  // Hard coded meshes scene
+	{
+		m_ImmediateContext->PSSetShaderResources(1, 1, &m_CubeTexRV);
+
+		// Pyramid
+		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
+		m_ImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+		meshWorld = XMLoadFloat4x4(&_pyramidWorld);
+		cb.mWorld = XMMatrixTranspose(meshWorld);
+		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
+		m_ImmediateContext->DrawIndexed(3 * 6, 0, 0);
+
+		// Cube
+		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
+		m_ImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+		meshWorld = XMLoadFloat4x4(&_cubeWorld);
+		cb.mWorld = XMMatrixTranspose(meshWorld);
+		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
+		m_ImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+	}
+
+	if (showScene3)  // Terrain scene
+	{
 		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
-		m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
-		
-		if (showScene1)  // Plane scene
-		{			
-			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
-			m_HerculesPlane->DrawTextured(&cb, m_ImmediateContext, 1);
-		}
+		m_SkySphere->Draw(&cb);
 
-		if (showScene2)  // Hard coded meshes scene
-		{
-			m_ImmediateContext->PSSetShaderResources(1, 1, &m_CubeTexRV);
-
-			// Pyramid
-			m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
-			m_ImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-			meshWorld = XMLoadFloat4x4(&_pyramidWorld);
-			cb.mWorld = XMMatrixTranspose(meshWorld);
-			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
-			m_ImmediateContext->DrawIndexed(3 * 6, 0, 0);
-
-			// Cube
-			m_ImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
-			m_ImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-			meshWorld = XMLoadFloat4x4(&_cubeWorld);
-			cb.mWorld = XMMatrixTranspose(meshWorld);
-			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
-			m_ImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
-		}
-
-		if (showScene3)  // Terrain scene
-		{
-			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
-			m_SkySphere->Draw(&cb);
-
-			/*m_ImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_TerrainVertexBuffer, &stride, &offset);
+		/*m_ImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_TerrainVertexBuffer, &stride, &offset);
 			m_ImmediateContext->IASetIndexBuffer(m_Terrain->m_TerrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 			meshWorld = XMLoadFloat4x4(&m_Terrain->m_WorldMatrix);
 			cb.mWorld = XMMatrixTranspose(meshWorld);
 			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 			m_ImmediateContext->DrawIndexed(m_Terrain->m_TerrainGrid.Indices.size() , 0, 0);*/
-		}
+	}
 	#pragma endregion
 
 
@@ -903,7 +926,7 @@ void Application::Draw()
 					if (isWireFrame)  // Is solid, set wire frame
 						m_ImmediateContext->RSSetState(_wireFrame);
 					if (!isWireFrame)  // Is wire frame, set solid
-						m_ImmediateContext->RSSetState(_solid);
+						m_ImmediateContext->RSSetState(_solidCullBack);
 				}
 
 				NewLine();
