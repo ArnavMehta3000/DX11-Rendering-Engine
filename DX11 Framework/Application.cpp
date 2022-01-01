@@ -93,8 +93,8 @@ void Application::InitCamera()
 	cameraInitData.up = Vector3(0.0f, 1.0f, 0.0f);
 	cameraInitData.windowWidth = _WindowWidth;
 	cameraInitData.windowHeight = _WindowHeight;
-	cameraInitData.nearZ = 0.1f;
-	cameraInitData.farZ = 100.0f;
+	cameraInitData.nearZ = 0.01f;
+	cameraInitData.farZ = 500.0f;
 
 
 	m_StaticCam = new Camera(cameraInitData);
@@ -255,7 +255,7 @@ void Application::InitModels()
 	skysphere.deviceContext = m_ImmediateContext;
 	skysphere.position = Vector3(0.0f, 3.0f, 0.0f);
 	skysphere.rotation = Vector3();
-	skysphere.scale = Vector3(100.0f, 100.0f, 100.0f);
+	skysphere.scale = Vector3(200, 200, 200);
 
 	m_SkySphere = new GameObject(skysphere);
 	m_SkySphere->SetMesh("Assets/Models/Blender/sphere.obj", _pd3dDevice, false);
