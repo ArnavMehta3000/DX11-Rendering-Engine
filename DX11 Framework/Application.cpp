@@ -264,9 +264,7 @@ void Application::InitModels()
 	sSGo.scale = Vector3(200, 200, 200);
 
 	m_SkySphere = new SkySphere(sSGo, _pd3dDevice, L"Assets/HDRI.dds");
-
-	m_Terrain = new Terrain(_pd3dDevice);
-	m_Terrain->GenerateGrid(5, 5, 5, 5);
+	
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -923,15 +921,7 @@ void Application::Draw()
 
 	if (showScene3)  // Terrain scene
 	{
-		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
-		m_SkySphere->Draw(&cb);
-
-		/*m_ImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_TerrainVertexBuffer, &stride, &offset);
-			m_ImmediateContext->IASetIndexBuffer(m_Terrain->m_TerrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-			meshWorld = XMLoadFloat4x4(&m_Terrain->m_WorldMatrix);
-			cb.mWorld = XMMatrixTranspose(meshWorld);
-			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
-			m_ImmediateContext->DrawIndexed(m_Terrain->m_TerrainGrid.Indices.size() , 0, 0);*/
+		
 	}
 	#pragma endregion
 

@@ -1,5 +1,6 @@
 #pragma once
 #ifndef SKYBOX_H
+#define SKYBOX_H
 #include "Core.h"
 #include "GameObject.h"
 

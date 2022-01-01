@@ -61,9 +61,9 @@
     <ClInclude Include="OrbitCamera.h">
       <Filter>Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="SkySphere.h" />
+    <ClInclude Include="Grid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -100,9 +100,9 @@
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="SkySphere" />
+    <ClCompile Include="SkySphere.cpp" />
+    <ClCompile Include="Grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

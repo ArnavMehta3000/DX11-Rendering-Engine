@@ -11,7 +11,7 @@
 #include "OrbitCamera.h"
 #include "GameObject.h"
 #include "SkySphere.h"
-#include "Terrain.h"
+#include "Grid.h"
 
 class Application
 {
@@ -24,7 +24,7 @@ private:
 	ID3D11DeviceContext*      m_ImmediateContext;
 	IDXGISwapChain*           _pSwapChain;
 	ID3D11RenderTargetView*   _pRenderTargetView;
-
+	
 	// Camera stuff
 	Camera*                   m_StaticCam;
 	FirstPersonCamera*        m_FpsCam;
@@ -32,9 +32,8 @@ private:
 	CameraMats                m_CurrentCamera;
 
 	// Game objects
-	SkySphere*                   m_SkySphere;
+	SkySphere*                m_SkySphere;
 	GameObject*               m_HerculesPlane;
-	Terrain*				  m_Terrain;
 
 
 	// Hard coded mesh data

@@ -382,6 +382,7 @@
     <ClCompile Include="DX11 Framework.cpp" />
     <ClCompile Include="FirstPersonCamera.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
@@ -391,8 +392,7 @@
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="OrbitCamera.cpp" />
-    <ClCompile Include="SkySphere" />
-    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="SkySphere.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
@@ -408,6 +408,7 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="FirstPersonCamera.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -422,7 +423,6 @@
     <ClInclude Include="OrbitCamera.h" />
     <CLInclude Include="resource.h" />
     <ClInclude Include="SkySphere.h" />
-    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vector3.h" />
     <ResourceCompile Include="DX11 Framework.rc" />
