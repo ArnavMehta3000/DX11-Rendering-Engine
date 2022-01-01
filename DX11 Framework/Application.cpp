@@ -34,13 +34,13 @@ Application::Application()
 	_driverType = D3D_DRIVER_TYPE_NULL;
 	_featureLevel = D3D_FEATURE_LEVEL_11_0;
 	_pd3dDevice = nullptr;
-	_pImmediateContext = nullptr;
+	m_ImmediateContext = nullptr;
 	_pSwapChain = nullptr;
 	_pRenderTargetView = nullptr;
 	_pVertexShader = nullptr;
 	_pPixelShader = nullptr;
 	_pVertexLayout = nullptr;
-	_pConstantBuffer = nullptr;
+	m_ConstantBuffer = nullptr;
 }
 
 Application::~Application()
@@ -78,7 +78,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplWin32_Init(_hWnd);
-	ImGui_ImplDX11_Init(_pd3dDevice,_pImmediateContext);
+	ImGui_ImplDX11_Init(_pd3dDevice,m_ImmediateContext);
 	ImGui::StyleColorsDark();
 
 	return S_OK;
@@ -170,7 +170,7 @@ HRESULT Application::InitShadersAndInputLayout()
 		return hr;
 
 	// Set the input layout
-	_pImmediateContext->IASetInputLayout(_pVertexLayout);
+	m_ImmediateContext->IASetInputLayout(_pVertexLayout);
 
 	return hr;
 }
@@ -229,8 +229,8 @@ void Application::InitTextures()
 void Application::InitModels()
 {
 	GOInitData hercules;
-	hercules.constantBuffer = _pConstantBuffer;
-	hercules.deviceContext = _pImmediateContext;
+	hercules.constantBuffer = m_ConstantBuffer;
+	hercules.deviceContext = m_ImmediateContext;
 	hercules.position = Vector3(0.0f, 0.0f, 0.0f);
 	hercules.rotation = Vector3();
 	hercules.scale = Vector3::One();
@@ -238,7 +238,15 @@ void Application::InitModels()
 	m_HerculesPlane = new GameObject(hercules);
 	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
 
+	GOInitData skysphere;
+	skysphere.constantBuffer = m_ConstantBuffer;
+	skysphere.deviceContext = m_ImmediateContext;
+	skysphere.position = Vector3(0.0f, 0.0f, 0.0f);
+	skysphere.rotation = Vector3();
+	skysphere.scale = Vector3::One();
 
+	m_SkySphere = new GameObject(skysphere);
+	m_SkySphere->SetMesh("Assets/Models/Blender/sphere.obj", _pd3dDevice, false);
 	
 	m_Terrain = new Terrain(_pd3dDevice);
 	m_Terrain->GenerateGrid(5, 5, 5, 5);
@@ -589,7 +597,7 @@ HRESULT Application::InitDevice()
 	{
 		_driverType = driverTypes[driverTypeIndex];
 		hr = D3D11CreateDeviceAndSwapChain(nullptr, _driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &_featureLevel, &_pImmediateContext);
+			D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &_featureLevel, &m_ImmediateContext);
 		if (SUCCEEDED(hr))
 			break;
 	}
@@ -631,7 +639,7 @@ HRESULT Application::InitDevice()
 		hr = _pd3dDevice->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
 
 	// Add it to the output merger
-	_pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView);
+	m_ImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView);
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
 	vp.Width = (FLOAT)_WindowWidth;
@@ -640,7 +648,7 @@ HRESULT Application::InitDevice()
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-	_pImmediateContext->RSSetViewports(1, &vp);
+	m_ImmediateContext->RSSetViewports(1, &vp);
 
 	hr = InitShadersAndInputLayout();
 	if (FAILED(hr))
@@ -659,7 +667,7 @@ HRESULT Application::InitDevice()
 	InitTextures();
 
 	// Set primitive topology
-	_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_ImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Create the constant buffer
 	D3D11_BUFFER_DESC bd;
@@ -668,7 +676,7 @@ HRESULT Application::InitDevice()
 	bd.ByteWidth = sizeof(ConstantBuffer);
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bd.CPUAccessFlags = 0;
-	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &_pConstantBuffer);
+	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &m_ConstantBuffer);
 
 
 	// Define rasterizer state - Wire Frame
@@ -717,12 +725,12 @@ HRESULT Application::InitDevice()
 
 void Application::Cleanup()
 {
-	if (_pImmediateContext)  _pImmediateContext->ClearState();
+	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
 
 	if (_wireFrame)			 _wireFrame->Release();
 	if (_solid)				 _solid->Release();
 	if (_transparency)		 _transparency->Release();
-	if (_pConstantBuffer)	 _pConstantBuffer->Release();
+	if (m_ConstantBuffer)	 m_ConstantBuffer->Release();
 	if (_depthStencilView)	 _depthStencilView->Release();
 	if (_depthStencilBuffer) _depthStencilBuffer->Release();
 	if (_pVertexLayout)		 _pVertexLayout->Release();
@@ -730,7 +738,7 @@ void Application::Cleanup()
 	if (_pPixelShader)		 _pPixelShader->Release();
 	if (_pRenderTargetView)  _pRenderTargetView->Release();
 	if (_pSwapChain)		 _pSwapChain->Release();
-	if (_pImmediateContext)  _pImmediateContext->Release();
+	if (m_ImmediateContext)  m_ImmediateContext->Release();
 	if (_pd3dDevice)		 _pd3dDevice->Release();
 }
 
@@ -758,6 +766,8 @@ void Application::Update()
 
 
 	// Update gameobject
+	m_SkySphere->Update();
+	m_SkySphere->SetPosition(Vector3(0, sin(t) * 5, 0));
 	m_HerculesPlane->Update();
 
 	
@@ -777,10 +787,10 @@ void Application::Update()
 void Application::Draw()
 {
 	// Clear the back buffer
-	_pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
+	m_ImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
 	// Clear depth stencil 
-	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_ImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
 	// TODO: Change camera here
@@ -805,62 +815,68 @@ void Application::Draw()
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
 	// https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
 
-	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 
 	// Renders a triangle
-	_pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
-	_pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
-	_pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
-	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
-	_pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+	m_ImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
+	m_ImmediateContext->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
+	m_ImmediateContext->PSSetConstantBuffers(0, 1, &m_ConstantBuffer);
+	m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
+	m_ImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 
 	// Global transparency
 	if (isTransparent)
-		_pImmediateContext->OMSetBlendState(_transparency, blendfactor , 0xffffffff);
+		m_ImmediateContext->OMSetBlendState(_transparency, blendfactor , 0xffffffff);
 	else
-		_pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
+		m_ImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
 
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
 
 	#pragma region Draw GameObjects
+		// Draw sky sphere
+		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
+		m_SkySphere->Draw(&cb);
+		
 		if (showScene1)  // Plane scene
 		{
-			_pImmediateContext->PSSetShaderResources(0, 1, &m_HerculesTexRV);
+			m_ImmediateContext->PSSetShaderResources(0, 1, &m_HerculesTexRV);
 			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
 			m_HerculesPlane->Draw(&cb);
 		}
 
 		if (showScene2)  // Hard coded meshes scene
 		{
-			_pImmediateContext->PSSetShaderResources(0, 1, &m_CubeTexRV);
+			m_ImmediateContext->PSSetShaderResources(0, 1, &m_CubeTexRV);
 
 			// Pyramid
-			_pImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
-			_pImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+			m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);
+			m_ImmediateContext->IASetIndexBuffer(_pPyramidIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 			meshWorld = XMLoadFloat4x4(&_pyramidWorld);
 			cb.mWorld = XMMatrixTranspose(meshWorld);
-			_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-			_pImmediateContext->DrawIndexed(3 * 6, 0, 0);
+			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
+			m_ImmediateContext->DrawIndexed(3 * 6, 0, 0);
 
 			// Cube
-			_pImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
-			_pImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+			m_ImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
+			m_ImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 			meshWorld = XMLoadFloat4x4(&_cubeWorld);
 			cb.mWorld = XMMatrixTranspose(meshWorld);
-			_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-			_pImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
+			m_ImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 		}
 
 		if (showScene3)  // Terrain scene
 		{
-			// Pyramid
-			_pImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_TerrainVertexBuffer, &stride, &offset);
-			_pImmediateContext->IASetIndexBuffer(m_Terrain->m_TerrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
+			m_SkySphere->Draw(&cb);
+
+			/*m_ImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_TerrainVertexBuffer, &stride, &offset);
+			m_ImmediateContext->IASetIndexBuffer(m_Terrain->m_TerrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 			meshWorld = XMLoadFloat4x4(&m_Terrain->m_WorldMatrix);
 			cb.mWorld = XMMatrixTranspose(meshWorld);
-			_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-			_pImmediateContext->DrawIndexed(m_Terrain->m_TerrainGrid.Indices.size() , 0, 0);
+			m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
+			m_ImmediateContext->DrawIndexed(m_Terrain->m_TerrainGrid.Indices.size() , 0, 0);*/
 		}
 	#pragma endregion
 
@@ -885,9 +901,9 @@ void Application::Draw()
 				if (Checkbox("Wireframe", &isWireFrame))
 				{
 					if (isWireFrame)  // Is solid, set wire frame
-						_pImmediateContext->RSSetState(_wireFrame);
+						m_ImmediateContext->RSSetState(_wireFrame);
 					if (!isWireFrame)  // Is wire frame, set solid
-						_pImmediateContext->RSSetState(_solid);
+						m_ImmediateContext->RSSetState(_solid);
 				}
 
 				NewLine();

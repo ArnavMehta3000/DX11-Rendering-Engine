@@ -20,7 +20,7 @@ private:
 	D3D_DRIVER_TYPE			  _driverType;
 	D3D_FEATURE_LEVEL		  _featureLevel;
 	ID3D11Device*             _pd3dDevice;
-	ID3D11DeviceContext*      _pImmediateContext;
+	ID3D11DeviceContext*      m_ImmediateContext;
 	IDXGISwapChain*           _pSwapChain;
 	ID3D11RenderTargetView*   _pRenderTargetView;
 
@@ -31,6 +31,7 @@ private:
 	CameraMats                m_CurrentCamera;
 
 	// Game objects
+	GameObject*               m_SkySphere;
 	GameObject*               m_HerculesPlane;
 	Terrain*				  m_Terrain;
 
@@ -53,7 +54,7 @@ private:
 	ID3D11PixelShader*        _pPixelShader;
 	ID3D11InputLayout*        _pVertexLayout;
 
-	ID3D11Buffer*             _pConstantBuffer;
+	ID3D11Buffer*             m_ConstantBuffer;
 
 	ID3D11DepthStencilView*   _depthStencilView;
 	ID3D11Texture2D*          _depthStencilBuffer = nullptr;
