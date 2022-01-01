@@ -1232,7 +1232,7 @@ enum ImGuiNavHighlightFlags_
     ImGuiNavHighlightFlags_None             = 0,
     ImGuiNavHighlightFlags_TypeDefault      = 1 << 0,
     ImGuiNavHighlightFlags_TypeThin         = 1 << 1,
-    ImGuiNavHighlightFlags_AlwaysDraw       = 1 << 2,       // Draw rectangular highlight if (g.NavId == id) _even_ when using the mouse.
+    ImGuiNavHighlightFlags_AlwaysDraw       = 1 << 2,       // DrawTextured rectangular highlight if (g.NavId == id) _even_ when using the mouse.
     ImGuiNavHighlightFlags_NoRounding       = 1 << 3
 };
 
@@ -2188,8 +2188,8 @@ struct ImGuiTableColumn
     ImGuiTableColumnIdx     NextEnabledColumn;              // Index of next enabled/visible column within Columns[], -1 if last enabled/visible column
     ImGuiTableColumnIdx     SortOrder;                      // Index of this column within sort specs, -1 if not sorting on this column, 0 for single-sort, may be >0 on multi-sort
     ImGuiTableDrawChannelIdx DrawChannelCurrent;            // Index within DrawSplitter.Channels[]
-    ImGuiTableDrawChannelIdx DrawChannelFrozen;             // Draw channels for frozen rows (often headers)
-    ImGuiTableDrawChannelIdx DrawChannelUnfrozen;           // Draw channels for unfrozen rows
+    ImGuiTableDrawChannelIdx DrawChannelFrozen;             // DrawTextured channels for frozen rows (often headers)
+    ImGuiTableDrawChannelIdx DrawChannelUnfrozen;           // DrawTextured channels for unfrozen rows
     bool                    IsEnabled;                      // IsUserEnabled && (Flags & ImGuiTableColumnFlags_Disabled) == 0
     bool                    IsUserEnabled;                  // Is the column not marked Hidden by the user? (unrelated to being off view, e.g. clipped by scrolling).
     bool                    IsUserEnabledNextFrame;

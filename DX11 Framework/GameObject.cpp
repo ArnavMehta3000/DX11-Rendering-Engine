@@ -22,6 +22,12 @@ void GameObject::SetMesh(char* file, ID3D11Device* device, bool invertTexCoords)
 	hasMesh = true;
 }
 
+void GameObject::LoadTexture(ID3D11Device* device, const wchar_t* file)
+{
+	m_Texture = new Texture(device);
+	hasTexture = m_Texture->LoadTexture(file);
+}
+
 void GameObject::Update()
 {
 	UpdateWorldMatrix();
@@ -36,6 +42,17 @@ void GameObject::Draw(ConstantBuffer* cb)
 
 	m_InitData.deviceContext->UpdateSubresource(m_InitData.constantBuffer, 0, nullptr, cb, 0, 0);
 	m_InitData.deviceContext->DrawIndexed(m_Mesh.IndexCount, 0, 0);
+}
+
+void GameObject::DrawTextured(ConstantBuffer* cb, ID3D11DeviceContext* ctx, int slot)
+{
+	if (hasTexture)
+	{
+		auto tex = m_Texture->GetTextureRV();
+		ctx->PSSetShaderResources(slot, 1, &tex);
+	}
+
+	Draw(cb);
 }
 
 XMFLOAT4X4 GameObject::GetWorldMatrix() { return m_WorldMatrix; }

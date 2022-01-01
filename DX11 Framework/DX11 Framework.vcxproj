@@ -392,6 +392,7 @@
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="OrbitCamera.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -420,6 +421,7 @@
     <ClInclude Include="OrbitCamera.h" />
     <CLInclude Include="resource.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Vector3.h" />
     <ResourceCompile Include="DX11 Framework.rc" />
   </ItemGroup>

@@ -237,6 +237,7 @@ void Application::InitModels()
 
 	m_HerculesPlane = new GameObject(hercules);
 	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+	m_HerculesPlane->LoadTexture(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds");
 
 	GOInitData skysphere;
 	skysphere.constantBuffer = m_ConstantBuffer;
@@ -834,15 +835,14 @@ void Application::Draw()
 	UINT offset = 0;
 
 	#pragma region Draw GameObjects
-		// Draw sky sphere
+		// DrawTextured sky sphere
 		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
 		m_SkySphere->Draw(&cb);
 		
 		if (showScene1)  // Plane scene
-		{
-			m_ImmediateContext->PSSetShaderResources(0, 1, &m_HerculesTexRV);
+		{			
 			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
-			m_HerculesPlane->Draw(&cb);
+			m_HerculesPlane->DrawTextured(&cb, m_ImmediateContext);
 		}
 
 		if (showScene2)  // Hard coded meshes scene

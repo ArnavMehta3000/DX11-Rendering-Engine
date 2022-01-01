@@ -4,6 +4,7 @@
 
 #include "Core.h"
 #include "OBJLoader.h"
+#include "Texture.h"
 
 struct GOInitData
 {
@@ -19,8 +20,10 @@ public:
 	~GameObject();
 
 	void SetMesh(char* file, ID3D11Device* device, bool invertTexCoords = false);
+	void LoadTexture(ID3D11Device* device, const wchar_t* file);
 	void Update();
 	void Draw(ConstantBuffer* cb);
+	void DrawTextured(ConstantBuffer* cb, ID3D11DeviceContext* ctx, int slot = 0);
 
 	XMFLOAT4X4 GetWorldMatrix();
 
@@ -35,13 +38,15 @@ public:
 
 
 private:
-	Vector3 m_Position, m_Rotation, m_Scale;
+	Vector3    m_Position, m_Rotation, m_Scale;
 	XMFLOAT4X4 m_WorldMatrix;
 	GOInitData m_InitData;
 	MeshData   m_Mesh;
+	Texture*   m_Texture;
 
 	bool initialized = false;
 	bool hasMesh = false;
+	bool hasTexture = false;
 
 protected:
 	void UpdateWorldMatrix();
