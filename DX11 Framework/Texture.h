@@ -13,6 +13,5 @@ public:
 private:
 	ID3D11ShaderResourceView* m_TextureRV = nullptr;
 	ID3D11Device* m_d3dDevice;
-	bool m_LoadedTexture;
 };
 #endif // !TEXTURE_H

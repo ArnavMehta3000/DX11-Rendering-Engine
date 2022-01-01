@@ -3,7 +3,6 @@
 Texture::Texture(ID3D11Device* device)
 {
 	m_d3dDevice = device;
-	m_LoadedTexture = false;
 }
 
 Texture::~Texture() {}
@@ -18,6 +17,5 @@ bool Texture::LoadTexture(const wchar_t* filename)
 		return false;
 	}
 
-	m_LoadedTexture = true;
 	return true;
 }
