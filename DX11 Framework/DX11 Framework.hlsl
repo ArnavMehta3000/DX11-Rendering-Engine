@@ -1,5 +1,6 @@
 // Texturing
-Texture2D diffuseTex : TEXTURE : register(t0);
+Texture2D skybox : TEXTURE : register(t0);
+Texture2D diffuseTex : TEXTURE : register(t1);
 SamplerState samLinear : SAMPLER : register(s0);
 
 // Material struct
@@ -139,6 +140,7 @@ float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
     return output;
 }
 
+
 // Vertex Shader
 VS_OUTPUT VS(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOORD0)
 {
@@ -177,12 +179,12 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
     float4 directionalLights = DirectionalLights(normalW, toEyeNormalized);
 
 	// Texturing
-    float4 textureColor = diffuseTex.Sample(samLinear, vsInput.Tex);
+    float4 textureColor = skybox.Sample(samLinear, vsInput.Tex);
 
     //discard;
 	
     psOutput.rgb = directionalLights.rgb * textureColor.rgb;
     psOutput.a = dirLight.Material.Diffuse.a;
 	
-	return psOutput;
+    return psOutput;
 }

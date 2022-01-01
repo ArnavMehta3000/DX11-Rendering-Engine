@@ -178,12 +178,12 @@ HRESULT Application::InitShadersAndInputLayout()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient  = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	directionalLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.ambient   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.diffuse   = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	directionalLight.Material.specular  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	directionalLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular  = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
 	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	directionalLight.SpecularPower      = 0.8f;
 
@@ -204,7 +204,6 @@ void Application::InitTextures()
 {
 	// Load texture
 	HRESULT hr;
-	hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds", nullptr, &m_HerculesTexRV);
 	hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &m_CubeTexRV);
 
 	if (FAILED(hr))
@@ -248,7 +247,8 @@ void Application::InitModels()
 
 	m_SkySphere = new GameObject(skysphere);
 	m_SkySphere->SetMesh("Assets/Models/Blender/sphere.obj", _pd3dDevice, false);
-	
+	m_SkySphere->LoadTexture(_pd3dDevice, L"Assets/HDRI.dds");
+
 	m_Terrain = new Terrain(_pd3dDevice);
 	m_Terrain->GenerateGrid(5, 5, 5, 5);
 }
@@ -837,17 +837,17 @@ void Application::Draw()
 	#pragma region Draw GameObjects
 		// DrawTextured sky sphere
 		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
-		m_SkySphere->Draw(&cb);
+		m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
 		
 		if (showScene1)  // Plane scene
 		{			
 			cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
-			m_HerculesPlane->DrawTextured(&cb, m_ImmediateContext);
+			m_HerculesPlane->DrawTextured(&cb, m_ImmediateContext, 1);
 		}
 
 		if (showScene2)  // Hard coded meshes scene
 		{
-			m_ImmediateContext->PSSetShaderResources(0, 1, &m_CubeTexRV);
+			m_ImmediateContext->PSSetShaderResources(1, 1, &m_CubeTexRV);
 
 			// Pyramid
 			m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPyramidVertexBuffer, &stride, &offset);

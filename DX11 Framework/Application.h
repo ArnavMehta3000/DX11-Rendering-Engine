@@ -87,7 +87,7 @@ private:
 	UINT _WindowHeight;
 	UINT _WindowWidth;
 
-	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+	float ClearColor[4] = { 0.0f, 0.35f, 0.7f, 1.0f };
 	float blendfactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	
 	bool isWireFrame = false;

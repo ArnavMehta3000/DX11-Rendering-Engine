@@ -13,7 +13,7 @@ bool Texture::LoadTexture(const wchar_t* filename)
 	
 	if (FAILED(hr))
 	{
-		OutputDebugString(L"Failed to load texture");
+		OutputDebugString(L"Failed to load texture\n");
 		return false;
 	}
 
