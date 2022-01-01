@@ -259,14 +259,11 @@ void Application::InitModels()
 	GOInitData sSGo;
 	sSGo.constantBuffer = m_ConstantBuffer;
 	sSGo.deviceContext = m_ImmediateContext;
-	sSGo.position = Vector3(0.0f, 3.0f, 0.0f);
-	sSGo.rotation = Vector3();
+	sSGo.position = Vector3();
+	sSGo.rotation = Vector3(0.5f, 0.0f, 0.0f);
 	sSGo.scale = Vector3(200, 200, 200);
 
-	m_SkySphere = new GameObject(sSGo);
-	m_SkySphere->SetMesh("Assets/Models/Blender/sphere.obj", _pd3dDevice, false);
-	m_SkySphere->LoadTexture(_pd3dDevice, L"Assets/HDRI.dds");
-
+	m_SkySphere = new SkySphere(sSGo, _pd3dDevice, L"Assets/HDRI.dds");
 
 	m_Terrain = new Terrain(_pd3dDevice);
 	m_Terrain->GenerateGrid(5, 5, 5, 5);
@@ -882,15 +879,18 @@ void Application::Draw()
 	UINT offset = 0;
 
 	#pragma region Draw GameObjects
-	// DrawTextured sky sphere
-	m_ImmediateContext->RSSetState(_solidCullFront);
-	m_ImmediateContext->PSSetShader(_pSkyPixelShader, nullptr, 0);
+	// Draw  skybox only when 
+	if (!isWireFrame)
+	{
+		m_ImmediateContext->RSSetState(_solidCullFront);
+		m_ImmediateContext->PSSetShader(_pSkyPixelShader, nullptr, 0);
 
-	cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
-	m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
+		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
+		m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
 
-	m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
-	m_ImmediateContext->RSSetState(_solidCullBack);
+		m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
+		m_ImmediateContext->RSSetState(_solidCullBack);
+	}
 
 
 

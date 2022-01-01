@@ -10,6 +10,7 @@
 #include "FirstPersonCamera.h"
 #include "OrbitCamera.h"
 #include "GameObject.h"
+#include "SkySphere.h"
 #include "Terrain.h"
 
 class Application
@@ -31,7 +32,7 @@ private:
 	CameraMats                m_CurrentCamera;
 
 	// Game objects
-	GameObject*               m_SkySphere;
+	SkySphere*                   m_SkySphere;
 	GameObject*               m_HerculesPlane;
 	Terrain*				  m_Terrain;
 
