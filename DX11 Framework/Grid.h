@@ -6,14 +6,24 @@
 
 struct GridData
 {
-	GridData(std::vector<Vector3> vertices, std::vector<Vector3> indices)
+	GridData()
+	{
+		Vertices = std::vector<Vector3>();
+		Indices = std::vector<WORD>();
+		VertexCount = 0;
+		IndexCount = 0;
+	}
+	GridData(std::vector<Vector3> vertices, std::vector<WORD> indices)
 	{
 		Vertices = vertices;
 		Indices = indices;
+		VertexCount = vertices.size();
+		IndexCount = indices.size();
 	}
 
 	std::vector<Vector3> Vertices;
-	std::vector<Vector3> Indices;
+	std::vector<WORD> Indices;
+	int VertexCount, IndexCount;
 };
 
 class Grid

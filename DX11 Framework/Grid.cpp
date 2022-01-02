@@ -32,7 +32,7 @@ GridData Grid::GenerateGrid(int rows, int cols, float cellSpacing)
 	//
 	//Calculate Indices
 	//
-	std::vector<Vector3> indices(indexCount);
+	std::vector<WORD> indices(indexCount);
 	int vert = 0, tris = 0;
 
 	for (int z = 0; z < rows; z++)

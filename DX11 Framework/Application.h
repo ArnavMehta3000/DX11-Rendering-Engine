@@ -11,7 +11,7 @@
 #include "OrbitCamera.h"
 #include "GameObject.h"
 #include "SkySphere.h"
-#include "Grid.h"
+#include "Terrain.h"
 
 class Application
 {
@@ -34,7 +34,7 @@ private:
 	// Game objects
 	SkySphere*                m_SkySphere;
 	GameObject*               m_HerculesPlane;
-
+	Terrain*                  m_Terrain;
 
 	// Hard coded mesh data
 	ID3D11Buffer*             _pCubeVertexBuffer;
