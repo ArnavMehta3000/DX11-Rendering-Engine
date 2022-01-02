@@ -265,7 +265,9 @@ void Application::InitModels()
 
 	m_SkySphere = new SkySphere(sSGo, _pd3dDevice, L"Assets/HDRI.dds");
 	
-	m_Terrain = new Terrain(Grid::GenerateGrid(4, 4, 5.0f), _pd3dDevice);
+
+	HMapInfo hm(513, 513, 1.0f, 1.0f);
+	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);
 }
 
 HRESULT Application::InitVertexBuffer()
@@ -922,14 +924,15 @@ void Application::Draw()
 
 	if (showScene3)  // Terrain scene
 	{
-		UINT stride = sizeof(TerrainVertex), offsett = 0;
-
-		m_ImmediateContext->IASetVertexBuffers(0, 1, &m_Terrain->m_VertexBuffer, &stride, &offset);
-		m_ImmediateContext->IASetIndexBuffer(m_Terrain->m_IndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-		meshWorld = XMLoadFloat4x4(&m_Terrain->m_WorldMat);
+		stride = sizeof(TerrainVertex);
+		ID3D11Buffer* vb = m_Terrain->GetBuffers().VertexBuffer;
+		ID3D11Buffer* ib = m_Terrain->GetBuffers().IndexBuffer;
+		m_ImmediateContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+		m_ImmediateContext->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0);
+		meshWorld = XMLoadFloat4x4(&m_Terrain->GetWorldMat()); 
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
-		m_ImmediateContext->DrawIndexed(m_Terrain->m_GridData.IndexCount, 0, 0);
+		m_ImmediateContext->DrawIndexed(m_Terrain->GetBuffers().IndexCount, 0, 0);
 	}
 	#pragma endregion
 
