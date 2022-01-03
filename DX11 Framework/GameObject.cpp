@@ -12,6 +12,47 @@ GameObject::GameObject(GOInitData data)
 	initialized = true;
 }
 
+GameObject::GameObject(const char* initFile, ID3D11DeviceContext* deviceContext, ID3D11Buffer* constantBuffer)
+{
+	using json = nlohmann::json;
+
+	json jFile;
+	std::ifstream input(initFile);
+	input >> jFile;
+
+	// Get position
+	json jPos = jFile["position"];
+	Vector3 position = Vector3((float)jPos.at(0), (float)jPos.at(1), (float)jPos.at(2));
+
+	// Get rotation
+	json jRot = jFile["rotation"];
+	Vector3 rotation = Vector3((float)jRot.at(0), (float)jRot.at(1), (float)jRot.at(2));
+
+	// Get scale
+	json jScale = jFile["scale"];
+	Vector3 scale = Vector3((float)jScale.at(0), (float)jScale.at(1), (float)jScale.at(2));
+
+
+
+	// Create init data
+	GOInitData init;
+	init.constantBuffer = constantBuffer;
+	init.deviceContext = deviceContext;
+	init.position = position;
+	init.rotation = rotation;
+	init.scale = scale;
+
+	
+	m_Position = init.position;
+	m_Rotation = init.rotation;
+	m_Scale = init.scale;
+
+	UpdateWorldMatrix();
+
+	m_InitData = init;
+	initialized = true;
+}
+
 GameObject::~GameObject() {}
 
 void GameObject::SetMesh(char* file, ID3D11Device* device, bool invertTexCoords)

@@ -64,6 +64,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="SkySphere.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="JSON\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -113,6 +114,7 @@
     <None Include="DX11 Framework.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="HerculesInitData.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX11 Framework.rc">

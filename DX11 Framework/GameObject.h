@@ -2,7 +2,9 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
+#include <fstream>
 #include "Core.h"
+#include "JSON\json.hpp"
 #include "OBJLoader.h"
 #include "Texture.h"
 
@@ -17,6 +19,7 @@ class GameObject
 {
 public:
 	GameObject(GOInitData data);
+	GameObject(const char* initFile, ID3D11DeviceContext* deviceContext, ID3D11Buffer* constantBuffer);
 	~GameObject();
 
 	void SetMesh(char* file, ID3D11Device* device, bool invertTexCoords = false);
