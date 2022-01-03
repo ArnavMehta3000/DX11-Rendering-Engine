@@ -48,6 +48,8 @@ Application::~Application()
 	Cleanup();
 }
 
+
+
 HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 {
 	if (FAILED(InitWindow(hInstance, nCmdShow)))
@@ -70,6 +72,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	// Initialize other things
 	InitVertexBuffer();
 	InitIndexBuffer();
+
 	InitLights();
 	InitTextures();
 	InitCamera();
@@ -93,22 +96,25 @@ void Application::InitCamera()
 {
 	// Create camera init data
 	CameraInitData cameraInitData;
-	cameraInitData.position = Vector3(0.0f, 5.0f, -5.0f);
+	cameraInitData.position = Vector3(0.0f, 2.0f, -17.0f);
 	cameraInitData.at = Vector3(0.0f, 0.0f, 0.0f);
 	cameraInitData.up = Vector3(0.0f, 1.0f, 0.0f);
 	cameraInitData.windowWidth = _WindowWidth;
 	cameraInitData.windowHeight = _WindowHeight;
 	cameraInitData.nearZ = 0.01f;
-	cameraInitData.farZ = 500.0f;
+	cameraInitData.farZ = 5000.0f;
 
+	m_FrontCam = new Camera(cameraInitData);
 
-	m_StaticCam = new Camera(cameraInitData);
+	cameraInitData.position = Vector3(0.0f, 17.0f, 1.0f);
+	m_TopDownCam = new Camera(cameraInitData);
+	
 	m_FpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
 	m_OrbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 
 	// Default camerais static camera
-	m_CurrentCamera.View = m_StaticCam->GetView();
-	m_CurrentCamera.Projection = m_StaticCam->GetProj();
+	m_CurrentCamera.View = m_FrontCam->GetView();
+	m_CurrentCamera.Projection = m_FrontCam->GetProj();
 }
 
 HRESULT Application::InitShadersAndInputLayout()
@@ -814,12 +820,38 @@ void Application::Update()
 
 	// Update cameras
 	m_FpsCam->Update();
-	m_StaticCam->Update();
+	m_FrontCam->Update();
+	m_TopDownCam->Update();
 	m_OrbitCam->Update();
+
+	if (m_FpsCam->enabled)
+	{
+		m_CurrentCamera.View = m_FpsCam->GetView();
+		m_CurrentCamera.Projection = m_FpsCam->GetProj();
+	}
+
+	if (m_FrontCam->enabled)
+	{
+		m_CurrentCamera.View = m_FrontCam->GetView();
+		m_CurrentCamera.Projection = m_FrontCam->GetProj();
+	}
+
+	if (m_TopDownCam->enabled)
+	{
+		m_CurrentCamera.View = m_TopDownCam->GetView();
+		m_CurrentCamera.Projection = m_TopDownCam->GetProj();
+	}
+
+	if (m_OrbitCam->enabled)
+	{
+		m_CurrentCamera.View = m_OrbitCam->GetView();
+		m_CurrentCamera.Projection = m_OrbitCam->GetProj();
+	}
 }
 
 void Application::Draw()
 {
+	#pragma region Render Setup
 	// Clear the back buffer
 	m_ImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
@@ -827,14 +859,13 @@ void Application::Draw()
 	m_ImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
-	// TODO: Change camera here
 	XMMATRIX view = XMLoadFloat4x4(&m_CurrentCamera.View);
 	XMMATRIX transposeView = XMMatrixTranspose(view);
 	XMMATRIX projection = XMLoadFloat4x4(&m_CurrentCamera.Projection);
 	XMFLOAT4X4 eye;
 
 	XMMATRIX meshWorld;
-	
+
 	XMStoreFloat4x4(&eye, view);
 
 	// Update variables
@@ -856,7 +887,10 @@ void Application::Draw()
 	m_ImmediateContext->VSSetConstantBuffers(0, 1, &m_ConstantBuffer);
 	m_ImmediateContext->PSSetConstantBuffers(0, 1, &m_ConstantBuffer);
 	m_ImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+	#pragma endregion
 
+
+	#pragma region Draw GameObjects
 	// Global transparency
 	if (isTransparent)
 		m_ImmediateContext->OMSetBlendState(_transparency, blendfactor , 0xffffffff);
@@ -866,7 +900,6 @@ void Application::Draw()
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
 
-	#pragma region Draw GameObjects
 	// Draw  skybox only when 
 	if (!isWireFrame)
 	{
@@ -938,6 +971,7 @@ void Application::Draw()
 			Begin("Debug Menu", 0, ImGuiWindowFlags_AlwaysAutoResize);
 
 			BeginTabBar("Settings");
+			#pragma region World Settings
 			if (BeginTabItem("World"))
 			{
 				ColorEdit3("Background Color", ClearColor);
@@ -961,7 +995,10 @@ void Application::Draw()
 
 				EndTabItem();
 			}
+			#pragma endregion
 
+
+			#pragma region Lights
 			if (BeginTabItem("Lights"))
 			{
 				if (TreeNode("Directional Light"))
@@ -1027,48 +1064,78 @@ void Application::Draw()
 				}
 				EndTabItem();
 			}
+			#pragma endregion
 
+
+			#pragma region Cameras
 			if (BeginTabItem("Cameras"))
 			{
 				Text("Set Camera");
 
-				if (Button("Static Camera") || m_StaticCam->enabled)
+				if (Button("Front View Camera") || m_FrontCam->enabled)
 				{
-					m_StaticCam->enabled = true;
+					m_FrontCam->enabled = true;
 					m_OrbitCam->enabled = false;
 					m_FpsCam->enabled = false;
+					m_TopDownCam->enabled = false;
 
-					
-					SameLine(); Checkbox("Show Options##Static", &staticCamOpt);
-					if (staticCamOpt)
+
+					SameLine(); Checkbox("Show Options##Static", &frontCamOpt);
+					if (frontCamOpt)
 					{
-						Vector3 pos = m_StaticCam->GetPosition();
-						Vector3 look = m_StaticCam->GetLookAt();
-						
+						Vector3 pos = m_FrontCam->GetPosition();
+						Vector3 look = m_FrontCam->GetLookAt();
+
 						DragFloat3("Position##Static", &pos.x); SameLine();
 						if (Button("Reset##SPos"))
-							m_StaticCam->SetPosition(Vector3(0.0f, 5.0f, -5.0f));
+							m_FrontCam->SetPosition(Vector3(0.0f, 2.0f, -17.0f));
 						else
-							m_StaticCam->SetPosition(pos);
+							m_FrontCam->SetPosition(pos);
 
 
 						DragFloat3("Look At##Static", &look.x); SameLine();
 						if (Button("Reset##SLook"))
-							m_StaticCam->SetLookAt(Vector3::Zero());
+							m_FrontCam->SetLookAt(Vector3::Zero());
 						else
-							m_StaticCam->SetLookAt(look);
+							m_FrontCam->SetLookAt(look);
 					}
-
-					m_CurrentCamera.View = m_StaticCam->GetView();
-					m_CurrentCamera.Projection = m_StaticCam->GetProj();
 				}
-				
+
+				if (Button("Top View Camera") || m_TopDownCam->enabled)
+				{
+					m_FrontCam->enabled = false;
+					m_OrbitCam->enabled = false;
+					m_FpsCam->enabled = false;
+					m_TopDownCam->enabled = true;
+
+					SameLine(); Checkbox("Show Options##Static", &topDownCamOpt);
+					if (topDownCamOpt)
+					{
+						Vector3 pos = m_TopDownCam->GetPosition();
+						Vector3 look = m_TopDownCam->GetLookAt();
+
+						DragFloat3("Position##Static", &pos.x); SameLine();
+						if (Button("Reset##SPos"))
+							m_TopDownCam->SetPosition(Vector3(0.0f, 17.0f, 1.0f));
+						else
+							m_TopDownCam->SetPosition(pos);
+
+
+						DragFloat3("Look At##Static", &look.x); SameLine();
+						if (Button("Reset##SLook"))
+							m_TopDownCam->SetLookAt(Vector3::Zero());
+						else
+							m_TopDownCam->SetLookAt(look);
+					}
+				}
+
 				if (Button("Orbit Camera") || m_OrbitCam->enabled)
 				{
-					m_StaticCam->enabled = false;
+					m_FrontCam->enabled = false;
 					m_OrbitCam->enabled = true;
 					m_FpsCam->enabled = false;
-					
+					m_TopDownCam->enabled = false;
+
 					SameLine(); Checkbox("Show Options##Orbit", &orbitCamOpt);
 					if (orbitCamOpt)
 					{
@@ -1079,20 +1146,18 @@ void Application::Draw()
 
 						DragFloat("Radius##Orbit", &radius, 0.5f, 1.0f, 100.0f);
 						SliderFloat("Speed##Orbit", &speed, -0.1f, 0.1f);
-						
+
 						m_OrbitCam->SetRadius(radius);
 						m_OrbitCam->SetSpeed(speed);
 					}
-
-					m_CurrentCamera.View = m_OrbitCam->GetView();
-					m_CurrentCamera.Projection = m_OrbitCam->GetProj();
 				}
-				
+
 				if (Button("FPS Camera") || m_FpsCam->enabled)
 				{
-					m_StaticCam->enabled = false;
+					m_FrontCam->enabled = false;
 					m_OrbitCam->enabled = false;
 					m_FpsCam->enabled = true;
+					m_TopDownCam->enabled = false;
 
 					SameLine();
 					Checkbox("Show Options##FPS", &fpsCamOpt);
@@ -1101,14 +1166,14 @@ void Application::Draw()
 						Text("W/S to move\nArrow keys to rotate");
 
 					}
-
-					m_CurrentCamera.View = m_FpsCam->GetView();
-					m_CurrentCamera.Projection = m_FpsCam->GetProj();
 				}
 
 				EndTabItem();
 			}
+			#pragma endregion
 
+
+			#pragma region Scenes
 			if (BeginTabItem("Scenes"))
 			{
 				if (Button(" Show Scene 1"))
@@ -1131,8 +1196,9 @@ void Application::Draw()
 					showScene2 = false;
 					showScene3 = true;
 				}
-
 				EndTabItem();
+				#pragma endregion
+
 			}
 
 			EndTabBar();

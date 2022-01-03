@@ -3,6 +3,12 @@
 Terrain::Terrain(const char* file, HMapInfo initData, ID3D11Device* device)
 	: m_InitData(initData), m_Device(device)
 {
+	XMMATRIX position = XMMatrixTranslationFromVector(Vector3::V3ToXMVECTOR(Vector3()));
+	XMMATRIX scaling = XMMatrixScalingFromVector(Vector3::V3ToXMVECTOR(Vector3(1.0f, 1.0f, 1.0f)));
+	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(Vector3::V3ToXMVECTOR(Vector3()));
+
+	XMStoreFloat4x4(&m_WorldMat, scaling * rotation * position);
+
 	XMStoreFloat4x4(&m_WorldMat, XMMatrixIdentity());
 	LoadHeightMap(file, initData);
 	GenerateMesh(m_HeightMap);
