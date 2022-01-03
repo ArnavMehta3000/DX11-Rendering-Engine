@@ -115,6 +115,7 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="HerculesInitData.json" />
+    <None Include="SkySphereInitData.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX11 Framework.rc">

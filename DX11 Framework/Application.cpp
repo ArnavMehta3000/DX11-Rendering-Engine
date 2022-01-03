@@ -245,25 +245,13 @@ void Application::InitTextures()
 
 void Application::InitModels()
 {
-	GOInitData herculesGo;
-	herculesGo.constantBuffer = m_ConstantBuffer;
-	herculesGo.deviceContext  = m_ImmediateContext;
-	herculesGo.position       = Vector3(0.0f, 0.0f, 0.0f);
-	herculesGo.rotation       = Vector3();
-	herculesGo.scale          = Vector3::One();
-
+	// Init plane
 	m_HerculesPlane = new GameObject("HerculesInitData.json", m_ImmediateContext, m_ConstantBuffer);
 	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
 	m_HerculesPlane->LoadTexture(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds");
 
-	GOInitData ssGo;
-	ssGo.constantBuffer = m_ConstantBuffer;
-	ssGo.deviceContext = m_ImmediateContext;
-	ssGo.position = Vector3();
-	ssGo.rotation = Vector3(0.5f, 0.0f, 0.0f);
-	ssGo.scale = Vector3(200, 200, 200);
-
-	m_SkySphere = new SkySphere(ssGo, _pd3dDevice, L"Assets/HDRI.dds");
+	// Init skybox
+	m_SkySphere = new SkySphere("SkySphereInitData.json", m_ImmediateContext, m_ConstantBuffer, _pd3dDevice);
 
 	HMapInfo hm(513, 513, 1.0f, 1.0f);
 	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);

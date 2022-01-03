@@ -402,6 +402,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="HerculesInitData.json" />
+    <None Include="SkySphereInitData.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
