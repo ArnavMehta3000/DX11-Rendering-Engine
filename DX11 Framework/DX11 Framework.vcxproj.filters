@@ -18,14 +18,12 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{49ea3f12-0ede-4468-8ec5-6cd28a759072}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{447c09e8-4f2b-409d-a42d-e6cd998e34b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="Matrix.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Core.h" />
-    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="imgui\imconfig.h">
@@ -61,17 +59,33 @@
     <ClInclude Include="OrbitCamera.h">
       <Filter>Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="SkySphere.h" />
     <ClInclude Include="Terrain.h" />
-    <ClInclude Include="JSON\json.hpp" />
+    <ClInclude Include="Core.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\json.hpp">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DX11 Framework.cpp" />
-    <ClCompile Include="Vector3.cpp" />
-    <ClCompile Include="Matrix.cpp" />
-    <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
@@ -102,8 +116,19 @@
       <Filter>Cameras</Filter>
     </ClCompile>
     <ClCompile Include="SkySphere.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="Vector3.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

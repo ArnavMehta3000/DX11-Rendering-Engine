@@ -296,6 +296,7 @@ HRESULT Application::InitVertexBuffer()
 	}
 #pragma endregion
 
+
 #pragma region Pyramid
 	{
 		SimpleVertex pyramidVertices[] =
@@ -323,6 +324,7 @@ HRESULT Application::InitVertexBuffer()
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
 	}
 #pragma endregion
+
 
 #pragma region Plane
 	{
@@ -447,6 +449,7 @@ HRESULT Application::InitIndexBuffer()
 	}
 #pragma endregion
 
+
 #pragma region Plane
 	{
 		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the vertex buffer
@@ -484,6 +487,7 @@ HRESULT Application::InitIndexBuffer()
 		PlaneInitData.pSysMem = planeIndices;
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneIndexBuffer);
 	}
+	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(0.0f, -1.5, 0.0));
 #pragma endregion
 
 
@@ -815,6 +819,7 @@ void Application::Update()
 	{
 		XMStoreFloat4x4(&_cubeWorld, XMMatrixTranslation(sin(t * 2) * 6, 0.0f, 0.0f));
 		XMStoreFloat4x4(&_pyramidWorld, XMMatrixTranslation(0.0f, 0.0f, cos(t * 2) * 6));
+		
 	}
 
 
@@ -901,7 +906,7 @@ void Application::Draw()
 	UINT offset = 0;
 
 	// Draw  skybox only when 
-	if (!isWireFrame)
+	if (!isWireFrame && !isTransparent)
 	{
 		m_ImmediateContext->RSSetState(_solidCullFront);
 		m_ImmediateContext->PSSetShader(_pSkyPixelShader, nullptr, 0);
@@ -940,6 +945,15 @@ void Application::Draw()
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
+		// Plane
+		int xSize = 10, zSize = 10;
+		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
+		m_ImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+		meshWorld = XMLoadFloat4x4(&_planeWorld);
+		cb.mWorld = XMMatrixTranspose(meshWorld);
+		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
+		m_ImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
 	}
 
 	if (showScene3)  // Terrain scene
@@ -1176,21 +1190,21 @@ void Application::Draw()
 			#pragma region Scenes
 			if (BeginTabItem("Scenes"))
 			{
-				if (Button(" Show Scene 1"))
+				if (Button("Scene 1: Mesh Loading"))
 				{
 					showScene1 = true;
 					showScene2 = false;
 					showScene3 = false;
 				}
 
-				if (Button(" Show Scene 2"))
+				if (Button("Scene 2: Hard Coded Meshes"))
 				{
 					showScene1 = false;
 					showScene2 = true;
 					showScene3 = false;
 				}
 
-				if (Button(" Show Scene 3"))
+				if (Button("Scene 3: Terrain"))
 				{
 					showScene1 = false;
 					showScene2 = false;
