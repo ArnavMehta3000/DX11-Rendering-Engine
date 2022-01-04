@@ -52,6 +52,7 @@ private:
 
 
 	ID3D11VertexShader*       _pVertexShader;
+	ID3D11VertexShader*		  _pPlaneVertexShader;
 	ID3D11PixelShader*        _pPixelShader;
 	ID3D11PixelShader*        _pSkyPixelShader;
 	ID3D11InputLayout*        _pVertexLayout;
@@ -101,7 +102,10 @@ private:
 
 	bool showScene1 = true;  // Plane scene
 	bool showScene2 = false; // Hard coded meshes
-	bool showScene3 = false;
+	bool showScene3 = false; // Terrain scene
+
+	// Plane vertex shader controls
+	float time, rate = 10.0f, amp = 0.1f, freq = 6.0f, threshold = -1.0f;
 
 public:
 	Application();

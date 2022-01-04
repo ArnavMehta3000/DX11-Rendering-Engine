@@ -52,8 +52,15 @@ cbuffer ConstantBuffer : register(b0)
 	PointLight pointLight;
 
 	float3 EyePosW; // Eye/camera in world
-	float padding;
+	float Time;
+
 	float3 LightVecW;
+    float Rate;
+
+    float Amplitude;
+    float Frequency;
+    float Threshold;
+    float padding;
 }
 
 
@@ -146,12 +153,12 @@ VS_OUTPUT VS(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOOR
 {
 	VS_OUTPUT output = (VS_OUTPUT) 0;
 	
-	output.Pos = mul(Pos, World);
-	output.PosW = output.Pos;
+    output.Pos = mul(Pos, World);
+    output.PosW = output.Pos;
 	
 	output.Pos = mul(output.Pos, View);
 	output.Pos = mul(output.Pos, Projection);
-	
+
 	output.NormalW = mul(Normal, World);
 	
     output.Tex = Tex;	
@@ -194,4 +201,30 @@ float4 PS_SKY(VS_OUTPUT vsInput) : SV_TARGET
 {
     float4 output = skybox.Sample(samLinear, 1.0f - vsInput.Tex);
     return output ;
+}
+
+VS_OUTPUT VS_PLANE(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOORD0)
+{
+    float dx = Pos.x;
+    float dz = Pos.z;
+    float freq = sqrt(dx * dx + dz * dz);
+    float angle = -Time * Rate + freq * Frequency;
+    Pos.y += sin(angle) * Amplitude;
+
+	if (Pos.y <= Threshold)
+        Pos.y = Threshold;
+
+    VS_OUTPUT output = (VS_OUTPUT) 0;
+	
+    output.Pos = mul(Pos, World) * sin(Time);
+    output.PosW = output.Pos;
+	
+    output.Pos = mul(output.Pos, View);
+    output.Pos = mul(output.Pos, Projection);
+	
+    output.NormalW = mul(Normal, World);
+	
+    output.Tex = Tex;
+	
+    return output;
 }

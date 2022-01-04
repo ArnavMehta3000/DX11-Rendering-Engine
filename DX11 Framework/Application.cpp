@@ -141,6 +141,21 @@ HRESULT Application::InitShadersAndInputLayout()
 		return hr;
 	}
 
+
+	// Create vertex shader for plane
+	ID3DBlob* pPlaneVSBlob = nullptr;
+	hr = CompileShaderFromFile(L"DX11 Framework.hlsl", "VS_PLANE", "vs_4_0", &pPlaneVSBlob);
+
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr,
+				   L"Plane vertex shader failed to compile.", L"Vertex Shader Error", MB_OK);
+		return hr;
+	}
+
+	hr = _pd3dDevice->CreateVertexShader(pPlaneVSBlob->GetBufferPointer(), pPlaneVSBlob->GetBufferSize(), nullptr, &_pPlaneVertexShader);
+
+
 	// Compile the pixel shader
 	ID3DBlob* pPSBlob = nullptr;
 	hr = CompileShaderFromFile(L"DX11 Framework.hlsl", "PS", "ps_4_0", &pPSBlob);
@@ -329,8 +344,8 @@ HRESULT Application::InitVertexBuffer()
 #pragma region Plane
 	{
 		// Define plane size
-		int offset = 5;
-		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the index buffer
+		const unsigned int xSize = 20, zSize = 20;  // HACK: Change the plane size in the index buffer
+		float offsetX = xSize / 2.0f, offsetZ = zSize / 2.0f;
 		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
 
 		// Populate the plane vertex buffer
@@ -338,7 +353,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x - offset, 0.0f, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(x - offset / xSize, z - offset / zSize) };
+				planeVertices[i] = { XMFLOAT3(x - offsetX, 0.0f, z - offsetZ), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(x - offsetX / xSize, z - offsetZ / zSize) };
 				i++;
 			}
 		}
@@ -452,7 +467,7 @@ HRESULT Application::InitIndexBuffer()
 
 #pragma region Plane
 	{
-		const unsigned int xSize = 10, zSize = 10;  // HACK: Change the plane size in the vertex buffer
+		const unsigned int xSize = 20, zSize = 20;  // HACK: Change the plane size in the vertex buffer
 		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
 
 		int vert = 0, tris = 0;
@@ -765,6 +780,9 @@ void Application::Cleanup()
 	if ( _pVertexLayout)
 		_pVertexLayout->Release();
 
+	if (_pPlaneVertexShader)
+		_pPlaneVertexShader->Release();
+
 	if ( _pVertexShader)
 		_pVertexShader->Release();
 
@@ -809,6 +827,7 @@ void Application::Update()
 	}
 	#pragma endregion
 
+	time = t;
 
 	// Update gameobject
 	m_SkySphere->Update();
@@ -877,6 +896,13 @@ void Application::Draw()
 	ConstantBuffer cb;
 	cb.mView = transposeView;
 	cb.mProjection = XMMatrixTranspose(projection);
+
+	// Plane vb
+	cb.Time = time;
+	cb.Rate = rate;
+	cb.Amplitude = amp;
+	cb.Frequency = freq;
+	cb.Threshold = threshold;
 
 	// Lights
 	cb.dirLight = directionalLight;
@@ -947,13 +973,17 @@ void Application::Draw()
 		m_ImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
 
 		// Plane
-		int xSize = 10, zSize = 10;
+		m_ImmediateContext->VSSetShader(_pPlaneVertexShader, nullptr, 0);  // Set shader
+		
+		int xSize = 20, zSize = 20;
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 		meshWorld = XMLoadFloat4x4(&_planeWorld);
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
+		
+		m_ImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);  // Reset Shader
 	}
 
 	if (showScene3)  // Terrain scene
@@ -1203,6 +1233,14 @@ void Application::Draw()
 					showScene1 = false;
 					showScene2 = true;
 					showScene3 = false;
+				}
+
+				if (showScene2)
+				{
+					DragFloat("Rate", &rate, 0.1f, 0.0f, 20.0f);
+					DragFloat("Amplitude", &amp, 0.1f, 0.0f, 20.0f);
+					DragFloat("Frequency", &freq, 0.1f, 0.0f, 50.0f);
+					DragFloat("Threshold", &threshold, 0.1f, -10.0f, 10.0f);
 				}
 
 				if (Button("Scene 3: Terrain"))

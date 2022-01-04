@@ -40,8 +40,14 @@ public:
     Light::PointLight pointLight;
     
     XMFLOAT3 EyePosW; // Camera position in world space
-    float padding;
+    float Time;
 
     XMFLOAT3 LightVecW;
+    float Rate;
+
+    float Amplitude;
+    float Frequency;
+    float Threshold;
+    float padding;
 };
 #endif // !CORE_H
