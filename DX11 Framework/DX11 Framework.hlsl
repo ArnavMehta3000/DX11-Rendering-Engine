@@ -91,8 +91,8 @@ float4 PointLights(float3 worldPos, float3 inputNormal, float3 toEyeNormalized)
 	ambient = pointLight.Material.Ambient * pointLight.Intensity.Ambient;
 
 	// If pixel is too far then return ambient light
-	//if (d > pointLight.Range)
-		//return float4(ambient.rgb, diffuse.a);
+    if (d > pointLight.Range)
+        return float4(ambient.rgb, diffuse.a);
 
 	lightToPixelVec = normalize(lightToPixelVec);
 
@@ -172,7 +172,7 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 {
 	float4 psOutput = (0.0f, 0.0f, 0.0f, 1.0f);
 	
-	// Compute the vector from the vertex to the eye position (normalize the difference)
+	// Compute the vector from the pixel to the eye position (normalize the difference)
 	float3 viewToEye = EyePosW - vsInput.Pos.xyz;
 	float3 toEyeNormalized = normalize(EyePosW - vsInput.Pos.xyz);
 	
@@ -190,7 +190,8 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 
     //discard;
 	
-    psOutput.rgb = directionalLights.rgb * textureColor.rgb;
+    float3 addedLights = float3(min(directionalLights.rgb + pointLights.rgb, 1));
+    psOutput.rgb = (directionalLights.rgb + pointLights.rgb) * textureColor.rgb;
     psOutput.a = dirLight.Material.Diffuse.a;
 	
     return psOutput;

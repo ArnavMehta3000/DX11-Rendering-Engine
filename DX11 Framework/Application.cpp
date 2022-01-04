@@ -694,26 +694,26 @@ void Application::InitCamera()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	directionalLight.Material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
-	directionalLight.Direction = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	directionalLight.SpecularPower = 0.8f;
+	directionalLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular  = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
+	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight.SpecularPower      = 0.8f;
 
-	//Point lights (WIP)
-	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	pointLight.Material.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Material.specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Position = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	pointLight.Attenuation = XMFLOAT3(5.0f, 5.0f, 5.0f);
-	pointLight.Range = 10.0f;
-	pointLight.SpecularPower = 10.2f;
+	//Point lights
+	pointLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.specular  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Position           = XMFLOAT3(0.0f, 3.0f, 0.0f);
+	pointLight.Attenuation        = XMFLOAT3(5.0f, 5.0f, 5.0f);
+	pointLight.Range              = 10.0f;
+	pointLight.SpecularPower      = 0.8f;
 }
 
 void Application::InitTextures()
@@ -870,6 +870,7 @@ void Application::Draw()
 
 	// Lights
 	cb.dirLight = directionalLight;
+	cb.pointLight = pointLight;
 	cb.LightVecW = directionalLight.Direction;
 	cb.pointLight = pointLight;
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
@@ -1010,26 +1011,16 @@ void Application::Draw()
 			#pragma region Lights
 			if (BeginTabItem("Lights"))
 			{
+				#pragma region Directional Light
 				if (TreeNode("Directional Light"))
 				{
 					Text("Direction");
 					SliderFloat3("##direction", &directionalLight.Direction.x, -1.0f, 1.0f);
 
-					if (TreeNode("Intensity"))
+					if (TreeNode("Color"))
 					{
-						ColorEdit3("Ambient##I", &directionalLight.Intensity.Ambient.x);
 						ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
 						ColorEdit3("Specular##I", &directionalLight.Intensity.Specular.x);
-
-						TreePop();
-					}
-
-
-					if (TreeNode("Material"))
-					{
-						ColorEdit3("Ambient##M", &directionalLight.Material.ambient.x);
-						ColorEdit3("Diffuse##M", &directionalLight.Material.diffuse.x);
-						ColorEdit3("Specular##M", &directionalLight.Material.specular.x);
 
 						TreePop();
 					}
@@ -1040,35 +1031,25 @@ void Application::Draw()
 
 					TreePop();
 				}
+				#pragma endregion
+
 
 				if (TreeNode("Point Light"))
 				{
-					Text("Direction");
-					SliderFloat3("##direction", &directionalLight.Direction.x, -1.0f, 1.0f);
+					Text("Position");
+					DragFloat3("##direction", &pointLight.Position.x, 0.5f, -50.0f, 50.0f);
 
-					if (TreeNode("Intensity"))
+					if (TreeNode("Color"))
 					{
-						ColorEdit3("Ambient##I", &directionalLight.Intensity.Ambient.x);
-						ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
-						ColorEdit3("Specular##I", &directionalLight.Intensity.Specular.x);
-
-						TreePop();
-					}
-
-
-					if (TreeNode("Material"))
-					{
-						ColorEdit3("Ambient##M", &directionalLight.Material.ambient.x);
-						ColorEdit3("Diffuse##M", &directionalLight.Material.diffuse.x);
-						ColorEdit3("Specular##M", &directionalLight.Material.specular.x);
+						ColorEdit3("Color##IP", &pointLight.Intensity.Specular.x);
 
 						TreePop();
 					}
 
 					NewLine();
 
-					SliderFloat("Specular Power", &directionalLight.SpecularPower, 0.001f, 2.0f);
-
+					SliderFloat("Specular Power", &pointLight.SpecularPower, 0.001f, 2.0f);
+					SliderFloat("Range", &pointLight.Range, 0.001f, 50.0f);
 					TreePop();
 				}
 				EndTabItem();
