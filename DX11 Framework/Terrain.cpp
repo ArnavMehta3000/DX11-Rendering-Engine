@@ -9,9 +9,11 @@ Terrain::Terrain(const char* file, HMapInfo initData, ID3D11Device* device)
 
 	XMStoreFloat4x4(&m_WorldMat, scaling * rotation * position);
 
-	XMStoreFloat4x4(&m_WorldMat, XMMatrixIdentity());
 	LoadHeightMap(file, initData);
-	GenerateMesh(m_HeightMap);
+	CreateVertexBuffer();
+	CreateIndexBuffer();
+
+	initialized = true;
 }
 
 Terrain::~Terrain()
@@ -22,7 +24,7 @@ Terrain::~Terrain()
 void Terrain::LoadHeightMap(const char* file, HMapInfo initData)
 {
 	std::vector<unsigned char> input(initData.Width * initData.Height);
-	m_HeightMap = std::vector<float>(initData.Width * initData.Height);
+	m_HeightMap = std::vector<float>((m_InitData.Width + 1) * (m_InitData.Height + 1));
 
 	std::ifstream inFile;
 	inFile.open(file, std::ios_base::binary);
@@ -37,118 +39,84 @@ void Terrain::LoadHeightMap(const char* file, HMapInfo initData)
 		m_HeightMap[i] = (input[i] / 255.0f) * initData.Scale;
 }
 
-void Terrain::GenerateMesh(std::vector<float> heightMap)
+void Terrain::CreateVertexBuffer()
 {
-	int width = m_InitData.Width;
-	int height = m_InitData.Height;
-	float halfX = -0.5f * (width - 1);
-	float halfZ = 0.5f * (height - 1);
+	const unsigned int xSize = m_InitData.Width, zSize = m_InitData.Height;
+	std::vector<SimpleVertex> terrainVertices((xSize + 1) * (zSize + 1));
 
-	TerrainData terrainData(width, height, m_Device);
-	int vertexIndex = 0;
-	for (unsigned int z = 0; z < height; z++)
-	{
-		for (unsigned int x = 0; x < width; x++)
+	float offsetX = (xSize + 1) / 2.0f;
+	float offsetZ = (zSize + 1) / 2.0f;
+
+	int i = 0;
+	for (int z = 0; z < zSize; z++)
+		for (int x = 0; x < xSize; x++)
 		{
-			terrainData.m_Vertices[vertexIndex] = XMFLOAT3(halfX + x, m_HeightMap[width * x + z], halfZ - z);
-			terrainData.m_UV[vertexIndex] = XMFLOAT2(x / (float)width, z / (float)height);
-
-			if (x < width - 1 && z < height - 1)
-			{
-				terrainData.AddTriangle(vertexIndex, vertexIndex + width + 1, vertexIndex + width);
-				terrainData.AddTriangle(vertexIndex + width + 1, vertexIndex, vertexIndex + 1);
-			}
-
-			vertexIndex++;
+			terrainVertices[i] = { XMFLOAT3(x - offsetX, m_HeightMap[i], z - offsetZ),
+								   XMFLOAT3(0.0f, 1.0f, 0.0f),
+								   XMFLOAT2(x - offsetX / xSize, z - offsetZ / zSize) };
+			i++;
 		}
-	}
 
-	m_Buffers = terrainData.CreateBuffers();
-}
-
-
-
-TerrainData::TerrainData(int terrainWidth, int terrainHeight, ID3D11Device* device)
-{
-	m_Vertices = std::vector<XMFLOAT3>(terrainHeight * terrainWidth);
-	m_Triangles = std::vector<WORD>((terrainWidth - 1) * (terrainHeight - 1) * 6);
-	m_UV = std::vector<XMFLOAT2>(terrainWidth * terrainHeight);
-	m_TerrainVertices = std::vector<TerrainVertex>(terrainHeight * terrainWidth);
-	m_Device = device;
-	m_TriangleIndex = 0;
-}
-
-TerrainData::~TerrainData()
-{
-	m_Vertices.clear();
-	m_Triangles.clear();
-}
-
-void TerrainData::AddTriangle(int t1, int t2, int t3)
-{
-	m_Triangles[m_TriangleIndex] = t1;
-	m_Triangles[m_TriangleIndex + 1] = t2;
-	m_Triangles[m_TriangleIndex + 2] = t3;
-	m_TriangleIndex += 3;
-}
-
-TerrainBuffers TerrainData::CreateBuffers()
-{
-	m_Buffers = TerrainBuffers();
 	HRESULT hr;
-	
-	// Create the vertex
-	for (int i = 0; i < m_TerrainVertices.size(); i++)
-		m_TerrainVertices[i] = TerrainVertex(m_Vertices[i], m_UV[i]);
-
-	// Create void pointer to vertex data
-	void* vertices = 0;
-	//memcpy(vertices, &m_TerrainVertices[0], sizeof(TerrainVertex) * m_TerrainVertices.size());
-
-	//
-	//Create the vertex buffer
-	//
-
-	// VB Desc
-	D3D11_BUFFER_DESC vbDesc;
-	ZeroMemory(&vbDesc, sizeof(vbDesc));
-	vbDesc.Usage = D3D11_USAGE_DEFAULT;
-	vbDesc.ByteWidth = sizeof(TerrainVertex) * m_TerrainVertices.size();
-	vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbDesc.CPUAccessFlags = 0;
+	// Set buffer description
+	D3D11_BUFFER_DESC vBd;
+	ZeroMemory(&vBd, sizeof(vBd));
+	vBd.Usage = D3D11_USAGE_DEFAULT;
+	vBd.ByteWidth = sizeof(SimpleVertex) * (xSize + 1) * (zSize + 1);
+	vBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBd.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA vbResource;
 	ZeroMemory(&vbResource, sizeof(vbResource));
-	vbResource.pSysMem = &m_TerrainVertices[0];
+	vbResource.pSysMem = &terrainVertices[0];
 
-	hr = m_Device->CreateBuffer(&vbDesc, &vbResource, &m_Buffers.VertexBuffer);
-	if (FAILED(hr))
-		OutputDebugString(L"Failed to create terrain VB");
+	hr = m_Device->CreateBuffer(&vBd, &vbResource, &m_VertexBuffer);
+}
 
+void Terrain::CreateIndexBuffer()
+{
+	const unsigned int xSize = m_InitData.Width, zSize = m_InitData.Height;
+	int indexCount = (m_InitData.Width + 1) * (m_InitData.Height + 1) * 6;
+	std::vector<WORD> terrainIndices(indexCount);
 
+	int vert = 0, tris = 0;
+	for (int z = 0; z < zSize; z++)
+	{
+		for (int x = 0; x < xSize; x++)
+		{
+			terrainIndices[tris + 0] = vert + 0;
+			terrainIndices[tris + 1] = vert + xSize + 1;
+			terrainIndices[tris + 2] = vert + 1;
+			terrainIndices[tris + 3] = vert + 1;
+			terrainIndices[tris + 4] = vert + xSize + 1;
+			terrainIndices[tris + 5] = vert + xSize + 2;
 
-	//
-	// Create the index buffer
-	//
+			vert++;
+			tris += 6;
+		}
+		vert++;
+	}
 
-	D3D11_BUFFER_DESC ibDesc;
-	ZeroMemory(&ibDesc, sizeof(ibDesc));
+	HRESULT hr;
 
-	ibDesc.Usage = D3D11_USAGE_DEFAULT;
-	ibDesc.ByteWidth = sizeof(WORD) * m_Triangles.size();
-	ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibDesc.CPUAccessFlags = 0;
+	//  Create buffer description
+	D3D11_BUFFER_DESC ibBd;
+	ZeroMemory(&ibBd, sizeof(ibBd));
+
+	ibBd.Usage = D3D11_USAGE_DEFAULT;
+	ibBd.ByteWidth = sizeof(WORD) * (m_InitData.Width + 1) * (m_InitData.Height + 1) * 6;
+	ibBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibBd.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA ibResource;
 	ZeroMemory(&ibResource, sizeof(ibResource));
-	ibResource.pSysMem = &m_Triangles[0];
+	ibResource.pSysMem = &terrainIndices[0];
+	hr = m_Device->CreateBuffer(&ibBd, &ibResource, &m_IndexBuffer);
+}
 
-	hr = m_Device->CreateBuffer(&ibDesc, &ibResource, &m_Buffers.IndexBuffer);
-	if (FAILED(hr))
-		OutputDebugString(L"Failed to create terrain IB");
+TerrainBuffers Terrain::GetBuffers()
+{
+	if (!initialized) return TerrainBuffers();
 
-
-	m_Buffers.SetCount(m_TerrainVertices.size(), m_Triangles.size());
-
-	return m_Buffers;
+	return TerrainBuffers(m_VertexBuffer, m_IndexBuffer, (m_InitData.Width + 1) * (m_InitData.Height + 1) * 6);
 }

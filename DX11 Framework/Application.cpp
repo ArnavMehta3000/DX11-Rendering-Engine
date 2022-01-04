@@ -259,7 +259,7 @@ void Application::InitModels()
 	// Init skybox
 	m_SkySphere = new SkySphere("SkySphereInitData.json", m_ImmediateContext, m_ConstantBuffer, _pd3dDevice);
 
-	HMapInfo hm(513, 513, 1.0f, 1.0f);
+	HMapInfo hm(513, 513, 20.0f);
 	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);
 }
 
@@ -338,7 +338,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x - offset, 0.0f, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f) };
+				planeVertices[i] = { XMFLOAT3(x - offset, 0.0f, z - offset), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(x - offset / xSize, z - offset / zSize) };
 				i++;
 			}
 		}
@@ -958,13 +958,14 @@ void Application::Draw()
 
 	if (showScene3)  // Terrain scene
 	{
-		stride = sizeof(TerrainVertex);
 		ID3D11Buffer* vb = m_Terrain->GetBuffers().VertexBuffer;
 		ID3D11Buffer* ib = m_Terrain->GetBuffers().IndexBuffer;
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0);
+
 		meshWorld = XMLoadFloat4x4(&m_Terrain->GetWorldMat()); 
 		cb.mWorld = XMMatrixTranspose(meshWorld);
+
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed(m_Terrain->GetBuffers().IndexCount, 0, 0);
 	}

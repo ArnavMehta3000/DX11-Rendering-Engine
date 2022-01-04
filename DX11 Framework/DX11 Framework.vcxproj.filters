@@ -24,7 +24,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -82,11 +81,13 @@
     <ClInclude Include="DDSTextureLoader.h">
       <Filter>Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="OBJLoader.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DX11 Framework.cpp" />
-    <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>imgui</Filter>
@@ -127,6 +128,9 @@
       <Filter>Utilities</Filter>
     </ClCompile>
     <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJLoader.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
