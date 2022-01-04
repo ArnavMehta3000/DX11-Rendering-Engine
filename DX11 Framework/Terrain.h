@@ -40,7 +40,7 @@ public:
 	void LoadHeightMap(const char* file, HMapInfo initData);
 	TerrainBuffers GetBuffers();
 
-public:
+private:
 	void CreateVertexBuffer();
 	void CreateIndexBuffer();
 

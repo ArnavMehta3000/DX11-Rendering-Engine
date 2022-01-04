@@ -47,8 +47,8 @@ void Terrain::CreateVertexBuffer()
 	float offsetX = (xSize + 1) / 2.0f;
 	float offsetZ = (zSize + 1) / 2.0f;
 
-	int i = 0;
-	for (int z = 0; z < zSize; z++)
+	
+	for (int i = 0, z = 0; z < zSize; z++)
 		for (int x = 0; x < xSize; x++)
 		{
 			terrainVertices[i] = { XMFLOAT3(x - offsetX, m_HeightMap[i], z - offsetZ),
@@ -76,7 +76,7 @@ void Terrain::CreateVertexBuffer()
 void Terrain::CreateIndexBuffer()
 {
 	const unsigned int xSize = m_InitData.Width, zSize = m_InitData.Height;
-	int indexCount = (m_InitData.Width + 1) * (m_InitData.Height + 1) * 6;
+	int indexCount = (m_InitData.Width) * (m_InitData.Height) * 6;
 	std::vector<WORD> terrainIndices(indexCount);
 
 	int vert = 0, tris = 0;
@@ -104,7 +104,7 @@ void Terrain::CreateIndexBuffer()
 	ZeroMemory(&ibBd, sizeof(ibBd));
 
 	ibBd.Usage = D3D11_USAGE_DEFAULT;
-	ibBd.ByteWidth = sizeof(WORD) * (m_InitData.Width + 1) * (m_InitData.Height + 1) * 6;
+	ibBd.ByteWidth = sizeof(WORD) * (m_InitData.Width) * (m_InitData.Height) * 6;
 	ibBd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibBd.CPUAccessFlags = 0;
 
@@ -118,5 +118,5 @@ TerrainBuffers Terrain::GetBuffers()
 {
 	if (!initialized) return TerrainBuffers();
 
-	return TerrainBuffers(m_VertexBuffer, m_IndexBuffer, (m_InitData.Width + 1) * (m_InitData.Height + 1) * 6);
+	return TerrainBuffers(m_VertexBuffer, m_IndexBuffer, (m_InitData.Width) * (m_InitData.Height) * 6);
 }
