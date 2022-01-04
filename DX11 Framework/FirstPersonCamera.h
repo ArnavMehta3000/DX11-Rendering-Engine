@@ -13,15 +13,12 @@ public:
 	void Update() override;
 	void SetLens() override;
 
-	void SetMoveSpeed(float move = 5.0f);
-	void SetLookSpeed(float look = 5.0f);
-
 private:
-	float m_MovementSens;
-	float m_LookSens;
 	Vector3 m_LookDirection;
-	float angle = 0;
 
+	float m_MoveSpeed;
+	float m_LookSpeed;
 
+	bool flipped = false;
 };
 #endif // !FIRSTPERSONCAMERA_H
