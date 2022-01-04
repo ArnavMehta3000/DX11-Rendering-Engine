@@ -256,7 +256,7 @@ HRESULT Application::InitVertexBuffer()
 	#pragma region Plane
 	{
 		// Define plane size
-		const unsigned int xSize = 20, zSize = 20;  // HACK: Change the plane size in the index buffer
+		const unsigned int xSize = 50, zSize = 50;  // HACK: Change the plane size in the index buffer
 		float offsetX = xSize / 2.0f, offsetZ = zSize / 2.0f;
 		SimpleVertex planeVertices[(xSize + 1) * (zSize + 1)];
 
@@ -379,7 +379,7 @@ HRESULT Application::InitIndexBuffer()
 
 	#pragma region Plane
 	{
-		const unsigned int xSize = 20, zSize = 20;  // HACK: Change the plane size in the vertex buffer
+		const unsigned int xSize = 50, zSize = 50;  // HACK: Change the plane size in the vertex buffer
 		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
 
 		int vert = 0, tris = 0;
@@ -939,7 +939,7 @@ void Application::Draw()
 		// Plane
 		m_ImmediateContext->VSSetShader(_pPlaneVertexShader, nullptr, 0);  // Set shader
 		
-		int xSize = 20, zSize = 20;
+		int xSize = 50, zSize = 50;
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 		meshWorld = XMLoadFloat4x4(&_planeWorld);

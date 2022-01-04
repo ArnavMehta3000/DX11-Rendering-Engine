@@ -87,11 +87,11 @@ void Terrain::CreateIndexBuffer()
 		for (int x = 0; x < xSize; x++)
 		{
 			terrainIndices[tris + 0] = vert + 0;
-			terrainIndices[tris + 1] = vert + xSize + 1;
+			terrainIndices[tris + 1] = vert + zSize + 1;
 			terrainIndices[tris + 2] = vert + 1;
 			terrainIndices[tris + 3] = vert + 1;
-			terrainIndices[tris + 4] = vert + xSize + 1;
-			terrainIndices[tris + 5] = vert + xSize + 2;
+			terrainIndices[tris + 4] = vert + zSize + 1;
+			terrainIndices[tris + 5] = vert + zSize + 2;
 
 			vert++;
 			tris += 6;

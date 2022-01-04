@@ -216,7 +216,7 @@ VS_OUTPUT VS_PLANE(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : T
 
     VS_OUTPUT output = (VS_OUTPUT) 0;
 	
-    output.Pos = mul(Pos, World) * sin(Time);
+    output.Pos = mul(Pos, World);
     output.PosW = output.Pos;
 	
     output.Pos = mul(output.Pos, View);
