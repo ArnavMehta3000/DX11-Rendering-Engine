@@ -57,8 +57,9 @@ void Terrain::CreateVertexBuffer()
 			i++;
 		}
 
+	#pragma region Create Vertex Buffer
 	HRESULT hr;
-	// Set buffer description
+// Set buffer description
 	D3D11_BUFFER_DESC vBd;
 	ZeroMemory(&vBd, sizeof(vBd));
 	vBd.Usage = D3D11_USAGE_DEFAULT;
@@ -69,6 +70,7 @@ void Terrain::CreateVertexBuffer()
 	D3D11_SUBRESOURCE_DATA vbResource;
 	ZeroMemory(&vbResource, sizeof(vbResource));
 	vbResource.pSysMem = &terrainVertices[0];
+	#pragma endregion
 
 	hr = m_Device->CreateBuffer(&vBd, &vbResource, &m_VertexBuffer);
 }
@@ -77,7 +79,7 @@ void Terrain::CreateIndexBuffer()
 {
 	const unsigned int xSize = m_InitData.Width, zSize = m_InitData.Height;
 	int indexCount = (m_InitData.Width) * (m_InitData.Height) * 6;
-	std::vector<WORD> terrainIndices(indexCount);
+	std::vector<UINT> terrainIndices(indexCount);
 
 	int vert = 0, tris = 0;
 	for (int z = 0; z < zSize; z++)
@@ -97,9 +99,10 @@ void Terrain::CreateIndexBuffer()
 		vert++;
 	}
 
+	#pragma region Create Index Buffer
 	HRESULT hr;
 
-	//  Create buffer description
+//  Create buffer description
 	D3D11_BUFFER_DESC ibBd;
 	ZeroMemory(&ibBd, sizeof(ibBd));
 
@@ -111,6 +114,9 @@ void Terrain::CreateIndexBuffer()
 	D3D11_SUBRESOURCE_DATA ibResource;
 	ZeroMemory(&ibResource, sizeof(ibResource));
 	ibResource.pSysMem = &terrainIndices[0];
+	#pragma endregion
+
+
 	hr = m_Device->CreateBuffer(&ibBd, &ibResource, &m_IndexBuffer);
 }
 

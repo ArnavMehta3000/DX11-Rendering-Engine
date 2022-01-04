@@ -50,6 +50,7 @@ Application::~Application()
 
 
 
+#pragma region Base Init Chain
 HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 {
 	if (FAILED(InitWindow(hInstance, nCmdShow)))
@@ -86,35 +87,10 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplWin32_Init(_hWnd);
-	ImGui_ImplDX11_Init(_pd3dDevice,m_ImmediateContext);
+	ImGui_ImplDX11_Init(_pd3dDevice, m_ImmediateContext);
 	ImGui::StyleColorsDark();
 
 	return S_OK;
-}
-
-void Application::InitCamera()
-{
-	// Create camera init data
-	CameraInitData cameraInitData;
-	cameraInitData.position = Vector3(0.0f, 2.0f, -17.0f);
-	cameraInitData.at = Vector3(0.0f, 0.0f, 0.0f);
-	cameraInitData.up = Vector3(0.0f, 1.0f, 0.0f);
-	cameraInitData.windowWidth = _WindowWidth;
-	cameraInitData.windowHeight = _WindowHeight;
-	cameraInitData.nearZ = 0.01f;
-	cameraInitData.farZ = 5000.0f;
-
-	m_FrontCam = new Camera(cameraInitData);
-
-	cameraInitData.position = Vector3(0.0f, 17.0f, 1.0f);
-	m_TopDownCam = new Camera(cameraInitData);
-	
-	m_FpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
-	m_OrbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
-
-	// Default camerais static camera
-	m_CurrentCamera.View = m_FrontCam->GetView();
-	m_CurrentCamera.Projection = m_FrontCam->GetProj();
 }
 
 HRESULT Application::InitShadersAndInputLayout()
@@ -128,7 +104,7 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
-			L"Default vertex shader failed to compile.", L"Vertex Shader Error", MB_OK);
+				   L"Default vertex shader failed to compile.", L"Vertex Shader Error", MB_OK);
 		return hr;
 	}
 
@@ -163,14 +139,14 @@ HRESULT Application::InitShadersAndInputLayout()
 	if (FAILED(hr))
 	{
 		MessageBox(nullptr,
-			L"Defaut pixel sahder failed to compile.", L"Pixel Shader Error", MB_OK);
+				   L"Defaut pixel sahder failed to compile.", L"Pixel Shader Error", MB_OK);
 		return hr;
 	}
 
 	// Create the pixel shader
 	hr = _pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &_pPixelShader);
 	pPSBlob->Release();
-	
+
 	if (FAILED(hr))
 		return hr;
 
@@ -184,7 +160,7 @@ HRESULT Application::InitShadersAndInputLayout()
 				   L"Sky Pixel Shader failed to compile.", L"Pixel Shader Error", MB_OK);
 		return hr;
 	}
-	
+
 	//Create the sky pixel shader
 	hr = _pd3dDevice->CreatePixelShader(pSkyPSBlob->GetBufferPointer(), pSkyPSBlob->GetBufferSize(), nullptr, &_pSkyPixelShader);
 	if (FAILED(hr))
@@ -214,75 +190,11 @@ HRESULT Application::InitShadersAndInputLayout()
 	return hr;
 }
 
-void Application::InitLights()
-{
-	// Directional light
-	directionalLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	directionalLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.specular  = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
-	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	directionalLight.SpecularPower      = 0.8f;
-
-	//Point lights (WIP)
-	pointLight.Intensity.Ambient  = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	pointLight.Material.ambient   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.diffuse   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Material.specular  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Position           = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	pointLight.Attenuation        = XMFLOAT3(5.0f, 5.0f, 5.0f);
-	pointLight.Range              = 10.0f;
-	pointLight.SpecularPower	  = 10.2f;
-}
-
-void Application::InitTextures()
-{
-	// Load texture
-	HRESULT hr;
-	hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &m_CubeTexRV);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-	// Define and create sampler state
-	D3D11_SAMPLER_DESC samplerDesc;
-	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-	samplerDesc.Filter         = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.AddressU       = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV       = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW       = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	samplerDesc.MinLOD         = 0;
-	samplerDesc.MaxLOD         = D3D11_FLOAT32_MAX;
-
-	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
-
-}
-
-void Application::InitModels()
-{
-	// Init plane
-	m_HerculesPlane = new GameObject("HerculesInitData.json", m_ImmediateContext, m_ConstantBuffer);
-	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
-	m_HerculesPlane->LoadTexture(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds");
-
-	// Init skybox
-	m_SkySphere = new SkySphere("SkySphereInitData.json", m_ImmediateContext, m_ConstantBuffer, _pd3dDevice);
-
-	HMapInfo hm(513, 513, 20.0f);
-	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);
-}
-
 HRESULT Application::InitVertexBuffer()
 {
 	HRESULT hr;
 
-#pragma region Cube
+	#pragma region Cube
 	{
 		SimpleVertex cubeVertices[] =
 		{
@@ -309,10 +221,10 @@ HRESULT Application::InitVertexBuffer()
 
 		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeVertexBuffer);
 	}
-#pragma endregion
+	#pragma endregion
 
 
-#pragma region Pyramid
+	#pragma region Pyramid
 	{
 		SimpleVertex pyramidVertices[] =
 		{
@@ -338,10 +250,10 @@ HRESULT Application::InitVertexBuffer()
 
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
 	}
-#pragma endregion
+	#pragma endregion
 
 
-#pragma region Plane
+	#pragma region Plane
 	{
 		// Define plane size
 		const unsigned int xSize = 20, zSize = 20;  // HACK: Change the plane size in the index buffer
@@ -372,7 +284,7 @@ HRESULT Application::InitVertexBuffer()
 
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
 	}
-#pragma endregion
+	#pragma endregion
 
 
 
@@ -390,7 +302,7 @@ HRESULT Application::InitIndexBuffer()
 {
 	HRESULT hr;
 
-#pragma region Cube
+	#pragma region Cube
 	{
 		// Index buffer for cube
 		WORD cubeIndices[] =
@@ -434,10 +346,10 @@ HRESULT Application::InitIndexBuffer()
 		CubeInitData.pSysMem = cubeIndices;
 		hr = _pd3dDevice->CreateBuffer(&cubeBd, &CubeInitData, &_pCubeIndexBuffer);
 	}
-#pragma endregion
+	#pragma endregion
 
 
-#pragma region Pyramid
+	#pragma region Pyramid
 	{
 		WORD pyramidIndices[] =
 		{
@@ -462,10 +374,10 @@ HRESULT Application::InitIndexBuffer()
 		PyramidInitData.pSysMem = pyramidIndices;
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
 	}
-#pragma endregion
+	#pragma endregion
 
 
-#pragma region Plane
+	#pragma region Plane
 	{
 		const unsigned int xSize = 20, zSize = 20;  // HACK: Change the plane size in the vertex buffer
 		WORD planeIndices[xSize * zSize * 6];  // Plane size * 3 verts * 2 tris per quad
@@ -503,7 +415,7 @@ HRESULT Application::InitIndexBuffer()
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneIndexBuffer);
 	}
 	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(0.0f, -1.5, 0.0));
-#pragma endregion
+	#pragma endregion
 
 
 
@@ -512,8 +424,6 @@ HRESULT Application::InitIndexBuffer()
 
 	return S_OK;
 }
-
-
 
 HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 {
@@ -539,8 +449,8 @@ HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 	RECT rc = { 0, 0, 1280, 960 };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	_hWnd = CreateWindow(L"TutorialWindowClass", L"DX11 Framework", WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
-		nullptr);
+						 CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
+						 nullptr);
 	if (!_hWnd)
 		return E_FAIL;
 
@@ -554,17 +464,17 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 	HRESULT hr = S_OK;
 
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined(DEBUG) || defined(_DEBUG)
-	// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
-	// Setting this flag improves the shader debugging experience, but still allows 
-	// the shaders to be optimized and to run exactly the way they will run in 
-	// the release configuration of this program.
+	#if defined(DEBUG) || defined(_DEBUG)
+		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
+		// Setting this flag improves the shader debugging experience, but still allows 
+		// the shaders to be optimized and to run exactly the way they will run in 
+		// the release configuration of this program.
 	dwShaderFlags |= D3DCOMPILE_DEBUG;
-#endif
+	#endif
 
 	ID3DBlob* pErrorBlob;
 	hr = D3DCompileFromFile(szFileName, nullptr, nullptr, szEntryPoint, szShaderModel,
-		dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
+							dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
 
 	if (FAILED(hr))
 	{
@@ -587,9 +497,9 @@ HRESULT Application::InitDevice()
 
 	UINT createDeviceFlags = 0;
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
+	#endif
 
 	D3D_DRIVER_TYPE driverTypes[] =
 	{
@@ -627,7 +537,7 @@ HRESULT Application::InitDevice()
 	{
 		_driverType = driverTypes[driverTypeIndex];
 		hr = D3D11CreateDeviceAndSwapChain(nullptr, _driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &_featureLevel, &m_ImmediateContext);
+										   D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &_featureLevel, &m_ImmediateContext);
 		if (SUCCEEDED(hr))
 			break;
 	}
@@ -686,7 +596,7 @@ HRESULT Application::InitDevice()
 		return hr;
 	}
 
-	
+
 
 	// Set primitive topology
 	m_ImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -731,13 +641,13 @@ HRESULT Application::InitDevice()
 	D3D11_RENDER_TARGET_BLEND_DESC rtbd;
 	ZeroMemory(&rtbd, sizeof(rtbd));
 
-	rtbd.BlendEnable           = true;
-	rtbd.SrcBlend              = D3D11_BLEND_SRC_COLOR;
-	rtbd.DestBlend             = D3D11_BLEND_BLEND_FACTOR;
-	rtbd.BlendOp               = D3D11_BLEND_OP_ADD;
-	rtbd.SrcBlendAlpha         = D3D11_BLEND_ONE;
-	rtbd.DestBlendAlpha        = D3D11_BLEND_ZERO;
-	rtbd.BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+	rtbd.BlendEnable = true;
+	rtbd.SrcBlend = D3D11_BLEND_SRC_COLOR;
+	rtbd.DestBlend = D3D11_BLEND_BLEND_FACTOR;
+	rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+	rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+	rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+	rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
 
 	blendDesc.AlphaToCoverageEnable = false;
@@ -751,59 +661,102 @@ HRESULT Application::InitDevice()
 
 	return S_OK;
 }
+#pragma endregion
 
-void Application::Cleanup()
+
+
+#pragma region My Init Chain
+void Application::InitCamera()
 {
-	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
+	// Create camera init data
+	CameraInitData cameraInitData;
+	cameraInitData.position = Vector3(0.0f, 2.0f, -17.0f);
+	cameraInitData.at = Vector3(0.0f, 0.0f, 0.0f);
+	cameraInitData.up = Vector3(0.0f, 1.0f, 0.0f);
+	cameraInitData.windowWidth = _WindowWidth;
+	cameraInitData.windowHeight = _WindowHeight;
+	cameraInitData.nearZ = 0.01f;
+	cameraInitData.farZ = 5000.0f;
 
-	if ( _wireFrame)
-		_wireFrame->Release();
+	m_FrontCam = new Camera(cameraInitData);
 
-	if ( _solidCullBack)
-		_solidCullBack->Release();
+	cameraInitData.position = Vector3(0.0f, 17.0f, 1.0f);
+	m_TopDownCam = new Camera(cameraInitData);
 
-	if ( _solidCullFront)
-		_solidCullFront->Release();
+	m_FpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
+	m_OrbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 
-	if ( _transparency)
-		_transparency->Release();
-
-	if (m_ConstantBuffer)
-		m_ConstantBuffer->Release();
-
-	if ( _depthStencilView)
-		_depthStencilView->Release();
-
-	if ( _depthStencilBuffer)
-		_depthStencilBuffer->Release();
-
-	if ( _pVertexLayout)
-		_pVertexLayout->Release();
-
-	if (_pPlaneVertexShader)
-		_pPlaneVertexShader->Release();
-
-	if ( _pVertexShader)
-		_pVertexShader->Release();
-
-	if ( _pPixelShader)
-		_pPixelShader->Release();
-
-	if (_pSkyPixelShader)
-		_pSkyPixelShader->Release();
-
-	if ( _pRenderTargetView)
-		_pRenderTargetView->Release();
-
-	if ( _pSwapChain)
-		_pSwapChain->Release();
-
-	if (m_ImmediateContext)
-		m_ImmediateContext->Release();
-
-	if ( _pd3dDevice)
-		_pd3dDevice->Release();
+	// Default camerais static camera
+	m_CurrentCamera.View = m_FrontCam->GetView();
+	m_CurrentCamera.Projection = m_FrontCam->GetProj();
 }
+
+void Application::InitLights()
+{
+	// Directional light
+	directionalLight.Intensity.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight.Material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
+	directionalLight.Direction = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight.SpecularPower = 0.8f;
+
+	//Point lights (WIP)
+	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	pointLight.Material.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Material.specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Position = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	pointLight.Attenuation = XMFLOAT3(5.0f, 5.0f, 5.0f);
+	pointLight.Range = 10.0f;
+	pointLight.SpecularPower = 10.2f;
+}
+
+void Application::InitTextures()
+{
+	// Load texture
+	HRESULT hr;
+	hr = CreateDDSTextureFromFile(_pd3dDevice, L"Assets/Crate_COLOR.dds", nullptr, &m_CubeTexRV);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+	// Define and create sampler state
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
+
+}
+
+void Application::InitModels()
+{
+	// Init plane
+	m_HerculesPlane = new GameObject("HerculesInitData.json", m_ImmediateContext, m_ConstantBuffer);
+	m_HerculesPlane->SetMesh("Assets/Models/Airplane/Hercules.obj", _pd3dDevice, false);
+	m_HerculesPlane->LoadTexture(_pd3dDevice, L"Assets/Models/Airplane/Hercules_COLOR.dds");
+
+	// Init skybox
+	m_SkySphere = new SkySphere("SkySphereInitData.json", m_ImmediateContext, m_ConstantBuffer, _pd3dDevice);
+
+	HMapInfo hm(513, 513, 20.0f);
+	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);
+}
+#pragma endregion
+
+
 
 
 
@@ -827,7 +780,18 @@ void Application::Update()
 	}
 	#pragma endregion
 
-	time = t;
+
+	// TODO: Fix 3 seconds on and off problem
+	float speed = 0.0001f;
+	if (time < 360)
+		time += speed;
+	else
+		time = 0.0f;
+
+	std::string s = "Time: " + std::to_string(time) + "\n";
+	std::wstring stemp = std::wstring(s.begin(), s.end());
+	OutputDebugString(stemp.c_str());
+
 
 	// Update gameobject
 	m_SkySphere->Update();
@@ -1268,4 +1232,58 @@ void Application::Draw()
 
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);
+}
+
+
+void Application::Cleanup()
+{
+	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
+
+	if (_wireFrame)
+		_wireFrame->Release();
+
+	if (_solidCullBack)
+		_solidCullBack->Release();
+
+	if (_solidCullFront)
+		_solidCullFront->Release();
+
+	if (_transparency)
+		_transparency->Release();
+
+	if (m_ConstantBuffer)
+		m_ConstantBuffer->Release();
+
+	if (_depthStencilView)
+		_depthStencilView->Release();
+
+	if (_depthStencilBuffer)
+		_depthStencilBuffer->Release();
+
+	if (_pVertexLayout)
+		_pVertexLayout->Release();
+
+	if (_pPlaneVertexShader)
+		_pPlaneVertexShader->Release();
+
+	if (_pVertexShader)
+		_pVertexShader->Release();
+
+	if (_pPixelShader)
+		_pPixelShader->Release();
+
+	if (_pSkyPixelShader)
+		_pSkyPixelShader->Release();
+
+	if (_pRenderTargetView)
+		_pRenderTargetView->Release();
+
+	if (_pSwapChain)
+		_pSwapChain->Release();
+
+	if (m_ImmediateContext)
+		m_ImmediateContext->Release();
+
+	if (_pd3dDevice)
+		_pd3dDevice->Release();
 }

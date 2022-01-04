@@ -105,7 +105,7 @@ private:
 	bool showScene3 = false; // Terrain scene
 
 	// Plane vertex shader controls
-	float time, rate = 10.0f, amp = 0.1f, freq = 6.0f, threshold = -1.0f;
+	float time = 0.0f, rate = 10.0f, amp = 0.6f, freq = 6.0f, threshold = -1.0f;
 
 public:
 	Application();
