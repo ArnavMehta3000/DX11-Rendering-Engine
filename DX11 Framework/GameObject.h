@@ -26,7 +26,7 @@ public:
 	void LoadTexture(ID3D11Device* device, const wchar_t* file);
 	virtual void Update();
 	virtual void Draw(ConstantBuffer* cb);
-	virtual void DrawTextured(ConstantBuffer* cb, ID3D11DeviceContext* ctx, int slot = 0);
+	virtual void DrawTextured(ConstantBuffer* cb, int slot = 0);
 
 	XMFLOAT4X4 GetWorldMatrix();
 
@@ -38,14 +38,12 @@ public:
 	void SetRotation(Vector3 rot);
 	void SetScale(Vector3 scale);
 
-
-
 private:
 	Vector3    m_Position, m_Rotation, m_Scale;
 	XMFLOAT4X4 m_WorldMatrix;
 	GOInitData m_InitData;
 	MeshData   m_Mesh;
-	Texture*   m_Texture;
+	Texture* m_Texture;
 
 	bool initialized = false;
 	bool hasMesh = false;

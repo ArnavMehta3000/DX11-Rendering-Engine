@@ -32,8 +32,6 @@ GameObject::GameObject(const char* initFile, ID3D11DeviceContext* deviceContext,
 	json jScale = jFile["scale"];
 	Vector3 scale = Vector3((float)jScale.at(0), (float)jScale.at(1), (float)jScale.at(2));
 
-
-
 	// Create init data
 	GOInitData init;
 	init.constantBuffer = constantBuffer;
@@ -42,7 +40,6 @@ GameObject::GameObject(const char* initFile, ID3D11DeviceContext* deviceContext,
 	init.rotation = rotation;
 	init.scale = scale;
 
-	
 	m_Position = init.position;
 	m_Rotation = init.rotation;
 	m_Scale = init.scale;
@@ -85,12 +82,12 @@ void GameObject::Draw(ConstantBuffer* cb)
 	m_InitData.deviceContext->DrawIndexed(m_Mesh.IndexCount, 0, 0);
 }
 
-void GameObject::DrawTextured(ConstantBuffer* cb, ID3D11DeviceContext* ctx, int slot)
+void GameObject::DrawTextured(ConstantBuffer* cb, int slot)
 {
 	if (hasTexture)
 	{
 		auto tex = m_Texture->GetTextureRV();
-		ctx->PSSetShaderResources(slot, 1, &tex);
+		m_InitData.deviceContext->PSSetShaderResources(slot, 1, &tex);
 	}
 
 	Draw(cb);
@@ -125,7 +122,7 @@ Vector3 GameObject::GetScale()
 	return m_Scale;
 }
 
-void GameObject::SetPosition(Vector3 pos) {	m_Position = pos; }
+void GameObject::SetPosition(Vector3 pos) { m_Position = pos; }
 
 void GameObject::SetRotation(Vector3 rot) { m_Rotation = rot; }
 
@@ -135,7 +132,7 @@ void GameObject::UpdateWorldMatrix()
 {
 	// Create transformation matrices
 	XMMATRIX position = XMMatrixTranslationFromVector(Vector3::V3ToXMVECTOR(m_Position));
-	XMMATRIX scaling  = XMMatrixScalingFromVector(Vector3::V3ToXMVECTOR(m_Scale));
+	XMMATRIX scaling = XMMatrixScalingFromVector(Vector3::V3ToXMVECTOR(m_Scale));
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(Vector3::V3ToXMVECTOR(m_Rotation));
 
 	XMStoreFloat4x4(&m_WorldMatrix, scaling * rotation * position);

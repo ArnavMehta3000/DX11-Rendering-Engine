@@ -110,8 +110,8 @@ float4 PointLights(float3 worldPos, float3 inputNormal, float3 toEyeNormalized)
         output += lightAmount * pointLight.Material.Diffuse * pointLight.Intensity.Diffuse;
 
 		// Calculate light falloff based on attenuation
-        float att = pointLight.Attenuation + (pointLight.Attenuation * d) + (pointLight.Attenuation * d * d);
-        output /= float4(att, att, att, 1.0f);
+        float3 att = pointLight.Attenuation + (pointLight.Attenuation * d) + (pointLight.Attenuation * d * d);
+        output /= float4(att, 1.0f);
     }
 
 

@@ -18,10 +18,14 @@
     <Filter Include="Utilities">
       <UniqueIdentifier>{447c09e8-4f2b-409d-a42d-e6cd998e34b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{4d046f79-8478-4fc7-8125-73f4df56ae6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Init Files">
+      <UniqueIdentifier>{ec3e7d5f-5de9-43e2-8947-9e1debb0eca1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -55,8 +59,6 @@
     <ClInclude Include="OrbitCamera.h">
       <Filter>Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="SkySphere.h" />
-    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Core.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -81,11 +83,20 @@
     <ClInclude Include="OBJLoader.h">
       <Filter>Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SkySphere.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="DX11 Framework.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -113,8 +124,6 @@
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="SkySphere.cpp" />
-    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Vector3.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -130,6 +139,21 @@
     <ClCompile Include="OBJLoader.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11 Framework.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SkySphere.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">
@@ -140,8 +164,12 @@
     <None Include="DX11 Framework.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="HerculesInitData.json" />
-    <None Include="SkySphereInitData.json" />
+    <None Include="HerculesInitData.json">
+      <Filter>Init Files</Filter>
+    </None>
+    <None Include="SkySphereInitData.json">
+      <Filter>Init Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX11 Framework.rc">

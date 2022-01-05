@@ -11,17 +11,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		EndPaint(hWnd, &ps);
-		break;
+		case WM_PAINT:
+			hdc = BeginPaint(hWnd, &ps);
+			EndPaint(hWnd, &ps);
+			break;
 
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
 
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 
 	return 0;
@@ -47,7 +47,6 @@ Application::~Application()
 {
 	Cleanup();
 }
-
 
 
 #pragma region Base Init Chain
@@ -117,7 +116,6 @@ HRESULT Application::InitShadersAndInputLayout()
 		return hr;
 	}
 
-
 	// Create vertex shader for plane
 	ID3DBlob* pPlaneVSBlob = nullptr;
 	hr = CompileShaderFromFile(L"DX11 Framework.hlsl", "VS_PLANE", "vs_4_0", &pPlaneVSBlob);
@@ -130,7 +128,6 @@ HRESULT Application::InitShadersAndInputLayout()
 	}
 
 	hr = _pd3dDevice->CreateVertexShader(pPlaneVSBlob->GetBufferPointer(), pPlaneVSBlob->GetBufferSize(), nullptr, &_pPlaneVertexShader);
-
 
 	// Compile the pixel shader
 	ID3DBlob* pPSBlob = nullptr;
@@ -223,7 +220,6 @@ HRESULT Application::InitVertexBuffer()
 	}
 	#pragma endregion
 
-
 	#pragma region Pyramid
 	{
 		SimpleVertex pyramidVertices[] =
@@ -251,7 +247,6 @@ HRESULT Application::InitVertexBuffer()
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidVertexBuffer);
 	}
 	#pragma endregion
-
 
 	#pragma region Plane
 	{
@@ -285,12 +280,6 @@ HRESULT Application::InitVertexBuffer()
 		hr = _pd3dDevice->CreateBuffer(&planeBd, &PlaneInitData, &_pPlaneVertexBuffer);
 	}
 	#pragma endregion
-
-
-
-
-
-
 
 	if (FAILED(hr))
 		return hr;
@@ -348,7 +337,6 @@ HRESULT Application::InitIndexBuffer()
 	}
 	#pragma endregion
 
-
 	#pragma region Pyramid
 	{
 		WORD pyramidIndices[] =
@@ -375,7 +363,6 @@ HRESULT Application::InitIndexBuffer()
 		hr = _pd3dDevice->CreateBuffer(&pyramidBd, &PyramidInitData, &_pPyramidIndexBuffer);
 	}
 	#pragma endregion
-
 
 	#pragma region Plane
 	{
@@ -416,8 +403,6 @@ HRESULT Application::InitIndexBuffer()
 	}
 	XMStoreFloat4x4(&_planeWorld, XMMatrixTranslation(0.0f, -1.5, 0.0));
 	#pragma endregion
-
-
 
 	if (FAILED(hr))
 		return hr;
@@ -466,8 +451,8 @@ HRESULT Application::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 	#if defined(DEBUG) || defined(_DEBUG)
 		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
-		// Setting this flag improves the shader debugging experience, but still allows 
-		// the shaders to be optimized and to run exactly the way they will run in 
+		// Setting this flag improves the shader debugging experience, but still allows
+		// the shaders to be optimized and to run exactly the way they will run in
 		// the release configuration of this program.
 	dwShaderFlags |= D3DCOMPILE_DEBUG;
 	#endif
@@ -558,7 +543,6 @@ HRESULT Application::InitDevice()
 	if (FAILED(hr))
 		return hr;
 
-
 	// Define depth/stencil buffer
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	depthStencilDesc.Width = _WindowWidth;
@@ -596,8 +580,6 @@ HRESULT Application::InitDevice()
 		return hr;
 	}
 
-
-
 	// Set primitive topology
 	m_ImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -610,7 +592,6 @@ HRESULT Application::InitDevice()
 	bd.CPUAccessFlags = 0;
 	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &m_ConstantBuffer);
 
-
 	// Define rasterizer state - Wire Frame
 	D3D11_RASTERIZER_DESC wfdesc;
 	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));  // Clear memory
@@ -618,9 +599,6 @@ HRESULT Application::InitDevice()
 	wfdesc.CullMode = D3D11_CULL_NONE;  // FRONT: for front face culling (front face not rendered) | default is BACK
 	wfdesc.DepthClipEnable = true;  // Enable clipping
 	hr = _pd3dDevice->CreateRasterizerState(&wfdesc, &_wireFrame);
-
-
-
 
 	// Define rasterizer state - Solid Cull Back
 	D3D11_RASTERIZER_DESC solidDesc;
@@ -632,7 +610,6 @@ HRESULT Application::InitDevice()
 
 	solidDesc.CullMode = D3D11_CULL_FRONT;
 	hr = _pd3dDevice->CreateRasterizerState(&solidDesc, &_solidCullFront);
-
 
 	// Define blend state
 	D3D11_BLEND_DESC blendDesc;
@@ -655,14 +632,12 @@ HRESULT Application::InitDevice()
 
 	_pd3dDevice->CreateBlendState(&blendDesc, &_transparency);
 
-
 	if (FAILED(hr))
 		return hr;
 
 	return S_OK;
 }
 #pragma endregion
-
 
 
 #pragma region My Init Chain
@@ -694,26 +669,26 @@ void Application::InitCamera()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	directionalLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.specular  = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
-	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	directionalLight.SpecularPower      = 0.8f;
+	directionalLight.Material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight.Material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
+	directionalLight.Direction = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight.SpecularPower = 0.8f;
 
 	//Point lights
-	pointLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	pointLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.specular  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Position           = XMFLOAT3(0.0f, 3.0f, 0.0f);
-	pointLight.Attenuation        = XMFLOAT3(5.0f, 5.0f, 5.0f);
-	pointLight.Range              = 10.0f;
-	pointLight.SpecularPower      = 0.8f;
+	pointLight.Material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Position = XMFLOAT3(0.0f, 3.0f, 0.0f);
+	pointLight.Attenuation = XMFLOAT3(5.0f, 5.0f, 5.0f);
+	pointLight.Range = 10.0f;
+	pointLight.SpecularPower = 0.8f;
 }
 
 void Application::InitTextures()
@@ -738,7 +713,6 @@ void Application::InitTextures()
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	_pd3dDevice->CreateSamplerState(&samplerDesc, &_pSamplerLinear);
-
 }
 
 void Application::InitModels()
@@ -755,9 +729,6 @@ void Application::InitModels()
 	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);
 }
 #pragma endregion
-
-
-
 
 
 void Application::Update()
@@ -780,33 +751,25 @@ void Application::Update()
 	}
 	#pragma endregion
 
-
-	// TODO: Fix 3 seconds on and off problem
 	float speed = 0.0001f;
 	if (time < 360)
 		time += speed;
 	else
 		time = 0.0f;
 
-	std::string s = "Time: " + std::to_string(time) + "\n";
-	std::wstring stemp = std::wstring(s.begin(), s.end());
-	OutputDebugString(stemp.c_str());
-
-
 	// Update gameobject
 	m_SkySphere->Update();
 	m_HerculesPlane->Update();
 
-	
+	// Update hard coded mesh scene
 	if (showScene2)
 	{
 		XMStoreFloat4x4(&_cubeWorld, XMMatrixTranslation(sin(t * 2) * 6, 0.0f, 0.0f));
 		XMStoreFloat4x4(&_pyramidWorld, XMMatrixTranslation(0.0f, 0.0f, cos(t * 2) * 6));
-		
 	}
 
 
-	// Update cameras
+	#pragma region Update Cameras
 	m_FpsCam->Update();
 	m_FrontCam->Update();
 	m_TopDownCam->Update();
@@ -835,6 +798,7 @@ void Application::Update()
 		m_CurrentCamera.View = m_OrbitCam->GetView();
 		m_CurrentCamera.Projection = m_OrbitCam->GetProj();
 	}
+	#pragma endregion
 }
 
 void Application::Draw()
@@ -843,9 +807,8 @@ void Application::Draw()
 	// Clear the back buffer
 	m_ImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
-	// Clear depth stencil 
+	// Clear depth stencil
 	m_ImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 
 	XMMATRIX view = XMLoadFloat4x4(&m_CurrentCamera.View);
 	XMMATRIX transposeView = XMMatrixTranspose(view);
@@ -885,36 +848,33 @@ void Application::Draw()
 	m_ImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 	#pragma endregion
 
-
 	#pragma region Draw GameObjects
 	// Global transparency
 	if (isTransparent)
-		m_ImmediateContext->OMSetBlendState(_transparency, blendfactor , 0xffffffff);
+		m_ImmediateContext->OMSetBlendState(_transparency, blendfactor, 0xffffffff);
 	else
 		m_ImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
 
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = 0;
 
-	// Draw  skybox only when 
+	// Draw  skybox only when
 	if (!isWireFrame && !isTransparent)
 	{
 		m_ImmediateContext->RSSetState(_solidCullFront);
 		m_ImmediateContext->PSSetShader(_pSkyPixelShader, nullptr, 0);
 
 		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_SkySphere->GetWorldMatrix()));
-		m_SkySphere->DrawTextured(&cb, m_ImmediateContext, 0);
+		m_SkySphere->DrawTextured(&cb, 0);
 
 		m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 		m_ImmediateContext->RSSetState(_solidCullBack);
 	}
 
-
-
 	if (showScene1)  // Plane scene
-	{			
+	{
 		cb.mWorld = XMMatrixTranspose(XMLoadFloat4x4(&m_HerculesPlane->GetWorldMatrix()));
-		m_HerculesPlane->DrawTextured(&cb, m_ImmediateContext, 1);
+		m_HerculesPlane->DrawTextured(&cb, 1);
 	}
 
 	if (showScene2)  // Hard coded meshes scene
@@ -939,7 +899,7 @@ void Application::Draw()
 
 		// Plane
 		m_ImmediateContext->VSSetShader(_pPlaneVertexShader, nullptr, 0);  // Set shader
-		
+
 		int xSize = 50, zSize = 50;
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pPlaneVertexBuffer, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(_pPlaneIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
@@ -947,7 +907,7 @@ void Application::Draw()
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed(xSize * zSize * 6, 0, 0);
-		
+
 		m_ImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);  // Reset Shader
 	}
 
@@ -958,16 +918,13 @@ void Application::Draw()
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0);
 
-		meshWorld = XMLoadFloat4x4(&m_Terrain->GetWorldMat()); 
+		meshWorld = XMLoadFloat4x4(&m_Terrain->GetWorldMat());
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed(m_Terrain->GetBuffers().IndexCount, 0, 0);
 	}
 	#pragma endregion
-
-
-
 
 	#pragma region ImGui Stuff
 	// ImGui display
@@ -1002,11 +959,9 @@ void Application::Draw()
 						ColorEdit4("Transparency Color", blendfactor);
 				}
 
-
 				EndTabItem();
 			}
 			#pragma endregion
-
 
 			#pragma region Lights
 			if (BeginTabItem("Lights"))
@@ -1015,17 +970,10 @@ void Application::Draw()
 				if (TreeNode("Directional Light"))
 				{
 					Text("Direction");
-					SliderFloat3("##direction", &directionalLight.Direction.x, -1.0f, 1.0f);
+					SliderFloat3("Direction", &directionalLight.Direction.x, -1.0f, 1.0f);
 
-					if (TreeNode("Color"))
-					{
-						ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
-						ColorEdit3("Specular##I", &directionalLight.Intensity.Specular.x);
-
-						TreePop();
-					}
-
-					NewLine();
+					ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
+					ColorEdit3("Specular##I", &directionalLight.Intensity.Specular.x);
 
 					SliderFloat("Specular Power", &directionalLight.SpecularPower, 0.001f, 2.0f);
 
@@ -1033,30 +981,22 @@ void Application::Draw()
 				}
 				#pragma endregion
 
+				NewLine();
 
 				if (TreeNode("Point Light"))
 				{
 					Text("Position");
-					DragFloat3("##direction", &pointLight.Position.x, 0.5f, -50.0f, 50.0f);
 
-					if (TreeNode("Color"))
-					{
-						ColorEdit3("Color##IP", &pointLight.Intensity.Specular.x);
-
-						TreePop();
-					}
-
-					NewLine();
-
-					SliderFloat("Specular Power", &pointLight.SpecularPower, 0.001f, 2.0f);
-					SliderFloat3("Attenuation", &pointLight.Attenuation.x, 0.001f, 20.0f);
+					DragFloat3("Position##point", &pointLight.Position.x, 0.5f, -50.0f, 50.0f);
+					ColorEdit3("Color##IP", &pointLight.Intensity.Specular.x);
+					SliderFloat("Diffusion", &pointLight.SpecularPower, 0.001f, 2.0f);
 					SliderFloat("Range", &pointLight.Range, 0.001f, 50.0f);
+
 					TreePop();
 				}
 				EndTabItem();
 			}
 			#pragma endregion
-
 
 			#pragma region Cameras
 			if (BeginTabItem("Cameras"))
@@ -1070,7 +1010,6 @@ void Application::Draw()
 					m_FpsCam->enabled = false;
 					m_TopDownCam->enabled = false;
 
-
 					SameLine(); Checkbox("Show Options##Static", &frontCamOpt);
 					if (frontCamOpt)
 					{
@@ -1082,7 +1021,6 @@ void Application::Draw()
 							m_FrontCam->SetPosition(Vector3(0.0f, 2.0f, -17.0f));
 						else
 							m_FrontCam->SetPosition(pos);
-
 
 						DragFloat3("Look At##Static", &look.x); SameLine();
 						if (Button("Reset##SLook"))
@@ -1110,7 +1048,6 @@ void Application::Draw()
 							m_TopDownCam->SetPosition(Vector3(0.0f, 17.0f, 1.0f));
 						else
 							m_TopDownCam->SetPosition(pos);
-
 
 						DragFloat3("Look At##Static", &look.x); SameLine();
 						if (Button("Reset##SLook"))
@@ -1155,14 +1092,12 @@ void Application::Draw()
 					if (fpsCamOpt)
 					{
 						Text("W/S to move\nArrow keys to rotate");
-
 					}
 				}
 
 				EndTabItem();
 			}
 			#pragma endregion
-
 
 			#pragma region Scenes
 			if (BeginTabItem("Scenes"))
@@ -1197,7 +1132,6 @@ void Application::Draw()
 				}
 				EndTabItem();
 				#pragma endregion
-
 			}
 
 			EndTabBar();
@@ -1210,12 +1144,9 @@ void Application::Draw()
 	}
 	#pragma endregion
 
-
-
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);
 }
-
 
 void Application::Cleanup()
 {

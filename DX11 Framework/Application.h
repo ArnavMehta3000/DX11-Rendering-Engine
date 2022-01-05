@@ -91,7 +91,7 @@ private:
 	UINT _WindowHeight;
 	UINT _WindowWidth;
 
-	float ClearColor[4] = { 0.0f, 0.35f, 0.7f, 1.0f };
+	float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	float blendfactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	
 	bool isWireFrame = false;
@@ -105,7 +105,7 @@ private:
 	bool showScene3 = false; // Terrain scene
 
 	// Plane vertex shader controls
-	float time = 0.0f, rate = 10.0f, amp = 0.6f, freq = 6.0f, threshold = -1.0f;
+	float time = 0.0f, rate = 10.0f, amp = 0.6f, freq = 1.0f, threshold = -5.0f;
 
 public:
 	Application();
