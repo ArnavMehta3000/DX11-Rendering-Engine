@@ -41,27 +41,14 @@ void OrbitCamera::Update()
 	float changeSpeed = 0.01f;
 	float x = m_At.x + (m_Radius * sin(angleInRad));
 	float z = m_At.z + (m_Radius * cos(angleInRad));
-	Vector3 vec;
-
-	if (GetAsyncKeyState(0x57))  // W Key
-		m_Radius -= changeSpeed;
-	if (GetAsyncKeyState(0x53))  // S Key
-		m_Radius += changeSpeed;
-
+	
 	if (GetAsyncKeyState(0x51))  // Q Key
 		m_Position.y += changeSpeed;
 	if (GetAsyncKeyState(0x45))  // E Key
-		m_Position.y -= changeSpeed;
+		m_Position.y -= changeSpeed;	
 
-	if (GetAsyncKeyState(0xBB))  // + Key
-		m_OrbitSpeed += changeSpeed / 1000;
-
-	if (GetAsyncKeyState(0xBD))  // - Key
-		m_OrbitSpeed -= changeSpeed / 1000;
-	
-
-	vec = Vector3(x, m_Position.y, z);
-	SetPosition(vec);
+	Vector3 pos = Vector3(x, m_Position.y, z);
+	SetPosition(pos);
 	
 
 	SetLens();

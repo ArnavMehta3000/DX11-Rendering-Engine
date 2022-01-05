@@ -48,6 +48,58 @@ Application::~Application()
 	Cleanup();
 }
 
+void Application::Cleanup()
+{
+	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
+
+	if (_wireFrame)
+		_wireFrame->Release();
+
+	if (_solidCullBack)
+		_solidCullBack->Release();
+
+	if (_solidCullFront)
+		_solidCullFront->Release();
+
+	if (_transparency)
+		_transparency->Release();
+
+	if (m_ConstantBuffer)
+		m_ConstantBuffer->Release();
+
+	if (_depthStencilView)
+		_depthStencilView->Release();
+
+	if (_depthStencilBuffer)
+		_depthStencilBuffer->Release();
+
+	if (_pVertexLayout)
+		_pVertexLayout->Release();
+
+	if (_pPlaneVertexShader)
+		_pPlaneVertexShader->Release();
+
+	if (_pVertexShader)
+		_pVertexShader->Release();
+
+	if (_pPixelShader)
+		_pPixelShader->Release();
+
+	if (_pSkyPixelShader)
+		_pSkyPixelShader->Release();
+
+	if (_pRenderTargetView)
+		_pRenderTargetView->Release();
+
+	if (_pSwapChain)
+		_pSwapChain->Release();
+
+	if (m_ImmediateContext)
+		m_ImmediateContext->Release();
+
+	if (_pd3dDevice)
+		_pd3dDevice->Release();
+}
 
 #pragma region Base Init Chain
 HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
@@ -983,6 +1035,7 @@ void Application::Draw()
 
 				NewLine();
 
+				#pragma region Point Light
 				if (TreeNode("Point Light"))
 				{
 					Text("Position");
@@ -994,6 +1047,8 @@ void Application::Draw()
 
 					TreePop();
 				}
+				#pragma endregion
+
 				EndTabItem();
 			}
 			#pragma endregion
@@ -1090,9 +1145,7 @@ void Application::Draw()
 					SameLine();
 					Checkbox("Show Options##FPS", &fpsCamOpt);
 					if (fpsCamOpt)
-					{
-						Text("W/S to move\nArrow keys to rotate");
-					}
+						Text("W/S to move\nArrow keys to rotate\nPg Up/Down to move camera up or down");
 				}
 
 				EndTabItem();
@@ -1146,57 +1199,4 @@ void Application::Draw()
 
 	// Present our back buffer to our front buffer
 	_pSwapChain->Present(0, 0);
-}
-
-void Application::Cleanup()
-{
-	if (m_ImmediateContext)  m_ImmediateContext->ClearState();
-
-	if (_wireFrame)
-		_wireFrame->Release();
-
-	if (_solidCullBack)
-		_solidCullBack->Release();
-
-	if (_solidCullFront)
-		_solidCullFront->Release();
-
-	if (_transparency)
-		_transparency->Release();
-
-	if (m_ConstantBuffer)
-		m_ConstantBuffer->Release();
-
-	if (_depthStencilView)
-		_depthStencilView->Release();
-
-	if (_depthStencilBuffer)
-		_depthStencilBuffer->Release();
-
-	if (_pVertexLayout)
-		_pVertexLayout->Release();
-
-	if (_pPlaneVertexShader)
-		_pPlaneVertexShader->Release();
-
-	if (_pVertexShader)
-		_pVertexShader->Release();
-
-	if (_pPixelShader)
-		_pPixelShader->Release();
-
-	if (_pSkyPixelShader)
-		_pSkyPixelShader->Release();
-
-	if (_pRenderTargetView)
-		_pRenderTargetView->Release();
-
-	if (_pSwapChain)
-		_pSwapChain->Release();
-
-	if (m_ImmediateContext)
-		m_ImmediateContext->Release();
-
-	if (_pd3dDevice)
-		_pd3dDevice->Release();
 }

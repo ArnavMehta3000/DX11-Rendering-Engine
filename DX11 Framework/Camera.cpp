@@ -71,7 +71,6 @@ void Camera::SetLens()
 	XMVECTOR Up = XMVectorSet(m_Up.x, m_Up.y, m_Up.z, 0.0f);
 
 	// Build a view matrix using left hand coord system
-	// TODO: LOOK AT
 	XMStoreFloat4x4(&m_View, XMMatrixLookAtLH(Eye, At, Up));
 
 	XMStoreFloat4x4(&m_Proj, XMMatrixPerspectiveFovLH(XM_PIDIV2, m_WindowWidth / (FLOAT)m_WindowHeight, m_NearZ, m_FarZ));
