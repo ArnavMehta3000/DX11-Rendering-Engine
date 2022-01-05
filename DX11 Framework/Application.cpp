@@ -1049,6 +1049,7 @@ void Application::Draw()
 					NewLine();
 
 					SliderFloat("Specular Power", &pointLight.SpecularPower, 0.001f, 2.0f);
+					SliderFloat3("Attenuation", &pointLight.Attenuation.x, 0.001f, 20.0f);
 					SliderFloat("Range", &pointLight.Range, 0.001f, 50.0f);
 					TreePop();
 				}
