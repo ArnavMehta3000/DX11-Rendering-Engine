@@ -190,7 +190,6 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 
     //discard;
 	
-    float3 addedLights = float3(min(directionalLights.rgb + pointLights.rgb, 1));
     psOutput.rgb = (directionalLights.rgb + pointLights.rgb) * textureColor.rgb;
     psOutput.a = dirLight.Material.Diffuse.a;
 	
