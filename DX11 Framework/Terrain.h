@@ -39,6 +39,7 @@ public:
 	XMFLOAT4X4 GetWorldMat() { return m_WorldMat; }
 	void LoadHeightMap(const char* file, HMapInfo initData);
 	TerrainBuffers GetBuffers();
+	void UpdateTerrain(HMapInfo newHmInfo);
 
 private:
 	void CreateVertexBuffer();
@@ -52,6 +53,7 @@ private:
 	ID3D11Buffer*      m_IndexBuffer;
 	int                m_IndexCount;
 
+	const char* m_file;
 	bool initialized = false;
 };
 #endif // !TERRAIN_H

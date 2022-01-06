@@ -45,9 +45,16 @@ public:
     XMFLOAT3 LightVecW;
     float Rate;
 
+    // Plane VS
     float Amplitude;
     float Frequency;
     float Threshold;
     float padding;
+
+    // Terrain PS
+    float WaterLevel;
+    float GrassLevel;
+    float StoneLevel;
+    float SnowLevel;
 };
 #endif // !CORE_H

@@ -55,6 +55,7 @@ private:
 	ID3D11VertexShader*		  _pPlaneVertexShader;
 	ID3D11PixelShader*        _pPixelShader;
 	ID3D11PixelShader*        _pSkyPixelShader;
+	ID3D11PixelShader*        _pTerrainPixelShader;
 	ID3D11InputLayout*        _pVertexLayout;
 
 	ID3D11Buffer*             m_ConstantBuffer;
@@ -106,6 +107,11 @@ private:
 
 	// Plane vertex shader controls
 	float time = 0.0f, rate = 10.0f, amp = 0.6f, freq = 1.0f, threshold = -5.0f;
+	// Terrain controls
+	float terrainHeight = 100.0f;
+
+	// Terrain pixel shader controls
+	float waterLevel = 20.0f, grassLevel = 50.0f, stoneLevel = 85.0f, snowLevel = 100.0f;
 
 public:
 	Application();

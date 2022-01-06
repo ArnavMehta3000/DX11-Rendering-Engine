@@ -20,16 +20,19 @@ public:
 	void Update() override;
 	void SetLens() override;
 
+	void SetMoveSpeed(float mSpeed);
 	void SetSpeed(float speed);
 	void SetRadius(float rad);
 	void SetOrbitMode(OrbitMode mode);
 
+	inline float GetMoveSpeed() { return m_MoveSpeed; }
 	inline float GetSpeed() { return m_OrbitSpeed; }
 	inline float GetRadius() { return m_Radius; }
 
 private:
 	OrbitMode m_OrbitMode;
 
+	float m_MoveSpeed;
 	float m_Radius;
 	float m_OrbitSpeed;
 	float m_Angle;

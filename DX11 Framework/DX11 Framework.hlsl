@@ -61,6 +61,11 @@ cbuffer ConstantBuffer : register(b0)
     float Frequency;
     float Threshold;
     float padding;
+
+    float WaterLevel;
+    float GrassLevel;
+    float StoneLevel;
+    float SnowLevel;
 }
 
 
@@ -161,8 +166,8 @@ VS_OUTPUT VS(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOOR
 
 	output.NormalW = mul(Normal, World);
 	
-    output.Tex = Tex;	
-	
+    output.Tex = Tex;
+
 	return output;
 }
 
@@ -188,8 +193,7 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 	// Texturing
     float4 textureColor = diffuseTex.Sample(samLinear, vsInput.Tex);
 
-    //discard;
-	
+
     psOutput.rgb = (directionalLights.rgb + pointLights.rgb) * textureColor.rgb;
     psOutput.a = dirLight.Material.Diffuse.a;
 	
@@ -200,7 +204,31 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 float4 PS_SKY(VS_OUTPUT vsInput) : SV_TARGET
 {
     float4 output = skybox.Sample(samLinear, 1.0f - vsInput.Tex);
-    return output ;
+    return output;
+}
+
+float4 PS_TERRAIN(VS_OUTPUT vsInput) : SV_TARGET
+{
+    float pos = vsInput.PosW.y;
+    float4 col;
+
+    if (pos < WaterLevel)
+        col.rgba =  float4(0.0f, 0.0f, 1.0f, 1.0f);  // Blue
+
+    else if (pos >= WaterLevel && pos < GrassLevel)
+        col.rgba = float4(0.0f, 1.0f, 0.0f, 1.0f); // Green
+
+    else if (pos >= GrassLevel && pos < StoneLevel)
+        col.rgba = float4(0.3f, 0.3f, 0.3f, 1.0f); // Grey
+
+    else if (pos >= StoneLevel && pos <= SnowLevel)
+        col.rgba = float4(1.0f, 1.0f, 1.0f, 1.0f); // White
+
+    else
+        col.rgba = float4(1.0f, 0.0f, 1.0f, 1.0f); // Pink
+
+
+    return col;
 }
 
 VS_OUTPUT VS_PLANE(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOORD0)

@@ -87,6 +87,9 @@ void Application::Cleanup()
 
 	if (_pSkyPixelShader)
 		_pSkyPixelShader->Release();
+	
+	if (_pTerrainPixelShader)
+		_pTerrainPixelShader->Release();
 
 	if (_pRenderTargetView)
 		_pRenderTargetView->Release();
@@ -214,6 +217,24 @@ HRESULT Application::InitShadersAndInputLayout()
 	hr = _pd3dDevice->CreatePixelShader(pSkyPSBlob->GetBufferPointer(), pSkyPSBlob->GetBufferSize(), nullptr, &_pSkyPixelShader);
 	if (FAILED(hr))
 		return hr;
+
+
+	// COmpile the terrain pixel shader
+	ID3DBlob* pTerrainBlob = nullptr;
+	hr = CompileShaderFromFile(L"DX11 Framework.hlsl", "PS_TERRAIN", "ps_4_0", &pTerrainBlob);
+	if (FAILED(hr))
+	{
+		pSkyPSBlob->Release();
+		MessageBox(nullptr,
+				   L"Terrain Pixel Shader failed to compile.", L"Pixel Shader Error", MB_OK);
+		return hr;
+	}
+
+	//Create the terrain pixel shader
+	hr = _pd3dDevice->CreatePixelShader(pTerrainBlob->GetBufferPointer(), pTerrainBlob->GetBufferSize(), nullptr, &_pTerrainPixelShader);
+	if (FAILED(hr))
+		return hr;
+
 
 	// Define the input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -883,9 +904,16 @@ void Application::Draw()
 	cb.Frequency = freq;
 	cb.Threshold = threshold;
 
+	// Terrain ps
+	cb.WaterLevel = waterLevel;
+	cb.GrassLevel = grassLevel;
+	cb.StoneLevel = stoneLevel;
+	cb.SnowLevel  = snowLevel;
+
 	// Lights
 	cb.dirLight = directionalLight;
 	cb.pointLight = pointLight;
+
 	cb.LightVecW = directionalLight.Direction;
 	cb.pointLight = pointLight;
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
@@ -941,6 +969,7 @@ void Application::Draw()
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed(3 * 6, 0, 0);
 
+
 		// Cube
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &_pCubeVertexBuffer, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(_pCubeIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
@@ -948,6 +977,7 @@ void Application::Draw()
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed((3 * 2 * 6), 0, 0);
+
 
 		// Plane
 		m_ImmediateContext->VSSetShader(_pPlaneVertexShader, nullptr, 0);  // Set shader
@@ -967,14 +997,18 @@ void Application::Draw()
 	{
 		ID3D11Buffer* vb = m_Terrain->GetBuffers().VertexBuffer;
 		ID3D11Buffer* ib = m_Terrain->GetBuffers().IndexBuffer;
+
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
 		m_ImmediateContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
+		m_ImmediateContext->PSSetShader(_pTerrainPixelShader, nullptr, 0);
 		meshWorld = XMLoadFloat4x4(&m_Terrain->GetWorldMat());
 		cb.mWorld = XMMatrixTranspose(meshWorld);
 
 		m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 		m_ImmediateContext->DrawIndexed(m_Terrain->GetBuffers().IndexCount, 0, 0);
+
+		m_ImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	}
 	#pragma endregion
 
@@ -1040,10 +1074,10 @@ void Application::Draw()
 				{
 					Text("Position");
 
-					DragFloat3("Position##point", &pointLight.Position.x, 0.5f, -50.0f, 50.0f);
+					DragFloat3("Position##point", &pointLight.Position.x, 0.5f, -1000.0f, 1000.0f);
 					ColorEdit3("Color##IP", &pointLight.Intensity.Specular.x);
 					SliderFloat("Diffusion", &pointLight.SpecularPower, 0.001f, 2.0f);
-					SliderFloat("Range", &pointLight.Range, 0.001f, 50.0f);
+					SliderFloat("Range", &pointLight.Range, 0.001f, 1000.0f);
 
 					TreePop();
 				}
@@ -1126,12 +1160,16 @@ void Application::Draw()
 
 						float radius = m_OrbitCam->GetRadius();
 						float speed = m_OrbitCam->GetSpeed();
+						float mSpeed = m_OrbitCam->GetMoveSpeed();
 
-						DragFloat("Radius##Orbit", &radius, 0.5f, 1.0f, 100.0f);
-						SliderFloat("Speed##Orbit", &speed, -0.1f, 0.1f);
+						if (DragFloat("Move Speed", &mSpeed, 0.001f, 0.005f, 1.0f))
+							m_OrbitCam->SetMoveSpeed(mSpeed);
 
-						m_OrbitCam->SetRadius(radius);
-						m_OrbitCam->SetSpeed(speed);
+						if (DragFloat("Radius##Orbit", &radius, 0.5f, 1.0f, 250.0f))
+							m_OrbitCam->SetRadius(radius);
+
+						if (SliderFloat("Speed##Orbit", &speed, -0.1f, 0.1f))
+							m_OrbitCam->SetSpeed(speed);
 					}
 				}
 
@@ -1171,6 +1209,8 @@ void Application::Draw()
 
 				if (showScene2)
 				{
+					NewLine();
+
 					DragFloat("Rate", &rate, 0.1f, 0.0f, 20.0f);
 					DragFloat("Amplitude", &amp, 0.1f, 0.0f, 20.0f);
 					DragFloat("Frequency", &freq, 0.1f, 0.0f, 50.0f);
@@ -1182,6 +1222,22 @@ void Application::Draw()
 					showScene1 = false;
 					showScene2 = false;
 					showScene3 = true;
+				}
+
+				if (showScene3)
+				{
+					NewLine();
+
+					DragFloat("Water Level", &waterLevel, 1.0f, 0.0f,		terrainHeight, "%.3f", ImGuiSliderFlags_NoInput);
+					DragFloat("Grass Level", &grassLevel, 1.0f, waterLevel, terrainHeight, "%.3f", ImGuiSliderFlags_NoInput);
+					DragFloat("Stone Level", &stoneLevel, 1.0f, grassLevel, terrainHeight, "%.3f", ImGuiSliderFlags_NoInput);
+					DragFloat("Snow Level",  &snowLevel,  1.0f, stoneLevel, terrainHeight, "%.3f", ImGuiSliderFlags_NoInput);
+
+					NewLine();
+					DragFloat("Height", &terrainHeight, 1.0f, 0.0f, 500.0f);
+					
+					if (Button("Generate"))
+						m_Terrain->UpdateTerrain(HMapInfo(513, 513, terrainHeight));
 				}
 				EndTabItem();
 				#pragma endregion

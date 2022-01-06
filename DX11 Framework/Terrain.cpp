@@ -1,7 +1,7 @@
 #include "Terrain.h"
 
 Terrain::Terrain(const char* file, HMapInfo initData, ID3D11Device* device)
-	: m_InitData(initData), m_Device(device)
+	: m_InitData(initData), m_Device(device), m_file(file)
 {
 	XMMATRIX position = XMMatrixTranslationFromVector(Vector3::V3ToXMVECTOR(Vector3()));
 	XMMATRIX scaling = XMMatrixScalingFromVector(Vector3::V3ToXMVECTOR(Vector3(1.0f, 1.0f, 1.0f)));
@@ -23,6 +23,7 @@ Terrain::~Terrain()
 
 void Terrain::LoadHeightMap(const char* file, HMapInfo initData)
 {
+	m_HeightMap.clear();
 	std::vector<unsigned char> input(initData.Width * initData.Height);
 	m_HeightMap = std::vector<float>((m_InitData.Width + 1) * (m_InitData.Height + 1));
 
@@ -41,61 +42,47 @@ void Terrain::LoadHeightMap(const char* file, HMapInfo initData)
 
 void Terrain::CreateVertexBuffer()
 {
-	/*const unsigned int xSize = m_InitData.Width, zSize = m_InitData.Height;
-	std::vector<SimpleVertex> terrainVertices((xSize) * (zSize));
-
-	float offsetX = (xSize) / 2.0f;
-	float offsetZ = (zSize) / 2.0f;
-
-	
-	for (int i = 0, z = 0; z < zSize; z++)
-		for (int x = 0; x < xSize; x++)
-		{
-			terrainVertices[i] = { XMFLOAT3(x - offsetX, m_HeightMap[i], z - offsetZ),
-								   XMFLOAT3(0.0f, 1.0f, 0.0f),
-								   XMFLOAT2(x - offsetX / xSize, z - offsetZ / zSize) };
-			i++;
-		}*/
-
-
-	int m = m_InitData.Width, n = m_InitData.Height;
-	UINT vertexCount = m * n;
-	UINT faceCount = (m - 1) * (n - 1) * 2;
+	int xSize = m_InitData.Width, zSize = m_InitData.Height;
+	UINT vertexCount = xSize * zSize;
+	UINT faceCount = (xSize - 1) * (zSize - 1) * 2;
 
 	float halfWidth = 0.5f * m_InitData.Width;
 	float halfDepth = 0.5f * m_InitData.Height;
-	float dx = m_InitData.Width / (n - 1);
-	float dz = m_InitData.Height / (m - 1);
-	float du = 1.0f / (n - 1);
-	float dv = 1.0f / (m - 1);
+
+	// Distance beteween vertex points
+	float dx = m_InitData.Width / (zSize - 1);
+	float dz = m_InitData.Height / (xSize - 1);
+
+	// UV Maps
+	float du = 1.0f / (zSize - 1);
+	float dv = 1.0f / (xSize - 1);
 
 	std::vector<SimpleVertex> terrainVertices(vertexCount);
 
-	int t = 0;
-	for (UINT i = 0; i < m; i++)
+	int vertex = 0;
+	for (UINT row = 0; row < xSize; row++)
 	{
-		float z = halfDepth - i * dz;
-		for (UINT j = 0; j < n; j++)
+		float z = halfDepth - row * dz;
+		for (UINT col = 0; col < zSize; col++)
 		{
-			float x = -halfWidth + j * dx;
+			float x = -halfWidth + col * dx;
 			
-			terrainVertices[i * n + j] = { XMFLOAT3(x, m_HeightMap[t], z),
-											XMFLOAT3(0.0f, 1.0f, 0.0f),
-											XMFLOAT2(j * du, i * dv) };
-			t++;
+			terrainVertices[row * zSize + col] = { XMFLOAT3(x, m_HeightMap[vertex], z),  // Position
+												   XMFLOAT3(0.0f, 1.0f, 0.0f),			 // Normals
+												   XMFLOAT2(col * du, row * dv) };		 // UV's
+			vertex++;
 		}
-		//t++;
 	}
 
 
 
 	#pragma region Create Vertex Buffer
 	HRESULT hr;
-// Set buffer description
+	// Set buffer description
 	D3D11_BUFFER_DESC vBd;
 	ZeroMemory(&vBd, sizeof(vBd));
 	vBd.Usage = D3D11_USAGE_DEFAULT;
-	vBd.ByteWidth = sizeof(SimpleVertex) * (m* n);
+	vBd.ByteWidth = sizeof(SimpleVertex) * (xSize* zSize);
 	vBd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vBd.CPUAccessFlags = 0;
 
@@ -109,22 +96,21 @@ void Terrain::CreateVertexBuffer()
 
 void Terrain::CreateIndexBuffer()
 {
-	int m = m_InitData.Width, n = m_InitData.Height;
-	UINT vertexCount = m * n;
-	UINT faceCount = (m - 1) * (n - 1) * 2;
+	int xSize = m_InitData.Width, zSize = m_InitData.Height;
+	UINT faceCount = (xSize - 1) * (zSize - 1) * 2;
 	std::vector<UINT> terrainIndices(faceCount * 3);
 
 	UINT tris = 0;
-	for (UINT i = 0; i < m - 1; ++i)
+	for (UINT row = 0; row < xSize - 1; ++row)
 	{
-		for (UINT j = 0; j < n - 1; ++j)
+		for (UINT col = 0; col < zSize - 1; ++col)
 		{
-			terrainIndices[tris] = i * n + j;
-			terrainIndices[tris + 1] = i * n + j + 1;
-			terrainIndices[tris + 2] = (i + 1) * n + j;
-			terrainIndices[tris + 3] = (i + 1) * n + j;
-			terrainIndices[tris + 4] = i * n + j + 1;
-			terrainIndices[tris + 5] = (i + 1) * n + j + 1;
+			terrainIndices[tris]     = row * zSize + col;
+			terrainIndices[tris + 1] = row * zSize + col + 1;
+			terrainIndices[tris + 2] = (row + 1) * zSize + col;
+			terrainIndices[tris + 3] = (row + 1) * zSize + col;
+			terrainIndices[tris + 4] = row * zSize + col + 1;
+			terrainIndices[tris + 5] = (row + 1) * zSize + col + 1;
 			tris += 6; // next quad
 		}
 	}
@@ -158,4 +144,13 @@ TerrainBuffers Terrain::GetBuffers()
 	if (!initialized) return TerrainBuffers();
 
 	return TerrainBuffers(m_VertexBuffer, m_IndexBuffer, (m_InitData.Width-1) * (m_InitData.Height-1) * 6);
+}
+
+void Terrain::UpdateTerrain(HMapInfo newHmInfo)
+{
+	m_InitData = newHmInfo;
+
+	LoadHeightMap(m_file, m_InitData);
+	CreateVertexBuffer();
+	CreateIndexBuffer();
 }

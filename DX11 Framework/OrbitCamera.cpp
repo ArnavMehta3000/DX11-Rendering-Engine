@@ -8,6 +8,8 @@ OrbitCamera::OrbitCamera(CameraInitData cam, OrbitMode mode, Vector3 orbitPoint,
 	m_Radius = radius;
 	m_At = orbitPoint;
 	m_Angle = 0;
+
+	m_MoveSpeed = 0.01f;
 }
 
 OrbitCamera::~OrbitCamera() {}
@@ -38,14 +40,14 @@ void OrbitCamera::Update()
 
 	float angleInRad = m_Angle * (XM_PI / 180);
 
-	float changeSpeed = 0.01f;
+	
 	float x = m_At.x + (m_Radius * sin(angleInRad));
 	float z = m_At.z + (m_Radius * cos(angleInRad));
 	
 	if (GetAsyncKeyState(0x51))  // Q Key
-		m_Position.y += changeSpeed;
+		m_Position.y += m_MoveSpeed;
 	if (GetAsyncKeyState(0x45))  // E Key
-		m_Position.y -= changeSpeed;	
+		m_Position.y -= m_MoveSpeed;	
 
 	Vector3 pos = Vector3(x, m_Position.y, z);
 	SetPosition(pos);
@@ -58,6 +60,8 @@ void OrbitCamera::SetLens()
 {
 	Camera::SetLens();
 }
+
+void OrbitCamera::SetMoveSpeed(float mSpeed) { m_MoveSpeed = mSpeed; }
 
 void OrbitCamera::SetSpeed(float speed) { m_OrbitSpeed = speed; }
 
