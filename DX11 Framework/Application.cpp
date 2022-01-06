@@ -312,7 +312,7 @@ HRESULT Application::InitVertexBuffer()
 		{
 			for (int x = 0; x <= xSize; x++)
 			{
-				planeVertices[i] = { XMFLOAT3(x - offsetX, 0.0f, z - offsetZ), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(x - offsetX / xSize, z - offsetZ / zSize) };
+				planeVertices[i] = { XMFLOAT3(x - offsetX, 0.0f, z - offsetZ), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(x - offsetX / xSize, z - offsetZ / zSize)};
 				i++;
 			}
 		}
@@ -777,7 +777,7 @@ void Application::InitModels()
 	// Init skybox
 	m_SkySphere = new SkySphere("SkySphereInitData.json", m_ImmediateContext, m_ConstantBuffer, _pd3dDevice);
 
-	HMapInfo hm(513, 513, 20.0f);
+	HMapInfo hm(513, 513, 100.0f);
 	m_Terrain = new Terrain("Assets/Terrain/HM 513.raw", hm, _pd3dDevice);
 }
 #pragma endregion
@@ -968,7 +968,7 @@ void Application::Draw()
 		ID3D11Buffer* vb = m_Terrain->GetBuffers().VertexBuffer;
 		ID3D11Buffer* ib = m_Terrain->GetBuffers().IndexBuffer;
 		m_ImmediateContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-		m_ImmediateContext->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0);
+		m_ImmediateContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
 		meshWorld = XMLoadFloat4x4(&m_Terrain->GetWorldMat());
 		cb.mWorld = XMMatrixTranspose(meshWorld);
