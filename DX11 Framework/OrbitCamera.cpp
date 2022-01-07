@@ -9,7 +9,7 @@ OrbitCamera::OrbitCamera(CameraInitData cam, OrbitMode mode, Vector3 orbitPoint,
 	m_At = orbitPoint;
 	m_Angle = 0;
 
-	m_MoveSpeed = 0.01f;
+	m_MoveSpeed = 0.5f;
 }
 
 OrbitCamera::~OrbitCamera() {}

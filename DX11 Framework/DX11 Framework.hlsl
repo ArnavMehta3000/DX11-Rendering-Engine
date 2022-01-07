@@ -213,10 +213,10 @@ float4 PS_TERRAIN(VS_OUTPUT vsInput) : SV_TARGET
     float4 col;
 
     if (pos < WaterLevel)
-        col.rgba =  float4(0.0f, 0.0f, 1.0f, 1.0f);  // Blue
+        col.rgba =  float4(0.0f, 0.623f, 1.0f, 1.0f);  // Blue
 
     else if (pos >= WaterLevel && pos < GrassLevel)
-        col.rgba = float4(0.0f, 1.0f, 0.0f, 1.0f); // Green
+        col.rgba = float4(0.0784f, 0.3137f, 0.0784f, 1.0f); // Green
 
     else if (pos >= GrassLevel && pos < StoneLevel)
         col.rgba = float4(0.3f, 0.3f, 0.3f, 1.0f); // Grey

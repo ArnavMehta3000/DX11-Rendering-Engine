@@ -44,14 +44,13 @@ void Terrain::CreateVertexBuffer()
 {
 	int xSize = m_InitData.Width, zSize = m_InitData.Height;
 	UINT vertexCount = xSize * zSize;
-	UINT faceCount = (xSize - 1) * (zSize - 1) * 2;
 
 	float halfWidth = 0.5f * m_InitData.Width;
 	float halfDepth = 0.5f * m_InitData.Height;
 
 	// Distance beteween vertex points
-	float dx = m_InitData.Width / (zSize - 1);
-	float dz = m_InitData.Height / (xSize - 1);
+	float dx = xSize / (zSize - 1);
+	float dz = zSize / (xSize - 1);
 
 	// UV Maps
 	float du = 1.0f / (zSize - 1);

@@ -732,9 +732,11 @@ void Application::InitCamera()
 	m_TopDownCam = new Camera(cameraInitData);
 
 	m_FpsCam = new FirstPersonCamera(cameraInitData, Vector3(0.0f, 0.0f, 1.0f));
+
+	cameraInitData.position = Vector3(0.0f, 20.0f, 1.0f);
 	m_OrbitCam = new OrbitCamera(cameraInitData, OrbitMode::Counter_Clockwise, cameraInitData.at, 5);
 
-	// Default camerais static camera
+	// Default camera is static camera
 	m_CurrentCamera.View = m_FrontCam->GetView();
 	m_CurrentCamera.Projection = m_FrontCam->GetProj();
 }
@@ -742,26 +744,26 @@ void Application::InitCamera()
 void Application::InitLights()
 {
 	// Directional light
-	directionalLight.Intensity.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Ambient  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Intensity.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	directionalLight.Material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	directionalLight.Material.specular = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
-	directionalLight.Direction = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	directionalLight.SpecularPower = 0.8f;
+	directionalLight.Material.ambient   = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight.Material.diffuse   = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	directionalLight.Material.specular  = XMFLOAT4(0.25f, 0.25f, 0.25f, 1.0f);
+	directionalLight.Direction          = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight.SpecularPower      = 0.8f;
 
 	//Point lights
-	pointLight.Intensity.Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Intensity.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Intensity.Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	pointLight.Material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Material.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pointLight.Position = XMFLOAT3(0.0f, 3.0f, 0.0f);
-	pointLight.Attenuation = XMFLOAT3(5.0f, 5.0f, 5.0f);
-	pointLight.Range = 10.0f;
-	pointLight.SpecularPower = 0.8f;
+	pointLight.Intensity.Ambient        = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Diffuse        = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Intensity.Specular       = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.ambient         = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	pointLight.Material.diffuse         = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Material.specular        = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	pointLight.Position                 = XMFLOAT3(0.0f, 3.0f, 0.0f);
+	pointLight.Attenuation              = XMFLOAT3(5.0f, 5.0f, 5.0f);
+	pointLight.Range                    = 10.0f;
+	pointLight.SpecularPower            = 0.8f;
 }
 
 void Application::InitTextures()
@@ -774,6 +776,7 @@ void Application::InitTextures()
 	{
 		return;
 	}
+
 	// Define and create sampler state
 	D3D11_SAMPLER_DESC samplerDesc;
 	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
@@ -917,7 +920,7 @@ void Application::Draw()
 	cb.LightVecW = directionalLight.Direction;
 	cb.pointLight = pointLight;
 	cb.EyePosW = XMFLOAT3(eye._41, eye._42, eye._43);
-	// https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
+	// Reference https://stackoverflow.com/questions/39280104/how-to-get-current-camera-position-from-view-matrix
 
 	m_ImmediateContext->UpdateSubresource(m_ConstantBuffer, 0, nullptr, &cb, 0, 0);
 
@@ -1024,6 +1027,7 @@ void Application::Draw()
 			Begin("Debug Menu", 0, ImGuiWindowFlags_AlwaysAutoResize);
 
 			BeginTabBar("Settings");
+
 			#pragma region World Settings
 			if (BeginTabItem("World"))
 			{
