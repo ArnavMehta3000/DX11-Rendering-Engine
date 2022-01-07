@@ -1059,7 +1059,6 @@ void Application::Draw()
 				#pragma region Directional Light
 				if (TreeNode("Directional Light"))
 				{
-					Text("Direction");
 					SliderFloat3("Direction", &directionalLight.Direction.x, -1.0f, 1.0f);
 
 					ColorEdit3("Diffuse##I", &directionalLight.Intensity.Diffuse.x);
@@ -1076,8 +1075,6 @@ void Application::Draw()
 				#pragma region Point Light
 				if (TreeNode("Point Light"))
 				{
-					Text("Position");
-
 					DragFloat3("Position##point", &pointLight.Position.x, 0.5f, -1000.0f, 1000.0f);
 					ColorEdit3("Color##IP", &pointLight.Intensity.Specular.x);
 					SliderFloat("Diffusion", &pointLight.SpecularPower, 0.001f, 2.0f);
@@ -1187,7 +1184,7 @@ void Application::Draw()
 					SameLine();
 					Checkbox("Show Options##FPS", &fpsCamOpt);
 					if (fpsCamOpt)
-						Text("W/S to move\nArrow keys to rotate\nPg Up/Down to move camera up or down");
+						Text("W/S to move\nArrow keys to rotate\nPg Up/Down to move camera up or down\nTAB to flip camera");
 				}
 
 				EndTabItem();
