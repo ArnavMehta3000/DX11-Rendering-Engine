@@ -127,7 +127,6 @@ float4 PointLights(float3 worldPos, float3 inputNormal, float3 toEyeNormalized)
 // Compute  all the directional lights
 float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
 {
-
     float4 output = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 diffuse = float4(0.0f, 0.0f, 1.0f, 0.0f);
@@ -135,8 +134,7 @@ float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
 
 	// Calculate diffuse and ambient lighting
     float diffuseAmount = max(dot(LightVecW, normalW), 0.0f);
-    diffuse = diffuseAmount * (dirLight.Material.Diffuse * dirLight.Intensity.Diffuse);
-	
+    diffuse = diffuseAmount * (dirLight.Material.Diffuse * dirLight.Intensity.Diffuse);	
     ambient = (dirLight.Intensity.Ambient * dirLight.Material.Ambient);
  
 	// Compute the reflection vector
@@ -153,7 +151,7 @@ float4 DirectionalLights(float3 normalW, float3 toEyeNormalized)
 }
 
 
-// Vertex Shader
+// Default vertex Shader
 VS_OUTPUT VS(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOORD0)
 {
 	VS_OUTPUT output = (VS_OUTPUT) 0;
@@ -172,7 +170,7 @@ VS_OUTPUT VS(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOOR
 }
 
 
-// Pixel Shader
+// Default pixel Shader
 float4 PS(VS_OUTPUT vsInput) : SV_Target
 {
 	float4 psOutput = (0.0f, 0.0f, 0.0f, 1.0f);
@@ -183,8 +181,6 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
 	
 	// Convert normal from local space to world space
     float3 normalW = normalize(vsInput.NormalW);
-
-
 	
 	// Calculate lighting
     float4 pointLights = PointLights(vsInput.PosW,  (normalW, 0.0f), toEyeNormalized);
@@ -200,13 +196,14 @@ float4 PS(VS_OUTPUT vsInput) : SV_Target
     return psOutput;
 }
 
-// Pixel shader 
+// Sky Sphere pixel shader 
 float4 PS_SKY(VS_OUTPUT vsInput) : SV_TARGET
 {
     float4 output = skybox.Sample(samLinear, 1.0f - vsInput.Tex);
     return output;
 }
 
+// Terrain pixel shader
 float4 PS_TERRAIN(VS_OUTPUT vsInput) : SV_TARGET
 {
     float pos = vsInput.PosW.y;
@@ -231,16 +228,23 @@ float4 PS_TERRAIN(VS_OUTPUT vsInput) : SV_TARGET
     return col;
 }
 
+// Grid plane vertex shader
 VS_OUTPUT VS_PLANE(float4 Pos : POSITION, float3 Normal : NORMAL, float2 Tex : TEXCOORD0)
 {
+    // Create circular waves
     float dx = Pos.x;
     float dz = Pos.z;
     float freq = sqrt(dx * dx + dz * dz);
     float angle = -Time * Rate + freq * Frequency;
+   
+    // Change vertex height
     Pos.y += sin(angle) * Amplitude;
 
+    // Apply Y-Threshold
 	if (Pos.y <= Threshold)
         Pos.y = Threshold;
+    
+
 
     VS_OUTPUT output = (VS_OUTPUT) 0;
 	
