@@ -170,6 +170,9 @@
     <None Include="SkySphereInitData.json">
       <Filter>Init Files</Filter>
     </None>
+    <None Include="UML Class Diagram.cd">
+      <Filter>Init Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX11 Framework.rc">

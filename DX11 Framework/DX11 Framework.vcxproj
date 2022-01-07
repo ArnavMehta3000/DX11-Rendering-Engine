@@ -403,6 +403,7 @@
     </None>
     <None Include="HerculesInitData.json" />
     <None Include="SkySphereInitData.json" />
+    <None Include="UML Class Diagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
